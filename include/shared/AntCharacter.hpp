@@ -21,12 +21,23 @@ protected:
 	Trait trait;
 	Occupancy occupancy;
 public:
-	Attitude getAttitude();
-	Trait getTrait();
-	Occupancy getOccupancy();
-	void setAttitude(Attitude newAttitude);
-	void setTrait(Trait newTrait);
-	void setOccupancy(Occupancy newOccupancy);
+	AntCharacter() {}
+
+//	AntCharacter(AntCharacter &);
+
+	AntCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy);
+
+	Attitude getAttitude() const;
+
+	Trait getTrait() const;
+
+	Occupancy getOccupancy() const;
+
+	void setAttitude(Attitude);
+
+	void setTrait(Trait);
+
+	void setOccupancy(Occupancy);
 };
 
 #endif //SFTP_ANTCHARACTER_HPP

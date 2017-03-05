@@ -5,16 +5,20 @@
 #ifndef SFTP_ASCIIMAP_HPP
 #define SFTP_ASCIIMAP_HPP
 
+#include "map/Map.hpp"
 
+class AsciiMap {
+protected:
+	Map map;
+	const char charOccupancy[5] = {' ', '^', 'v', '>', '<'}; //Dead, North, South, East, West
+public:
+	AsciiMap(Map &);
 
+	Map getMap();
 
-class Tile {
+	void setMap(Map);
 
+	void displayAsciiMap();
 };
-
-class asciimap {
-
-};
-
 
 #endif //SFTP_ASCIIMAP_HPP

@@ -4,15 +4,27 @@
 
 #include "shared/AntCharacter.hpp"
 
-Attitude AntCharacter::getAttitude() {
+//AntCharacter::AntCharacter(AntCharacter &newAntCharacter) {
+//	attitude = newAntCharacter.getAttitude();
+//	trait = newAntCharacter.getTrait();
+//	occupancy = newAntCharacter.getOccupancy();
+//}
+
+AntCharacter::AntCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy) {
+	attitude = newAttitude;
+	trait = newTrait;
+	occupancy = newOccupancy;
+}
+
+Attitude AntCharacter::getAttitude() const {
 	return attitude;
 }
 
-Occupancy AntCharacter::getOccupancy() {
+Occupancy AntCharacter::getOccupancy() const {
 	return occupancy;
 }
 
-Trait AntCharacter::getTrait() {
+Trait AntCharacter::getTrait() const {
 	return trait;
 }
 

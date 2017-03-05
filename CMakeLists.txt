@@ -23,6 +23,7 @@ include_directories(
 add_library(shared
 		src/shared/logger.cpp
 		src/shared/Utils.cpp include/shared/Utils.hpp
+		src/shared/AntCharacter.cpp
 		)
 target_link_libraries(
 	shared
@@ -39,4 +40,32 @@ target_link_libraries(
 	shared
 	)
 
+###Map Module
+add_library(map
+		src/map/Coordinate.cpp
+		src/map/Tile.cpp
+		src/map/Energy.cpp
+		src/map/Map.cpp
+		)
+target_link_libraries(
+		map
+		shared
+)
+
 ###UI Module
+add_library(ui
+		src/ui/AsciiMap.cpp
+		)
+target_link_libraries(
+		ui
+		map
+)
+
+add_executable(
+		unit_test_asciimap
+		src/unit_test/ui/asciimap.cpp
+)
+target_link_libraries(
+		unit_test_asciimap
+		ui
+)

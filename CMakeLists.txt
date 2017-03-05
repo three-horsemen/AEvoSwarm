@@ -65,6 +65,37 @@ target_link_libraries(
 		brain
 )
 
+###Agent module
+add_library(agent
+		src/agent/Agent.cpp
+		)
+target_link_libraries(
+		agent
+		${Boost_LIBRARIES}
+		pthread
+		brain
+)
+
+###Ant module
+add_library(ant
+		src/agent/Ant.cpp
+		src/unit_test/agent/unit_test_ant_rules.cpp.cpp)
+target_link_libraries(
+		ant
+		${Boost_LIBRARIES}
+		pthread
+		agent
+)
+
+add_executable(
+		unit_test_ant_rules
+		src/unit_test/agent/unit_test_ant_rules.cpp
+)
+target_link_libraries(
+		unit_test_ant_rules
+		ant
+)
+
 ###Map Module
 add_library(map
 		src/map/Coordinate.cpp

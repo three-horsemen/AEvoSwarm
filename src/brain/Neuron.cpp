@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include "ant/Neuron.hpp"
+#include "brain/Neuron.hpp"
 
 Neuron::Neuron() {
 	weights = 0;

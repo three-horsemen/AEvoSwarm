@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include "ant/OutputLayer.hpp"
+#include "brain/OutputLayer.hpp"
 
 OutputLayer::OutputLayer(int size)
 		: Layer(OUTPUT, size, size) {

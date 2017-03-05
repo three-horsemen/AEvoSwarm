@@ -6,7 +6,7 @@
 #define SFTP_OUTPUTLAYER_HPP
 
 #include <iostream>
-#include <ant/Layer.hpp>
+#include <brain/Layer.hpp>
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include "ant/Layer.hpp"
+#include "brain/Layer.hpp"
 #include <shared/logger.hpp>
 
 Layer::Layer(LayerType type, int inputSize, int outputSize) {

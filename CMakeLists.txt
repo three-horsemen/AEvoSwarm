@@ -42,12 +42,12 @@ target_link_libraries(
 
 ###Brain module
 add_library(ant
-		src/ant/NeuralNetwork.cpp
-		src/ant/FullyConnectedLayer.cpp
-		src/ant/Neuron.cpp
-		include/ant/InputLayer.cpp
-		src/ant/OutputLayer.cpp
-		src/ant/Layer.cpp
+		src/brain/NeuralNetwork.cpp
+		src/brain/FullyConnectedLayer.cpp
+		src/brain/Neuron.cpp
+		include/brain/InputLayer.cpp
+		src/brain/OutputLayer.cpp
+		src/brain/Layer.cpp
 		)
 target_link_libraries(
 		ant
@@ -58,7 +58,7 @@ target_link_libraries(
 
 add_executable(
 		unit_test_neural_network
-		src/unit_test/ant/unit_test_neural_network.cpp
+		src/unit_test/brain/unit_test_neural_network.cpp
 )
 target_link_libraries(
 		unit_test_neural_network

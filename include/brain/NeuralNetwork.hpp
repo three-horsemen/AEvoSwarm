@@ -7,8 +7,8 @@
 
 #include <vector>
 
-#include <ant/Layer.hpp>
-#include <ant/FullyConnectedLayer.hpp>
+#include <brain/Layer.hpp>
+#include <brain/FullyConnectedLayer.hpp>
 
 using namespace std;
 

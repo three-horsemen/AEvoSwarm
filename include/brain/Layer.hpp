@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include <ant/Neuron.hpp>
+#include <brain/Neuron.hpp>
 
 using namespace std;
 

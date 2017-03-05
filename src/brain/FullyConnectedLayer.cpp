@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include "ant/FullyConnectedLayer.hpp"
+#include "brain/FullyConnectedLayer.hpp"
 
 FullyConnectedLayer::FullyConnectedLayer(int inputSize, int outputSize, weight *weights) : Layer(FULLY_CONNECTED,
 																								 inputSize,

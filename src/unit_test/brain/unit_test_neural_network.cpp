@@ -2,9 +2,9 @@
 // Created by reuben on 5/3/17.
 //
 
-#include <ant/NeuralNetwork.hpp>
-#include <ant/InputLayer.hpp>
-#include <ant/OutputLayer.hpp>
+#include <brain/NeuralNetwork.hpp>
+#include <brain/InputLayer.hpp>
+#include <brain/OutputLayer.hpp>
 
 int main(int argc, char *argv[]) {
 	srand((unsigned int) time(NULL));

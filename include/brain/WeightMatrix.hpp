@@ -5,7 +5,7 @@
 #ifndef SFTP_WEIGHTMATRIX_HPP
 #define SFTP_WEIGHTMATRIX_HPP
 
-#include <ant/Neuron.hpp>
+#include <brain/Neuron.hpp>
 
 class WeightMatrix {
 	int inputSize, outputSize;

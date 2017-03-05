@@ -5,9 +5,9 @@
 #ifndef SFTP_FULLYCONNECTEDLAYER_HPP
 #define SFTP_FULLYCONNECTEDLAYER_HPP
 
-#include <ant/Layer.hpp>
-#include <ant/WeightMatrix.hpp>
-#include <ant/Neuron.hpp>
+#include <brain/Layer.hpp>
+#include <brain/WeightMatrix.hpp>
+#include <brain/Neuron.hpp>
 
 class FullyConnectedLayer : public Layer {
 	Neuron *neurons;

@@ -38,3 +38,5 @@ target_link_libraries(
 	unit_test_logger
 	shared
 	)
+
+###UI Module

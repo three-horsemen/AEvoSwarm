@@ -12,9 +12,9 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.54 COMPONENTS log log_setup thread system date_time REQUIRED)
 
 include_directories(
-	include
-	${Boost_INCLUDE_DIRS}
-	)
+		include
+		${Boost_INCLUDE_DIRS}
+)
 
 #find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h)
 #find_library(SQLITE3_LIBRARY NAMES sqlite3)
@@ -22,19 +22,43 @@ include_directories(
 ###Shared module
 add_library(shared
 		src/shared/logger.cpp
-		src/shared/Utils.cpp include/shared/Utils.hpp
+		src/shared/Utils.cpp
 		)
 target_link_libraries(
-	shared
-	${Boost_LIBRARIES}
-	pthread
-	)
+		shared
+		${Boost_LIBRARIES}
+		pthread
+)
+
+add_library(ant
+		src/ant/NeuralNetwork.cpp
+		src/ant/FullyConnectedLayer.cpp
+		src/ant/Neuron.cpp
+		include/ant/InputLayer.cpp
+		src/ant/OutputLayer.cpp
+		src/ant/Layer.cpp
+		)
+target_link_libraries(
+		ant
+		${Boost_LIBRARIES}
+		pthread
+		shared
+)
 
 add_executable(
-	unit_test_logger
-	src/unit_test/shared/logger.cpp
-	)
+		unit_test_neural_network
+		src/unit_test/ant/unit_test_neural_network.cpp
+)
 target_link_libraries(
-	unit_test_logger
-	shared
-	)
+		unit_test_neural_network
+		ant
+)
+
+add_executable(
+		unit_test_logger
+		src/unit_test/shared/logger.cpp
+)
+target_link_libraries(
+		unit_test_logger
+		shared
+)

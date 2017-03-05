@@ -4,6 +4,14 @@
 
 #include "map/Map.hpp"
 
+Map::Map() {
+	for (int i = 0; i < MAP_MAX_X; i++) {
+		for (int j = 0; j < MAP_MAX_Y; j++) {
+			tiles[i][j].setCoordinate(Coordinate(i, j));
+		}
+	}
+}
+
 Map::Map(Tile newTiles[MAP_MAX_X][MAP_MAX_Y]) {
 	for (int i = 0; i < MAP_MAX_X; i++) {
 		for (int j = 0; j < MAP_MAX_Y; j++) {

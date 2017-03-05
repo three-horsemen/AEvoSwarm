@@ -4,14 +4,9 @@
 
 #include "map/Tile.hpp"
 
-//Tile::Tile(Tile &newTile) :
-//		coordinate(newTile.getCoordinate().getX(), newTile.getCoordinate().getY()),
-//		agentCharacter(newTile.getAgentCharacter().getAttitude(), newTile.getAgentCharacter().getTrait(),
-//					 newTile.getAgentCharacter().getOccupancy()) {
-//	coordinate = newTile.getCoordinate();
-//	agentCharacter = newTile.getAgentCharacter();
-//	totalEnergy = newTile.getTotalEnergy();
-//}
+Tile::Tile() {
+	totalEnergy = 0;
+}
 
 Tile::Tile(Coordinate newCoordinate, AgentCharacter newAgentCharacter, Energy newTotalEnergy) :
 		coordinate(newCoordinate.getX(), newCoordinate.getY()),

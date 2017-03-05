@@ -21,7 +21,7 @@ protected:
 	Trait trait;
 	Occupancy occupancy;
 public:
-	AgentCharacter() {}
+	AgentCharacter();
 
 	AgentCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy);
 

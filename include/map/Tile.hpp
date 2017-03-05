@@ -19,7 +19,7 @@ protected:
 	AgentCharacter agentCharacter;
 	Energy totalEnergy;
 public:
-	Tile() {}
+	Tile();
 
 	Tile(Coordinate, AgentCharacter, Energy);
 

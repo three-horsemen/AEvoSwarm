@@ -14,7 +14,7 @@ class Map {
 protected:
 	Tile tiles[MAP_MAX_X][MAP_MAX_Y];
 public:
-	Map() {}
+	Map();
 
 	Map(Tile Tiles[MAP_MAX_X][MAP_MAX_Y]);
 

@@ -4,11 +4,11 @@
 
 #include "agent/AgentCharacter.hpp"
 
-//AgentCharacter::AgentCharacter(AgentCharacter &newAgentCharacter) {
-//	attitude = newAgentCharacter.getAttitude();
-//	trait = newAgentCharacter.getTrait();
-//	occupancy = newAgentCharacter.getOccupancy();
-//}
+AgentCharacter::AgentCharacter() {
+	attitude = 0;
+	trait = 0;
+	occupancy = OCCUPANCY_DEAD;
+}
 
 AgentCharacter::AgentCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy) {
 	attitude = newAttitude;

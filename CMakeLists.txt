@@ -41,7 +41,7 @@ target_link_libraries(
 )
 
 ###Brain module
-add_library(ant
+add_library(brain
 		src/brain/NeuralNetwork.cpp
 		src/brain/FullyConnectedLayer.cpp
 		src/brain/Neuron.cpp
@@ -50,7 +50,7 @@ add_library(ant
 		src/brain/Layer.cpp
 		)
 target_link_libraries(
-		ant
+		brain
 		${Boost_LIBRARIES}
 		pthread
 		shared
@@ -62,7 +62,7 @@ add_executable(
 )
 target_link_libraries(
 		unit_test_neural_network
-		ant
+		brain
 )
 
 ###Map Module

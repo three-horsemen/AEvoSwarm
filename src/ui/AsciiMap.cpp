@@ -28,18 +28,19 @@ void AsciiMap::setMap(Map newMap) {
 void AsciiMap::displayAsciiMap() {
 
 	for (int i = 0; i < MAP_MAX_X; i++) {
-		cout << "#";
+		cout << "----";
 	}
-	cout << endl;
+	cout << "-" << endl;
 	for (int i = 0; i < MAP_MAX_X; i++) {
 		for (int j = 0; j < MAP_MAX_Y; j++) {
 			Coordinate tempCoordinate(i, j);
-			cout << charOccupancy[map.getTile(tempCoordinate).getAntCharacter().getOccupancy()];
+			cout << "| " << charOccupancy[map.getTile(tempCoordinate).getAgentCharacter().getOccupancy()] << " ";
 		}
-		cout << endl;
-	}
-	for (int i = 0; i < MAP_MAX_X; i++) {
-		cout << "#";
+		cout << "|" << endl;
+		for (int j = 0; j < MAP_MAX_Y; j++) {
+			cout << "----";
+		}
+		cout << "-" << endl;
 	}
 	cout << endl;
 }

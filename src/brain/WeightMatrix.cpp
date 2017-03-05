@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include "ant/WeightMatrix.hpp"
+#include "agent/WeightMatrix.hpp"
 
 WeightMatrix::WeightMatrix(int inputSize, int outputSize) {
 	this->inputSize = inputSize;

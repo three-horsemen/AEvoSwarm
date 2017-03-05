@@ -6,18 +6,19 @@
 
 //Tile::Tile(Tile &newTile) :
 //		coordinate(newTile.getCoordinate().getX(), newTile.getCoordinate().getY()),
-//		antCharacter(newTile.getAntCharacter().getAttitude(), newTile.getAntCharacter().getTrait(),
-//					 newTile.getAntCharacter().getOccupancy()) {
+//		agentCharacter(newTile.getAgentCharacter().getAttitude(), newTile.getAgentCharacter().getTrait(),
+//					 newTile.getAgentCharacter().getOccupancy()) {
 //	coordinate = newTile.getCoordinate();
-//	antCharacter = newTile.getAntCharacter();
+//	agentCharacter = newTile.getAgentCharacter();
 //	totalEnergy = newTile.getTotalEnergy();
 //}
 
-Tile::Tile(Coordinate newCoordinate, AntCharacter newAntCharacter, Energy newTotalEnergy) :
+Tile::Tile(Coordinate newCoordinate, AgentCharacter newAgentCharacter, Energy newTotalEnergy) :
 		coordinate(newCoordinate.getX(), newCoordinate.getY()),
-		antCharacter(newAntCharacter.getAttitude(), newAntCharacter.getTrait(), newAntCharacter.getOccupancy()) {
+		agentCharacter(newAgentCharacter.getAttitude(), newAgentCharacter.getTrait(),
+					   newAgentCharacter.getOccupancy()) {
 	coordinate = newCoordinate;
-	antCharacter = newAntCharacter;
+	agentCharacter = newAgentCharacter;
 	totalEnergy = newTotalEnergy;
 }
 
@@ -25,16 +26,16 @@ Coordinate Tile::getCoordinate() {
 	return coordinate;
 }
 
-AntCharacter Tile::getAntCharacter() {
-	return antCharacter;
+AgentCharacter Tile::getAgentCharacter() {
+	return agentCharacter;
 }
 
 Energy Tile::getTotalEnergy() {
 	return totalEnergy;
 }
 
-void Tile::setAntCharacter(AntCharacter newAntCharacter) {
-	antCharacter = newAntCharacter;
+void Tile::setAgentCharacter(AgentCharacter newAgentCharacter) {
+	agentCharacter = newAgentCharacter;
 }
 
 void Tile::setCoordinate(Coordinate newCoordinate) {

@@ -33,3 +33,7 @@ void Coordinate::setY(int newY) {
 bool Coordinate::operator==(Coordinate coordinate2) {
 	return ((coordinate2.getX() == X) && (coordinate2.getY() == Y));
 }
+
+bool Coordinate::operator!=(Coordinate coordinate2) {
+	return ((coordinate2.getX() != X) || (coordinate2.getY() != Y));
+}

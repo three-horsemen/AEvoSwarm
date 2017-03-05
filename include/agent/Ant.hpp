@@ -24,6 +24,15 @@ protected:
 	Energy fertility;
 	Energy baby;
 	AgentCharacter character;
+
+	Coordinate getCoordinateAhead(Coordinate, Occupancy);
+
+	Coordinate getCoordinateAhead(Occupancy);
+
+	Coordinate getCoordinateBehind(Coordinate, Occupancy);
+
+	Coordinate getCoordinateBehind(Occupancy);
+
 public:
 	enum Action {
 		FORWARD,
@@ -34,10 +43,14 @@ public:
 		FORTIFY,
 		MATURE,
 		GROW_BABY,
-		GIVE_BIRTH
+		GIVE_BIRTH,
+		DIE
 	};
+	static constexpr short actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
 	Ant(Environment &);
+
+	bool isEnergyAvailable(Agent::Action action);
 
 	bool isActionValid(Agent::Action action);
 

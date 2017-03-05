@@ -23,6 +23,8 @@ public:
 	void setY(int);
 
 	bool operator==(Coordinate);
+
+	bool operator!=(Coordinate);
 };
 
 

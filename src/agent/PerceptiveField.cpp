@@ -8,3 +8,7 @@
 PerceptiveField::PerceptiveField() {
 
 }
+
+Tile PerceptiveField::getTile(Coordinate coordinate) {
+	return tile[coordinate.getX()][coordinate.getY()];
+}

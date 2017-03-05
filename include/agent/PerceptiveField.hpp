@@ -14,6 +14,8 @@ public:
 	Tile tile[WIDTH][HEIGHT];
 
 	PerceptiveField();
+
+	Tile getTile(Coordinate);
 };
 
 

@@ -22,6 +22,8 @@ public:
 
 	Agent(Environment);
 
+	virtual bool isEnergyAvailable(Agent::Action action)=0;
+
 	virtual bool isActionValid(Action action)=0;
 
 	virtual void observeEnvironment(Environment &)=0;

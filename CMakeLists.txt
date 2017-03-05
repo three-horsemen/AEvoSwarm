@@ -129,3 +129,11 @@ target_link_libraries(
 		ui
 		shared
 )
+add_executable(unit_test_controlant
+		src/unit_test/ui/controlant.cpp
+		)
+target_link_libraries(
+		unit_test_controlant
+		ui
+		shared
+)

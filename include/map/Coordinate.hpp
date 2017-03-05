@@ -10,7 +10,7 @@ protected:
 	int X;
 	int Y;
 public:
-	Coordinate() {}
+	Coordinate();
 
 	Coordinate(int, int);
 
@@ -21,6 +21,8 @@ public:
 	void setX(int);
 
 	void setY(int);
+
+	bool operator==(Coordinate);
 };
 
 

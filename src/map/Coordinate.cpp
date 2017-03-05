@@ -4,10 +4,10 @@
 
 #include "map/Coordinate.hpp"
 
-//Coordinate::Coordinate(Coordinate &newCoordinate) {
-//	X = newCoordinate.getX();
-//	Y = newCoordinate.getY();
-//}
+Coordinate::Coordinate() {
+	X = 0;
+	Y = 0;
+}
 
 Coordinate::Coordinate(int newX, int newY) {
 	X = newX;
@@ -28,4 +28,8 @@ void Coordinate::setX(int newX) {
 
 void Coordinate::setY(int newY) {
 	Y = newY;
+}
+
+bool Coordinate::operator==(Coordinate coordinate2) {
+	return ((coordinate2.getX() == X) && (coordinate2.getY() == Y));
 }

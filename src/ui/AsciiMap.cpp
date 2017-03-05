@@ -33,8 +33,7 @@ void AsciiMap::displayAsciiMap() {
 	cout << "-" << endl;
 	for (int i = 0; i < MAP_MAX_X; i++) {
 		for (int j = 0; j < MAP_MAX_Y; j++) {
-			Coordinate tempCoordinate(i, j);
-			cout << "| " << charOccupancy[map.getTile(tempCoordinate).getAgentCharacter().getOccupancy()] << " ";
+			cout << "| " << charOccupancy[map.getTile(Coordinate(i, j)).getAgentCharacter().getOccupancy()] << " ";
 		}
 		cout << "|" << endl;
 		for (int j = 0; j < MAP_MAX_Y; j++) {

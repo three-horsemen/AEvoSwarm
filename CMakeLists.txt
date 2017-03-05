@@ -23,7 +23,7 @@ include_directories(
 add_library(shared
 		src/shared/logger.cpp
 		src/shared/Utils.cpp
-		src/shared/AntCharacter.cpp
+		src/agent/AgentCharacter.cpp
 		)
 target_link_libraries(
 		shared
@@ -65,7 +65,16 @@ target_link_libraries(
 		brain
 )
 
-###Map Module
+###Agent module
+add_library(agent
+		src/agent/AgentCharacter.cpp
+		)
+target_link_libraries(
+		agent
+		shared
+)
+
+###Map module
 add_library(map
 		src/map/Coordinate.cpp
 		src/map/Tile.cpp
@@ -74,16 +83,18 @@ add_library(map
 		)
 target_link_libraries(
 		map
+		agent
 		shared
 )
 
-###UI Module
+###UI module
 add_library(ui
 		src/ui/AsciiMap.cpp
 		)
 target_link_libraries(
 		ui
 		map
+		shared
 )
 
 add_executable(
@@ -93,4 +104,5 @@ add_executable(
 target_link_libraries(
 		unit_test_asciimap
 		ui
+		shared
 )

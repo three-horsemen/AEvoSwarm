@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_ANTCHARACTER_HPP
-#define SFTP_ANTCHARACTER_HPP
+#ifndef SFTP_AGENTCHARACTER_HPP
+#define SFTP_AGENTCHARACTER_HPP
 
 typedef short Attitude;
 typedef short Trait;
@@ -15,17 +15,15 @@ typedef enum {
 	OCCUPANCY_WEST
 } Occupancy;
 
-class AntCharacter {
+class AgentCharacter {
 protected:
 	Attitude attitude;
 	Trait trait;
 	Occupancy occupancy;
 public:
-	AntCharacter() {}
+	AgentCharacter() {}
 
-//	AntCharacter(AntCharacter &);
-
-	AntCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy);
+	AgentCharacter(Attitude newAttitude, Trait newTrait, Occupancy newOccupancy);
 
 	Attitude getAttitude() const;
 
@@ -40,4 +38,4 @@ public:
 	void setOccupancy(Occupancy);
 };
 
-#endif //SFTP_ANTCHARACTER_HPP
+#endif //SFTP_AGENTCHARACTER_HPP

@@ -7,7 +7,7 @@
 int main() {
 	Attitude randomAttitude = 2;
 	Trait randomTrait = 3;
-	Occupancy randomOccupancy = OCCUPANCY_SOUTH;
+	Occupancy randomOccupancy = OCCUPANCY_EAST;
 	Energy randomEnergy = 10;
 	Map map;
 	for (int i = 0; i < MAP_MAX_X; i++) {
@@ -15,7 +15,7 @@ int main() {
 			map.setTile(
 					Tile(
 							Coordinate(i, j),
-							AntCharacter(Attitude(randomAttitude), Trait(randomTrait), Occupancy(randomOccupancy)),
+							AgentCharacter(Attitude(randomAttitude), Trait(randomTrait), Occupancy(randomOccupancy)),
 							Energy(randomEnergy)
 					),
 					Coordinate(i, j)

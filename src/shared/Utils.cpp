@@ -38,9 +38,16 @@ std::string Utils::getPassword() {
 	termios newt = oldt;
 	newt.c_lflag &= ~ECHO;
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	cout<<"Password: ";
+	cout << "Password: ";
 	std::string password;
 	getline(cin, password);
 	(void) tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldt);
 	return password;
+}
+
+int Utils::modulo(int x, int y) {
+	if (x < 0)
+		return y + x;
+	else
+		return x % y;
 }

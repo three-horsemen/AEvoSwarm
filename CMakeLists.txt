@@ -65,22 +65,36 @@ target_link_libraries(
 		brain
 )
 
+###Map Module
+add_library(map
+		src/map/Coordinate.cpp
+		src/map/Tile.cpp
+		src/map/Energy.cpp
+		src/map/Map.cpp
+		)
+target_link_libraries(
+		map
+		agent
+		shared
+)
+
 ###Agent module
 add_library(agent
 		src/agent/Agent.cpp
 		src/agent/AgentCharacter.cpp
-		)
+		src/agent/PerceptiveField.cpp include/agent/PerceptiveField.hpp)
 target_link_libraries(
 		agent
 		${Boost_LIBRARIES}
 		pthread
 		brain
+		map
 )
 
 ###Ant module
 add_library(ant
 		src/agent/Ant.cpp
-		src/unit_test/agent/unit_test_ant_rules.cpp.cpp)
+		src/unit_test/agent/unit_test_ant_rules.cpp)
 target_link_libraries(
 		ant
 		${Boost_LIBRARIES}
@@ -95,19 +109,7 @@ add_executable(
 target_link_libraries(
 		unit_test_ant_rules
 		ant
-)
-
-###Map Module
-add_library(map
-		src/map/Coordinate.cpp
-		src/map/Tile.cpp
-		src/map/Energy.cpp
-		src/map/Map.cpp
-		)
-target_link_libraries(
-		map
-		agent
-		shared
+		ui
 )
 
 ###UI module
@@ -117,7 +119,7 @@ add_library(ui
 target_link_libraries(
 		ui
 		map
-		shared
+		agent
 )
 
 add_executable(

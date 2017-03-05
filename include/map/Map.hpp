@@ -23,4 +23,6 @@ public:
 	void setTile(Tile, Coordinate);
 };
 
+typedef Map Environment;
+
 #endif //SFTP_MAP_HPP

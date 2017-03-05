@@ -6,11 +6,12 @@
 #define SFTP_ASCIIMAP_HPP
 
 #include "map/Map.hpp"
+#include <agent/PerceptiveField.hpp>
 
 class AsciiMap {
 protected:
 	Map map;
-	const char charOccupancy[5] = {' ', '^', 'v', '>', '<'}; //Dead, North, South, East, West
+	//static constexpr char charOccupancy[5] = {' ', '^', 'v', '>', '<'}; //Dead, North, South, East, West
 public:
 	AsciiMap(Map &);
 
@@ -19,6 +20,8 @@ public:
 	void setMap(Map);
 
 	void displayAsciiMap();
+
+	static void displayPerceptiveField(PerceptiveField &);
 };
 
 #endif //SFTP_ASCIIMAP_HPP

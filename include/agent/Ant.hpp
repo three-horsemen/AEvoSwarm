@@ -6,6 +6,7 @@
 #define SFTP_ANT_HPP
 
 #include <shared/logger.hpp>
+#include <shared/Utils.hpp>
 
 #include <agent/Agent.hpp>
 
@@ -25,12 +26,13 @@ public:
 		GIVE_BIRTH
 	};
 
-	bool isActionValid(Agent::Action action) {
-		switch (action) {
-			default:
-				throw invalid_argument("Unknown action specified");
-		}
-	}
+	Ant(Environment &);
+
+	bool isActionValid(Agent::Action action);
+
+	void observeEnvironment(Environment &);
+
+	PerceptiveField *getPerceptiveField();
 };
 
 

@@ -9,6 +9,10 @@
 #include "agent/AgentCharacter.hpp"
 #include "map/Energy.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 class Tile {
 protected:
 	Coordinate coordinate;

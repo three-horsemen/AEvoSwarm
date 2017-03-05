@@ -27,6 +27,8 @@ public:
 
 	static std::string getPassword();
 
+	static int modulo(int, int);
+
 };
 
 

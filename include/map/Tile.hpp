@@ -6,6 +6,7 @@
 #define SFTP_TILE_HPP
 
 #include "map/Coordinate.hpp"
+//#include "agent/Ant.hpp"
 #include "agent/AgentCharacter.hpp"
 #include "map/Energy.hpp"
 
@@ -35,6 +36,5 @@ public:
 
 	void setTotalEnergy(Energy);
 };
-
 
 #endif //SFTP_TILE_HPP

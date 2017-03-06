@@ -45,7 +45,7 @@ add_library(brain
 		src/brain/NeuralNetwork.cpp
 		src/brain/FullyConnectedLayer.cpp
 		src/brain/Neuron.cpp
-		include/brain/InputLayer.cpp
+		src/brain/InputLayer.cpp
 		src/brain/OutputLayer.cpp
 		src/brain/Layer.cpp
 		)
@@ -137,5 +137,6 @@ add_executable(unit_test_controlant
 target_link_libraries(
 		unit_test_controlant
 		ui
+		ant
 		shared
 )

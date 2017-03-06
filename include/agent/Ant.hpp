@@ -37,13 +37,11 @@ public:
 		GIVE_BIRTH
 	};
 
-	Ant(Environment &);
+	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
 	bool isActionValid(Agent::Action action);
 
 	void observeEnvironment(Environment &);
-
-	PerceptiveField *getPerceptiveField();
 
 	Coordinate getCoordinate();
 
@@ -57,6 +55,8 @@ public:
 
 	AgentCharacter getCharacter();
 
+	void setCoordinate(Coordinate);
+
 	void setPotential(Energy newPotential);
 
 	void setShield(Energy newShield);
@@ -68,6 +68,10 @@ public:
 	void setCharacter(AgentCharacter newCharacter);
 
 	Energy getTotalEnergy();
+
+	Tile operator<<(Tile);
+
+	Tile operator>>(Tile);
 };
 
 

@@ -30,7 +30,9 @@ Energy Tile::getTotalEnergy() {
 }
 
 void Tile::setAgentCharacter(AgentCharacter newAgentCharacter) {
-	agentCharacter = newAgentCharacter;
+	agentCharacter.setAttitude(newAgentCharacter.getAttitude());
+	agentCharacter.setOccupancy(newAgentCharacter.getOccupancy());
+	agentCharacter.setTrait(newAgentCharacter.getTrait());
 }
 
 void Tile::setCoordinate(Coordinate newCoordinate) {

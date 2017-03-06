@@ -20,13 +20,13 @@ public:
 	enum Action {
 	};
 
-	Agent(Environment);
+	Agent();
 
 	virtual bool isActionValid(Action action)=0;
 
 	virtual void observeEnvironment(Environment &)=0;
 
-	virtual PerceptiveField *getPerceptiveField()=0;
+	PerceptiveField *getPerceptiveField();
 };
 
 

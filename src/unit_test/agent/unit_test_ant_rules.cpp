@@ -13,7 +13,15 @@ int main(int argc, char *argv[]) {
 	Energy randomEnergy = 10;
 
 	Environment environment;
-	Ant ant(environment);
+//	Ant ant(environment);
+
+	Coordinate randomCoordinate(5, 5);
+	AgentCharacter randomCharacter(randomAttitude, randomTrait, randomOccupancy);
+	Energy newPotential = 5;
+	Energy newShield = 6;
+	Energy newFertility = 7;
+	Energy newBaby = 8;
+	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby, randomCharacter);
 
 	for (int i = 0; i < MAP_MAX_X; i++) {
 		for (int j = 0; j < MAP_MAX_Y; j++) {
@@ -39,8 +47,9 @@ int main(int argc, char *argv[]) {
 			Energy(randomEnergy)
 						),
 						Coordinate(0, 1));
-	AsciiMap asciiMap(environment);
-	asciiMap.displayAsciiMap();
+//	AsciiMap asciiMap(environment);
+//	asciiMap.displayAsciiMap();
+	AsciiMap::displayAsciiMap(environment);
 
 	ant.observeEnvironment(environment);
 	AsciiMap::displayPerceptiveField(*ant.getPerceptiveField());

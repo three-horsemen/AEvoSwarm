@@ -4,6 +4,8 @@
 
 #include <agent/Ant.hpp>
 
+short Ant::actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
+
 Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newBaby,
 		 AgentCharacter newCharacter) {
 	coordinate = newCoordinate;

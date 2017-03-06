@@ -46,7 +46,8 @@ public:
 		GIVE_BIRTH,
 		DIE
 	};
-	static constexpr short actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
+	static short actionCost[10];
+//	static constexpr short actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 

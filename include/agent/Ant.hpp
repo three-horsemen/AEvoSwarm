@@ -86,6 +86,16 @@ public:
 	Tile operator<<(Tile);
 
 	Tile operator>>(Tile);
+
+	Tile operator>(Tile);
+
+	Tile operator<(Tile);
+
+	void moveForward(Map &);
+
+	void turnLeft(Map &);
+
+	void turnRight(Map &);
 };
 
 

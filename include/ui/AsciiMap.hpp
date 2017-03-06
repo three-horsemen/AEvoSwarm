@@ -11,7 +11,6 @@
 class AsciiMap {
 protected:
 	Map map;
-	//static constexpr char charOccupancy[5] = {' ', '^', 'v', '>', '<'}; //Dead, North, South, East, West
 public:
 	AsciiMap(Map &);
 

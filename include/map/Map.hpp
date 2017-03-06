@@ -7,16 +7,19 @@
 
 #include "map/Tile.hpp"
 
-#define MAP_MAX_X 10
-#define MAP_MAX_Y 10
+//#define MAP_MAX_X 10
+//#define MAP_MAX_Y 10
 
 class Map {
+public:
+	static const short MAX_X = 10;
+	static const short MAX_Y = 10;
 protected:
-	Tile tiles[MAP_MAX_X][MAP_MAX_Y];
+	Tile tiles[MAX_X][MAX_X];
 public:
 	Map();
 
-	Map(Tile Tiles[MAP_MAX_X][MAP_MAX_Y]);
+	Map(Tile Tiles[MAX_X][MAX_X]);
 
 	Tile getTile(Coordinate);
 

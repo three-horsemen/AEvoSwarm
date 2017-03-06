@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
 	Energy newBaby = 8;
 	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby, randomCharacter);
 
-	for (int i = 0; i < MAP_MAX_X; i++) {
-		for (int j = 0; j < MAP_MAX_Y; j++) {
+	for (int i = 0; i < Map::MAX_X; i++) {
+		for (int j = 0; j < Map::MAX_Y; j++) {
 			environment.setTile(
 					Tile(
 							Coordinate(i, j),

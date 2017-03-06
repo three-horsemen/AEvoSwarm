@@ -97,7 +97,7 @@ void Ant::observeEnvironment(Environment &environment) {
 		 i < coordinate.getX() + PerceptiveField::WIDTH / 2; i++) {
 		for (int j = coordinate.getY() - PerceptiveField::HEIGHT / 2;
 			 j < coordinate.getY() + PerceptiveField::HEIGHT / 2; j++) {
-			int x = Utils::modulo(i, MAP_MAX_X), y = Utils::modulo(j, MAP_MAX_Y);
+			int x = Utils::modulo(i, Map::MAX_X), y = Utils::modulo(j, Map::MAX_Y);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.tile[i + PerceptiveField::WIDTH / 2][j + PerceptiveField::HEIGHT / 2] = tile;
 		}
@@ -153,16 +153,80 @@ Energy Ant::getTotalEnergy() {
 }
 
 Tile Ant::operator<<(Tile tile) {
-	std::cout << "Occupancy of tile before withdrawal: " << tile.getAgentCharacter().getOccupancy() << endl;
 	tile.setAgentCharacter(AgentCharacter());
-	std::cout << "Occupancy of tile after withdrawal: " << tile.getAgentCharacter().getOccupancy() << endl;
 	tile.setTotalEnergy(tile.getTotalEnergy() - this->getTotalEnergy());
 	return tile;
 }
 
 Tile Ant::operator>>(Tile tile) {
-	tile.setAgentCharacter(this->getCharacter());
+	tile.setAgentCharacter(character);
 	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
-	this->setCoordinate(tile.getCoordinate());
+	coordinate = tile.getCoordinate();
+//	this->setCoordinate(tile.getCoordinate());
 	return tile;
+}
+
+Tile Ant::operator>(Tile tile) {
+	Occupancy currentOccupancy = character.getOccupancy();
+	Occupancy newOccupancy;
+	if (currentOccupancy == OCCUPANCY_NORTH)
+		newOccupancy = OCCUPANCY_EAST;
+	else if (currentOccupancy == OCCUPANCY_EAST)
+		newOccupancy = OCCUPANCY_SOUTH;
+	else if (currentOccupancy == OCCUPANCY_SOUTH)
+		newOccupancy = OCCUPANCY_WEST;
+	else if (currentOccupancy == OCCUPANCY_WEST)
+		newOccupancy = OCCUPANCY_NORTH;
+	character.setOccupancy(newOccupancy);
+
+	tile.setAgentCharacter(character);
+	tile.setTotalEnergy(this->getTotalEnergy());
+	return tile;
+}
+
+Tile Ant::operator<(Tile tile) {
+	Occupancy currentOccupancy = character.getOccupancy();
+	Occupancy newOccupancy;
+	if (currentOccupancy == OCCUPANCY_NORTH)
+		newOccupancy = OCCUPANCY_WEST;
+	else if (currentOccupancy == OCCUPANCY_EAST)
+		newOccupancy = OCCUPANCY_NORTH;
+	else if (currentOccupancy == OCCUPANCY_SOUTH)
+		newOccupancy = OCCUPANCY_EAST;
+	else if (currentOccupancy == OCCUPANCY_WEST)
+		newOccupancy = OCCUPANCY_SOUTH;
+	character.setOccupancy(newOccupancy);
+
+	tile.setAgentCharacter(character);
+	tile.setTotalEnergy(this->getTotalEnergy());
+	return tile;
+}
+
+void Ant::moveForward(Map &map) {
+	Coordinate destinationCoordinate = coordinate;
+	Occupancy occupancy = character.getOccupancy();
+	if (occupancy == OCCUPANCY_NORTH)
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() - 1), Map::MAX_X));
+	else if (occupancy == OCCUPANCY_EAST)
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() + 1), Map::MAX_Y));
+	else if (occupancy == OCCUPANCY_SOUTH)
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() + 1), Map::MAX_X));
+	else if (occupancy == OCCUPANCY_WEST)
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() - 1), Map::MAX_Y));
+	map.setTile(
+			(*this << map.getTile(coordinate)),
+			coordinate
+	);
+	map.setTile(
+			(*this >> map.getTile(destinationCoordinate)),
+			destinationCoordinate
+	);
+}
+
+void Ant::turnLeft(Map &map) {
+	map.setTile(*this < map.getTile(coordinate), coordinate);
+}
+
+void Ant::turnRight(Map &map) {
+	map.setTile(*this > map.getTile(coordinate), coordinate);
 }

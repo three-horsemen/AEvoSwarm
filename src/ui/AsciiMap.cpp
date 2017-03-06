@@ -9,8 +9,6 @@
 using namespace std;
 
 namespace ascii_map {
-	static constexpr char charOccupancy[5] = {' ', '^', 'v', '>', '<'};
-
 	char getCharForOccupancy(Occupancy occupancy) {
 		if (occupancy == OCCUPANCY_DEAD)
 			return ' ';
@@ -26,8 +24,8 @@ namespace ascii_map {
 }
 
 AsciiMap::AsciiMap(Map &newMap) {
-	for (int i = 0; i < MAP_MAX_X; i++) {
-		for (int j = 0; j < MAP_MAX_Y; j++) {
+	for (int i = 0; i < Map::MAX_X; i++) {
+		for (int j = 0; j < Map::MAX_Y; j++) {
 			map.setTile(
 					Tile(newMap.getTile(Coordinate(i, j))),
 					Coordinate(i, j));
@@ -45,19 +43,18 @@ void AsciiMap::setMap(Map newMap) {
 
 void AsciiMap::displayAsciiMap(Map &map) {
 
-	for (int i = 0; i < MAP_MAX_X; i++) {
+	for (int i = 0; i < Map::MAX_X; i++) {
 		cout << "----";
 	}
 	cout << "-" << endl;
-	for (int i = 0; i < MAP_MAX_X; i++) {
-		for (int j = 0; j < MAP_MAX_Y; j++) {
-			Coordinate tempCoordinate(i, j);
+	for (int i = 0; i < Map::MAX_X; i++) {
+		for (int j = 0; j < Map::MAX_Y; j++) {
 			cout << "| "
-				 << ascii_map::getCharForOccupancy(map.getTile(tempCoordinate).getAgentCharacter().getOccupancy())
+				 << ascii_map::getCharForOccupancy(map.getTile(Coordinate(i, j)).getAgentCharacter().getOccupancy())
 				 << " ";
 		}
 		cout << "|" << endl;
-		for (int j = 0; j < MAP_MAX_Y; j++) {
+		for (int j = 0; j < Map::MAX_Y; j++) {
 			cout << "----";
 		}
 		cout << "-" << endl;
@@ -73,7 +70,8 @@ void AsciiMap::displayPerceptiveField(PerceptiveField &perceptiveField) {
 	cout << "-" << endl;
 	for (int i = 0; i < PerceptiveField::WIDTH; i++) {
 		for (int j = 0; j < PerceptiveField::HEIGHT; j++) {
-			cout << "| " << ascii_map::charOccupancy[perceptiveField.tile[i][j].getAgentCharacter().getOccupancy()]
+			cout << "| "
+				 << ascii_map::getCharForOccupancy(perceptiveField.tile[i][j].getAgentCharacter().getOccupancy())
 				 << " ";
 		}
 		cout << "|" << endl;

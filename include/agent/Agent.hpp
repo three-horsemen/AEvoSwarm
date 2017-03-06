@@ -20,7 +20,7 @@ public:
 	enum Action {
 	};
 
-	Agent(Environment);
+	Agent();
 
 	virtual bool isEnergyAvailable(Agent::Action action)=0;
 
@@ -28,7 +28,7 @@ public:
 
 	virtual void observeEnvironment(Environment &)=0;
 
-	virtual PerceptiveField *getPerceptiveField()=0;
+	PerceptiveField *getPerceptiveField();
 };
 
 

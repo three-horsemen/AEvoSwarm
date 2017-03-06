@@ -30,7 +30,7 @@ void AsciiMap::setMap(Map newMap) {
 	map = newMap;
 }
 
-void AsciiMap::displayAsciiMap() {
+void AsciiMap::displayAsciiMap(Map &map) {
 
 	for (int i = 0; i < MAP_MAX_X; i++) {
 		cout << "----";

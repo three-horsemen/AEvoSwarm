@@ -48,15 +48,13 @@ public:
 	};
 	static constexpr short actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
-	Ant(Environment &);
+	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
 	bool isEnergyAvailable(Agent::Action action);
 
 	bool isActionValid(Agent::Action action);
 
 	void observeEnvironment(Environment &);
-
-	PerceptiveField *getPerceptiveField();
 
 	Coordinate getCoordinate();
 
@@ -70,6 +68,8 @@ public:
 
 	AgentCharacter getCharacter();
 
+	void setCoordinate(Coordinate);
+
 	void setPotential(Energy newPotential);
 
 	void setShield(Energy newShield);
@@ -81,6 +81,10 @@ public:
 	void setCharacter(AgentCharacter newCharacter);
 
 	Energy getTotalEnergy();
+
+	Tile operator<<(Tile);
+
+	Tile operator>>(Tile);
 };
 
 

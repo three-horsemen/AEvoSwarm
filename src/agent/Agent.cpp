@@ -4,6 +4,10 @@
 
 #include <agent/Agent.hpp>
 
-Agent::Agent(Environment environment) {
+Agent::Agent() {
 
+}
+
+PerceptiveField *Agent::getPerceptiveField() {
+	return &perceptiveField;
 }

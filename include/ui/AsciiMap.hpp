@@ -19,7 +19,7 @@ public:
 
 	void setMap(Map);
 
-	void displayAsciiMap();
+	static void displayAsciiMap(Map &);
 
 	static void displayPerceptiveField(PerceptiveField &);
 };

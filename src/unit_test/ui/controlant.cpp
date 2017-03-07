@@ -11,7 +11,6 @@ int main() {
 	Attitude randomAttitude = 2;
 	Trait randomTrait = 3;
 	Occupancy randomOccupancy = OCCUPANCY_WEST;
-	Energy randomEnergy = 10;
 	Coordinate randomCoordinate(5, 2);
 	Energy newPotential = 5;
 	Energy newShield = 6;
@@ -19,7 +18,8 @@ int main() {
 	Energy newBaby = 8;
 	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby,
 			AgentCharacter(randomAttitude, randomTrait, randomOccupancy));
-	Map map;
+	Map map = Map::generateRandomMap();
+	cout << "Total energy present on the random map: " << map.getTotalEnergy() << endl;
 	for (int i = 0; i < Map::MAX_X; i++) {
 		for (int j = 0; j < Map::MAX_Y; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {

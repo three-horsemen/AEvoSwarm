@@ -6,9 +6,7 @@
 #define SFTP_MAP_HPP
 
 #include "map/Tile.hpp"
-
-//#define MAP_MAX_X 10
-//#define MAP_MAX_Y 10
+#include <time.h>
 
 class Map {
 public:
@@ -24,8 +22,13 @@ public:
 	Tile getTile(Coordinate);
 
 	void setTile(Tile, Coordinate);
+
+	Energy getTotalEnergy();
+
+	static Map generateRandomMap();
 };
 
 typedef Map Environment;
+
 
 #endif //SFTP_MAP_HPP

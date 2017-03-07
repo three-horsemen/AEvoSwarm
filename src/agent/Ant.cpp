@@ -14,6 +14,8 @@ Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy
 	fertility = newFertility;
 	baby = newBaby;
 	character = newCharacter;
+	if (newCharacter.getOccupancy() == OCCUPANCY_DEAD)
+		throw invalid_argument("An ant can't be born dead!");
 }
 
 Coordinate Ant::getCoordinateAhead(Coordinate coordinate, Occupancy occupancy) {
@@ -93,11 +95,12 @@ bool Ant::isActionValid(Agent::Action action) {
 }
 
 void Ant::observeEnvironment(Environment &environment) {
-	for (int i = coordinate.getX() - PerceptiveField::WIDTH / 2;
-		 i < coordinate.getX() + PerceptiveField::WIDTH / 2; i++) {
-		for (int j = coordinate.getY() - PerceptiveField::HEIGHT / 2;
-			 j < coordinate.getY() + PerceptiveField::HEIGHT / 2; j++) {
-			int x = Utils::modulo(i, Map::MAX_X), y = Utils::modulo(j, Map::MAX_Y);
+	for (int i = -PerceptiveField::WIDTH / 2;
+		 i < PerceptiveField::WIDTH / 2; i++) {
+		for (int j = -PerceptiveField::HEIGHT / 2;
+			 j < +PerceptiveField::HEIGHT / 2; j++) {
+			int x = Utils::modulo(coordinate.getX() + i, Map::MAX_X), y = Utils::modulo(coordinate.getY() + j,
+																						Map::MAX_Y);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.tile[i + PerceptiveField::WIDTH / 2][j + PerceptiveField::HEIGHT / 2] = tile;
 		}

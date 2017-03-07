@@ -15,20 +15,20 @@ int main(int argc, char *argv[]) {
 	Environment environment;
 //	Ant ant(environment);
 
-	Coordinate randomCoordinate(5, 5);
+	Coordinate randomCoordinate(2, 2);
 	AgentCharacter randomCharacter(randomAttitude, randomTrait, randomOccupancy);
 	Energy newPotential = 5;
 	Energy newShield = 6;
 	Energy newFertility = 7;
 	Energy newBaby = 8;
-	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby, randomCharacter);
+	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby, AgentCharacter(0, 0, OCCUPANCY_NORTH));
 
 	for (int i = 0; i < Map::MAX_X; i++) {
 		for (int j = 0; j < Map::MAX_Y; j++) {
 			environment.setTile(
 					Tile(
 							Coordinate(i, j),
-							AgentCharacter(Attitude(randomAttitude), Trait(randomTrait), Occupancy(randomOccupancy)),
+							randomCharacter,
 							Energy(randomEnergy)
 					),
 					Coordinate(i, j)

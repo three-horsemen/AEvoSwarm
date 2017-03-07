@@ -2,7 +2,7 @@
 // Created by soorya on 5/3/17.
 //
 
-#include "map/Coordinate.hpp"
+#include "environment/Coordinate.hpp"
 
 Coordinate::Coordinate() {
 	X = 0;

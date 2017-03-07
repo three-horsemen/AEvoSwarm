@@ -2,17 +2,17 @@
 // Created by soorya on 5/3/17.
 //
 
-#include "ui/AsciiMap.hpp"
+#include "ui/AsciiEnvironment.hpp"
 
 int main() {
 	Attitude randomAttitude = 2;
 	Trait randomTrait = 3;
 	Occupancy randomOccupancy = OCCUPANCY_EAST;
 	Energy randomEnergy = 10;
-	Map map;
-	for (int i = 0; i < MAP_MAX_X; i++) {
-		for (int j = 0; j < MAP_MAX_Y; j++) {
-			map.setTile(
+	Environment environment;
+	for (int i = 0; i < Environment::MAX_X; i++) {
+		for (int j = 0; j < Environment::MAX_Y; j++) {
+			environment.setTile(
 					Tile(
 							Coordinate(i, j),
 							AgentCharacter(Attitude(randomAttitude), Trait(randomTrait), Occupancy(randomOccupancy)),
@@ -22,8 +22,6 @@ int main() {
 			);
 		}
 	}
-	AsciiMap asciiMap(map);
-	asciiMap.displayAsciiMap();
-
+	AsciiEnvironment::displayAsciiEnvironment(environment);
 	return 0;
 }

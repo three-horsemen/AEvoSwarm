@@ -99,8 +99,8 @@ void Ant::observeEnvironment(Environment &environment) {
 		 i < PerceptiveField::WIDTH / 2; i++) {
 		for (int j = -PerceptiveField::HEIGHT / 2;
 			 j < +PerceptiveField::HEIGHT / 2; j++) {
-			int x = Utils::modulo(coordinate.getX() + i, Map::MAX_X), y = Utils::modulo(coordinate.getY() + j,
-																						Map::MAX_Y);
+			int x = Utils::modulo(coordinate.getX() + i, Environment::MAX_X), y = Utils::modulo(coordinate.getY() + j,
+																								Environment::MAX_Y);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.tile[i + PerceptiveField::WIDTH / 2][j + PerceptiveField::HEIGHT / 2] = tile;
 		}
@@ -170,7 +170,7 @@ Tile Ant::operator>>(Tile tile) {
 
 Tile Ant::operator>(Tile tile) {
 	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy;
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
 	if (currentOccupancy == OCCUPANCY_NORTH)
 		newOccupancy = OCCUPANCY_EAST;
 	else if (currentOccupancy == OCCUPANCY_EAST)
@@ -188,7 +188,7 @@ Tile Ant::operator>(Tile tile) {
 
 Tile Ant::operator<(Tile tile) {
 	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy;
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
 	if (currentOccupancy == OCCUPANCY_NORTH)
 		newOccupancy = OCCUPANCY_WEST;
 	else if (currentOccupancy == OCCUPANCY_EAST)
@@ -204,33 +204,33 @@ Tile Ant::operator<(Tile tile) {
 	return tile;
 }
 
-void Ant::moveForward(Map &map) {
+void Ant::moveForward(Environment &environment) {
 	Coordinate destinationCoordinate = coordinate;
 	Occupancy occupancy = character.getOccupancy();
 	if (occupancy == OCCUPANCY_NORTH)
-		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() - 1), Map::MAX_X));
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() - 1), Environment::MAX_X));
 	else if (occupancy == OCCUPANCY_EAST)
-		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() + 1), Map::MAX_Y));
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() + 1), Environment::MAX_Y));
 	else if (occupancy == OCCUPANCY_SOUTH)
-		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() + 1), Map::MAX_X));
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() + 1), Environment::MAX_X));
 	else if (occupancy == OCCUPANCY_WEST)
-		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() - 1), Map::MAX_Y));
-	map.setTile(
-			(*this << map.getTile(coordinate)),
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() - 1), Environment::MAX_Y));
+	environment.setTile(
+			(*this << environment.getTile(coordinate)),
 			coordinate
 	);
-	map.setTile(
-			(*this >> map.getTile(destinationCoordinate)),
+	environment.setTile(
+			(*this >> environment.getTile(destinationCoordinate)),
 			destinationCoordinate
 	);
 }
 
-void Ant::turnLeft(Map &map) {
-	map.setTile(*this < map.getTile(coordinate), coordinate);
+void Ant::turnLeft(Environment &environment) {
+	environment.setTile(*this < environment.getTile(coordinate), coordinate);
 }
 
-void Ant::turnRight(Map &map) {
-	map.setTile(*this > map.getTile(coordinate), coordinate);
+void Ant::turnRight(Environment &environment) {
+	environment.setTile(*this > environment.getTile(coordinate), coordinate);
 }
 
 Ant Ant::generateRandomAnt() {
@@ -267,9 +267,9 @@ Ant Ant::generateRandomAnt() {
 	return ant;
 }
 
-void Ant::placeAntOnMap(Map &map, Coordinate coordinate) {
-	map.setTile(
-			(*this >> map.getTile(coordinate)),
+void Ant::placeAntInEnvironment(Environment &environment, Coordinate coordinate) {
+	environment.setTile(
+			(*this >> environment.getTile(coordinate)),
 			coordinate
 	);
 }

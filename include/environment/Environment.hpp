@@ -2,22 +2,22 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_MAP_HPP
-#define SFTP_MAP_HPP
+#ifndef SFTP_ENVIRONMENT_HPP
+#define SFTP_ENVIRONMENT_HPP
 
-#include "map/Tile.hpp"
+#include "environment/Tile.hpp"
 #include <time.h>
 
-class Map {
+class Environment {
 public:
 	static const short MAX_X = 10;
 	static const short MAX_Y = 10;
 protected:
 	Tile tiles[MAX_X][MAX_X];
 public:
-	Map();
+	Environment();
 
-	Map(Tile Tiles[MAX_X][MAX_X]);
+	Environment(Tile Tiles[MAX_X][MAX_X]);
 
 	Tile getTile(Coordinate);
 
@@ -25,10 +25,7 @@ public:
 
 	Energy getTotalEnergy();
 
-	static Map generateRandomMap();
+	static Environment generateRandomEnvironment();
 };
 
-typedef Map Environment;
-
-
-#endif //SFTP_MAP_HPP
+#endif //SFTP_ENVIRONMENT_HPP

@@ -5,13 +5,10 @@
 #ifndef SFTP_TILE_HPP
 #define SFTP_TILE_HPP
 
-#include "map/Coordinate.hpp"
-//#include "agent/Ant.hpp"
+#include "environment/Coordinate.hpp"
 #include "agent/AgentCharacter.hpp"
-#include "map/Energy.hpp"
-
+#include "environment/Energy.hpp"
 #include <iostream>
-
 using namespace std;
 
 class Tile {

@@ -5,8 +5,9 @@
 #ifndef SFTP_AGENT_HPP
 #define SFTP_AGENT_HPP
 
-#include <map/Map.hpp>
+#include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
+#include <brain/NeuralNetwork.hpp>
 
 enum Action {
 

@@ -5,7 +5,7 @@
 #ifndef SFTP_AGENTCHARACTER_HPP
 #define SFTP_AGENTCHARACTER_HPP
 
-//#include "map/Tile.hpp"
+//#include "environment/Tile.hpp"
 
 typedef short Attitude;
 typedef short Trait;

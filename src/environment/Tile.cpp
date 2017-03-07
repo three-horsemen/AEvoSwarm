@@ -2,7 +2,7 @@
 // Created by soorya on 5/3/17.
 //
 
-#include "map/Tile.hpp"
+#include "environment/Tile.hpp"
 
 Tile::Tile() {
 	totalEnergy = 0;

@@ -65,15 +65,15 @@ target_link_libraries(
 		brain
 )
 
-###Map Module
-add_library(map
-		src/map/Coordinate.cpp
-		src/map/Tile.cpp
-		src/map/Energy.cpp
-		src/map/Map.cpp
+###Environment Module
+add_library(environment
+		src/environment/Coordinate.cpp
+		src/environment/Tile.cpp
+		src/environment/Energy.cpp
+		src/environment/Environment.cpp
 		)
 target_link_libraries(
-		map
+		environment
 		agent
 		shared
 )
@@ -88,7 +88,7 @@ target_link_libraries(
 		${Boost_LIBRARIES}
 		pthread
 		brain
-		map
+		environment
 )
 
 ###Ant module
@@ -114,20 +114,20 @@ target_link_libraries(
 
 ###UI module
 add_library(ui
-		src/ui/AsciiMap.cpp
+		src/ui/AsciiEnvironment.cpp
 		)
 target_link_libraries(
 		ui
-		map
+		environment
 		agent
 )
 
 add_executable(
-		unit_test_asciimap
-		src/unit_test/ui/asciimap.cpp
+		unit_test_asciienvironment
+		src/unit_test/ui/asciienvironment.cpp
 )
 target_link_libraries(
-		unit_test_asciimap
+		unit_test_asciienvironment
 		ui
 		shared
 )

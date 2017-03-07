@@ -165,7 +165,6 @@ Tile Ant::operator>>(Tile tile) {
 	tile.setAgentCharacter(character);
 	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
 	coordinate = tile.getCoordinate();
-//	this->setCoordinate(tile.getCoordinate());
 	return tile;
 }
 
@@ -232,4 +231,45 @@ void Ant::turnLeft(Map &map) {
 
 void Ant::turnRight(Map &map) {
 	map.setTile(*this > map.getTile(coordinate), coordinate);
+}
+
+Ant Ant::generateRandomAnt() {
+	srand((unsigned int) time(NULL));
+	const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 50;
+	const Attitude HYPOTHETICAL_MAX_ATTITUDE = 256;
+	const Attitude HYPOTHETICAL_MAX_TRAIT = 256;
+	const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
+	Occupancy occupancy;
+	int val = rand() % HYPOTHETICAL_MAX_OCCUPANCY_VAL;
+	if (val == 0)
+		occupancy = OCCUPANCY_NORTH;
+	else if (val == 1)
+		occupancy = OCCUPANCY_EAST;
+	else if (val == 2)
+		occupancy = OCCUPANCY_SOUTH;
+	else
+		occupancy = OCCUPANCY_WEST;
+	Ant ant(
+			Coordinate(-1, -1),
+			(Energy) (rand() % HYPOTHETICAL_MAX_POTENTIAL_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_SHIELD_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_FERTILITY_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY),
+			AgentCharacter(
+					(Attitude) (rand() % HYPOTHETICAL_MAX_ATTITUDE),
+					(Trait) (rand() % HYPOTHETICAL_MAX_TRAIT),
+					occupancy
+			)
+	);
+	return ant;
+}
+
+void Ant::placeAntOnMap(Map &map, Coordinate coordinate) {
+	map.setTile(
+			(*this >> map.getTile(coordinate)),
+			coordinate
+	);
 }

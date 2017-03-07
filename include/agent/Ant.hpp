@@ -96,6 +96,11 @@ public:
 	void turnLeft(Map &);
 
 	void turnRight(Map &);
+
+
+	static Ant generateRandomAnt();
+
+	void placeAntOnMap(Map &map, Coordinate coordinate);
 };
 
 

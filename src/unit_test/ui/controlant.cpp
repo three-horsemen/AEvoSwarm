@@ -8,17 +8,10 @@
 using namespace std;
 
 int main() {
-	Attitude randomAttitude = 2;
-	Trait randomTrait = 3;
-	Occupancy randomOccupancy = OCCUPANCY_WEST;
 	Coordinate randomCoordinate(5, 2);
-	Energy newPotential = 5;
-	Energy newShield = 6;
-	Energy newFertility = 7;
-	Energy newBaby = 8;
-	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby,
-			AgentCharacter(randomAttitude, randomTrait, randomOccupancy));
+	Ant ant = Ant::generateRandomAnt();
 	Map map = Map::generateRandomMap();
+	ant.placeAntOnMap(map, randomCoordinate);
 	cout << "Total energy present on the random map: " << map.getTotalEnergy() << endl;
 	for (int i = 0; i < Map::MAX_X; i++) {
 		for (int j = 0; j < Map::MAX_Y; j++) {

@@ -36,7 +36,7 @@ public:
 
 	virtual Action getSelectedAction()=0;
 
-	virtual Action performAction(Agent::Action)=0;
+	virtual void performAction(Agent::Action)=0;
 
 	virtual void affectEnvironment(Environment &)=0;
 

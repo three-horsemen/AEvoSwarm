@@ -7,8 +7,8 @@
 
 //#include "environment/Tile.hpp"
 
-typedef short Attitude;
-typedef short Trait;
+typedef unsigned short Attitude;
+typedef unsigned short Trait;
 typedef enum {
 	OCCUPANCY_DEAD = 0,
 	OCCUPANCY_NORTH = 0010,

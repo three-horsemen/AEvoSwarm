@@ -5,7 +5,7 @@
 #ifndef SFTP_ENERGY_HPP
 #define SFTP_ENERGY_HPP
 
-typedef short Energy;
+typedef unsigned short Energy;
 
 //
 //class Energy {

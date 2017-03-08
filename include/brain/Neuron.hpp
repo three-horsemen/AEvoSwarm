@@ -11,6 +11,8 @@ using namespace std;
 
 typedef float weight;
 typedef float excitation;
+//TODO Convert "excitation" to "Excitation" convention
+//TODO Convert "weight" to "Weight" convention
 
 class Neuron {
 	int inputSize;

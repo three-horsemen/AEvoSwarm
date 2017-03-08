@@ -25,6 +25,7 @@ namespace ant {
 			LEFT,
 			RIGHT
 		};
+		const short SENSOR_COUNT = 3;
 	}
 	namespace percept {
 		enum Percept {
@@ -32,6 +33,7 @@ namespace ant {
 			TRAIT,
 			ENERGY
 		};
+		const short PERCEPT_COUNT = 3;
 	}
 	namespace adjacency {
 		enum Adjacency {
@@ -40,6 +42,7 @@ namespace ant {
 			RIGHT,
 			BEHIND
 		};
+		const short ADJACENCY_COUNT = 4;
 	}
 }
 using namespace ant;
@@ -103,7 +106,7 @@ public:
 
 	Agent::Action getSelectedAction();
 
-	Agent::Action performAction(Agent::Action);
+	void performAction(Agent::Action);
 
 	void affectEnvironment(Environment &);
 
@@ -148,6 +151,8 @@ public:
 	void placeAntInEnvironment(Environment &, Coordinate);
 
 	int calculateDistance(Coordinate, Coordinate);
+
+	unsigned long getMaxPerceptValue(percept::Percept);
 
 	excitation getSensation(sensor::Sensor, percept::Percept);
 };

@@ -156,7 +156,29 @@ void Ant::observeEnvironment(Environment &environment) {
 }
 
 void Ant::senseObservation(Environment &environment) {
-	//TODO populate sensoryInput from sensors here
+	//This function will return a vector of three average senses from three vectors.
+	//Taking for granted: the excitation pointer has been allocated memory.
+	Attitude maxAttitude = 0;
+	do {
+		maxAttitude--;
+	} while (maxAttitude < 0);
+	Trait maxTrait = 0;
+	do {
+		maxTrait--;
+	} while (maxTrait < 0);
+
+	int ptr = 0;
+	for (int i = 0; i < ant::sensor::SENSOR_COUNT; i++) {
+		for (int j = 0; j < ant::percept::PERCEPT_COUNT; j++) {
+			sensoryInputs[ptr++] = getSensation((sensor::Sensor) i, (percept::Percept) j);
+		}
+	}
+	sensoryInputs[ptr++] = getPotential() / getMaxPerceptValue(percept::ENERGY);
+	sensoryInputs[ptr++] = getShield() / getMaxPerceptValue(percept::ENERGY);
+	sensoryInputs[ptr++] = getFertility() / getMaxPerceptValue(percept::ENERGY);
+	sensoryInputs[ptr++] = getBaby() / getMaxPerceptValue(percept::ENERGY);
+	sensoryInputs[ptr++] = getCharacter().getAttitude() / maxAttitude;
+	sensoryInputs[ptr] = getCharacter().getTrait() / maxTrait;
 }
 
 Agent::Action Ant::getSelectedAction() {
@@ -167,7 +189,7 @@ Agent::Action Ant::getSelectedAction() {
 	//TODO Return valid selected action
 }
 
-Agent::Action Ant::performAction(Agent::Action agentAction) {
+void Ant::performAction(Agent::Action agentAction) {
 	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
 	Action action = (Action) agentAction;
 
@@ -411,6 +433,32 @@ int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
 
 }
 
+unsigned long Ant::getMaxPerceptValue(percept::Percept percept) {
+	unsigned long maxPerceptVal = 0;
+	if (percept == percept::ENERGY) {
+		Energy e = 0;
+		do {
+			e--;
+		} while (e < 0);
+		maxPerceptVal = e;
+	} else if (percept == percept::ATTITUDE) {
+		Attitude e = 0;
+		do {
+			e--;
+		} while (e < 0);
+		maxPerceptVal = e;
+	} else if (percept == percept::TRAIT) {
+		Trait e = 0;
+		do {
+			e--;
+		} while (e < 0);
+		maxPerceptVal = e;
+	}
+	return maxPerceptVal;
+}
+
+
+
 excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	int maxHeight = perceptiveField.height;
 	int maxWidth = perceptiveField.width;
@@ -425,7 +473,7 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	Coordinate sensoryCoordinate = getCoordinate(adjacency);
 	int distance;
 	float totalWeightedDistance = 0;
-	float perceivedAverage = 0;
+	excitation perceivedAverage = 0;
 	for (int i = 0; i < maxWidth; i++) {
 		for (int j = 0; j < maxHeight; j++) {
 			distance = 1 + calculateDistance(perceptiveField.getTile(Coordinate(i, j)).getCoordinate(),
@@ -442,5 +490,7 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 		}
 	}
 	perceivedAverage /= totalWeightedDistance;
-	return perceivedAverage;
+	float maxPerceptValue = getMaxPerceptValue(percept);
+	excitation resultantExcitation = perceivedAverage / maxPerceptValue;
+	return resultantExcitation;
 }

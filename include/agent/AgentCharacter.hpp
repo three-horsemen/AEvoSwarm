@@ -11,10 +11,10 @@ typedef short Attitude;
 typedef short Trait;
 typedef enum {
 	OCCUPANCY_DEAD = 0,
-	OCCUPANCY_NORTH = 0010,
-	OCCUPANCY_SOUTH = 0011,
-	OCCUPANCY_EAST = 0100,
-	OCCUPANCY_WEST = 0101
+	OCCUPANCY_NORTH = 2,
+	OCCUPANCY_SOUTH = 3,
+	OCCUPANCY_EAST = 4,
+	OCCUPANCY_WEST = 5
 } Occupancy;
 
 class AgentCharacter {

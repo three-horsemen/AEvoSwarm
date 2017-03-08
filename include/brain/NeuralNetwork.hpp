@@ -19,6 +19,8 @@ public:
 
 	~NeuralNetwork();
 
+	void freeLayers();
+
 	void compute();
 
 	void addLayer(Layer &);

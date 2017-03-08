@@ -52,7 +52,9 @@ protected:
 	Energy baby;
 	AgentCharacter character;
 
-	static short actionCost[10];
+	//TODO Use Boost enum
+	static const short actionCount = 10;
+	static short actionCost[actionCount];
 	excitation *sensoryInputs;
 
 	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);

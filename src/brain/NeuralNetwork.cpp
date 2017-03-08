@@ -28,6 +28,12 @@ void NeuralNetwork::compute() {
 	}
 }
 
+void NeuralNetwork::freeLayers() {
+	for (int i = 1; i < layers.size(); i++) {
+		delete layers[i];
+	}
+}
+
 void NeuralNetwork::addLayer(Layer &layer) {
 	if (layers.size() == 0) {
 		if (layer.type == INPUT) {

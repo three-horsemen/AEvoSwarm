@@ -48,5 +48,5 @@ excitation *Layer::getOutputs() {
 }
 
 void Layer::compute() {
-	LOG_ERROR << "Layer::compute";
+	throw runtime_error("Layer not implemented");
 }

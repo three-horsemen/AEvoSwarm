@@ -4,9 +4,10 @@
 
 #include <agent/Ant.hpp>
 
-short Ant::actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
+short Ant::actionCost[actionCount] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
 Ant::Ant() : Agent(5, 5) {
+	developBrain();
 }
 
 Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newBaby,
@@ -136,7 +137,7 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 			return !perceptiveField.getTile(
 					getCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();
 		case Ant::DIE:
-			return getPotential() > actionCost[Ant::EAT];
+			return true;
 		default:
 			throw invalid_argument("Unknown action specified");
 	}
@@ -160,11 +161,24 @@ void Ant::senseObservation(Environment &environment) {
 }
 
 Agent::Action Ant::getSelectedAction() {
+	//neuron::randomizeExcitation(brain.getLayer(0)->inputSize, sensoryInputs);
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
 	excitation *outputs = brain.getOutputLayer()->getOutputs();
-	//TODO Use brain and senses here
-	//TODO Return valid selected action
+
+	assert(brain.getOutputLayer()->outputSize == actionCount);
+
+	int mostExcitedValidAction = -1;
+	float maxExcitation = -1;
+	for (int action = 0; action < actionCount; action++) {
+		if (isActionValid((Agent::Action) action) && outputs[action] > maxExcitation) {
+			mostExcitedValidAction = action;
+			maxExcitation = outputs[action];
+		}
+	}
+
+	assert(mostExcitedValidAction != -1);
+	return (Agent::Action) mostExcitedValidAction;
 }
 
 Agent::Action Ant::performAction(Agent::Action agentAction) {
@@ -203,35 +217,39 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 
 void Ant::developBrain() {
 	const short inputSize = 25, fC1Size = 24, fC2Size = 16, outputSize = 10;
-	InputLayer inputLayer(inputSize);
+	InputLayer *inputLayer = new InputLayer(inputSize);
 	excitation excitations[inputSize];
 	neuron::randomizeExcitation(inputSize, excitations);
-	inputLayer.setInputs((excitation *) excitations);
-	brain.addLayer((Layer &) inputLayer);
+	inputLayer->setInputs((excitation *) excitations);
+	brain.addLayer((Layer &) *inputLayer);
 
 	weight weights1[fC1Size][inputSize];
 	neuron::randomizeWeights(inputSize, fC1Size, (weight *) weights1);
-	FullyConnectedLayer fullyConnectedLayer1(inputSize, fC1Size, (weight *) weights1);
-	brain.addLayer((Layer &) fullyConnectedLayer1);
+	FullyConnectedLayer *fullyConnectedLayer1 = new FullyConnectedLayer(inputSize, fC1Size, (weight *) weights1);
+	brain.addLayer((Layer &) *fullyConnectedLayer1);
 
 	weight weights2[fC2Size][fC1Size];
 	neuron::randomizeWeights(fC1Size, fC2Size, (weight *) weights2);
-	FullyConnectedLayer fullyConnectedLayer2(fC1Size, fC2Size, (weight *) weights2);
-	brain.addLayer((Layer &) fullyConnectedLayer2);
+	FullyConnectedLayer *fullyConnectedLayer2 = new FullyConnectedLayer(fC1Size, fC2Size, (weight *) weights2);
+	brain.addLayer((Layer &) *fullyConnectedLayer2);
 
 	weight weights3[outputSize][fC2Size];
 	neuron::randomizeWeights(fC2Size, outputSize, (weight *) weights3);
-	FullyConnectedLayer fullyConnectedLayer3(fC2Size, outputSize, (weight *) weights3);
-	brain.addLayer((Layer &) fullyConnectedLayer3);
+	FullyConnectedLayer *fullyConnectedLayer3 = new FullyConnectedLayer(fC2Size, outputSize, (weight *) weights3);
+	brain.addLayer((Layer &) *fullyConnectedLayer3);
 
-	OutputLayer outputLayer(outputSize);
-	brain.addLayer((Layer &) outputLayer);
+	OutputLayer *outputLayer = new OutputLayer(outputSize);
+	brain.addLayer((Layer &) *outputLayer);
 
 	sensoryInputs = new excitation[inputSize];
+	neuron::randomizeExcitation(inputSize, excitations);
+	inputLayer->setInputs((excitation *) excitations);
+	brain.compute();
 }
 
 void Ant::resorbBrain() {
 	delete[] sensoryInputs;
+	brain.freeLayers();
 }
 
 Coordinate Ant::getCoordinate() {

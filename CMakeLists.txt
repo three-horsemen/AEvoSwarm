@@ -126,11 +126,11 @@ target_link_libraries(
 )
 
 add_executable(
-		unit_test_ant_rules
-		src/unit_test/agent/unit_test_ant_rules.cpp
+		unit_test_ant_action
+		src/unit_test/agent/unit_test_ant_action.cpp
 )
 target_link_libraries(
-		unit_test_ant_rules
+		unit_test_ant_action
 		ui
 )
 

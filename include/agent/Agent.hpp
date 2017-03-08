@@ -33,7 +33,11 @@ public:
 
 	virtual void observeEnvironment(Environment &)=0;
 
+	virtual void senseObservation(Environment &)=0;
+
 	virtual void developBrain()=0;
+
+	virtual void resorbBrain()=0;
 
 	virtual Action getSelectedAction()=0;
 

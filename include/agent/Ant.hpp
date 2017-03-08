@@ -53,6 +53,7 @@ protected:
 	AgentCharacter character;
 
 	static short actionCost[10];
+	excitation *sensoryInputs;
 
 	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
@@ -86,13 +87,19 @@ public:
 
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
+	~Ant();
+
 	bool isEnergyAvailable(Agent::Action action);
 
 	bool isActionValid(Agent::Action action);
 
 	void developBrain();
 
+	void resorbBrain();
+
 	void observeEnvironment(Environment &);
+
+	void senseObservation(Environment &);
 
 	Agent::Action getSelectedAction();
 

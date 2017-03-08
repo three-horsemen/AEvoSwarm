@@ -23,6 +23,10 @@ Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy
 	developBrain();
 }
 
+Ant::~Ant() {
+	resorbBrain();
+}
+
 Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjacency::Adjacency adjacency) {
 	int x = coordinate.getX(), y = coordinate.getY();
 	switch (occupancy) {
@@ -151,7 +155,14 @@ void Ant::observeEnvironment(Environment &environment) {
 	}
 }
 
+void Ant::senseObservation(Environment &environment) {
+	//TODO populate sensoryInput from sensors here
+}
+
 Agent::Action Ant::getSelectedAction() {
+	brain.getLayer(0)->setInputs(sensoryInputs);
+	brain.compute();
+	excitation *outputs = brain.getOutputLayer()->getOutputs();
 	//TODO Use brain and senses here
 	//TODO Return valid selected action
 }
@@ -215,6 +226,12 @@ void Ant::developBrain() {
 
 	OutputLayer outputLayer(outputSize);
 	brain.addLayer((Layer &) outputLayer);
+
+	sensoryInputs = new excitation[inputSize];
+}
+
+void Ant::resorbBrain() {
+	delete[] sensoryInputs;
 }
 
 Coordinate Ant::getCoordinate() {

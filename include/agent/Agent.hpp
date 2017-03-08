@@ -7,6 +7,7 @@
 
 #include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
+#include <brain/NeuralNetwork.hpp>
 
 enum Action {
 

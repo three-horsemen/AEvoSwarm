@@ -24,19 +24,19 @@ int main() {
 	do {
 		AsciiEnvironment::displayAsciiEnvironment(environment);
 		cout << "What action to perform? (Press 9 to exit)" << endl <<
-			 Ant::FORWARD << ". FORWARD,\n" <<
-			 Ant::LEFT << ". LEFT,\n" <<
-			 Ant::RIGHT << ". RIGHT\n" <<
+			 ant::action::FORWARD << ". FORWARD,\n" <<
+			 ant::action::LEFT << ". LEFT,\n" <<
+			 ant::action::RIGHT << ". RIGHT\n" <<
 			 "::";
 		cin >> choice;
 		switch (choice) {
-			case Ant::FORWARD:
+			case ant::action::FORWARD:
 				ant.moveForward(environment);
 				break;
-			case Ant::LEFT:
+			case ant::action::LEFT:
 				ant.turnLeft(environment);
 				break;
-			case Ant::RIGHT:
+			case ant::action::RIGHT:
 				ant.turnRight(environment);
 				break;
 			default:

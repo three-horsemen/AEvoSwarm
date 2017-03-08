@@ -15,39 +15,64 @@
 #include <environment/Energy.hpp>
 
 using namespace std;
+namespace ant {
+	namespace sensor {
+		enum Sensor {
+			FRONT,
+			LEFT,
+			RIGHT
+		};
+	}
+	namespace percept {
+		enum Percept {
+			ATTITUDE,
+			TRAIT,
+			ENERGY
+		};
+	}
+	namespace adjacency {
+		enum Adjacency {
+			AHEAD,
+			LEFT,
+			RIGHT,
+			BEHIND
+		};
+	}
+	namespace action {
+		enum Action {
+			FORWARD,
+			LEFT,
+			RIGHT,
+			EAT,
+			ATTACK,
+			FORTIFY,
+			MATURE,
+			GROW_BABY,
+			GIVE_BIRTH,
+			DIE
+		};
+	}
+}
+using namespace ant;
 
 class Ant : public Agent {
+public:
+	static short actionCost[10];
 protected:
-	Coordinate coordinate;
 	Energy potential;
 	Energy shield;
 	Energy fertility;
 	Energy baby;
 	AgentCharacter character;
 
-	Coordinate getCoordinateAhead(Coordinate, Occupancy);
+	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
-	Coordinate getCoordinateAhead(Occupancy);
+	Coordinate getCoordinate(Occupancy, adjacency::Adjacency);
 
-	Coordinate getCoordinateBehind(Coordinate, Occupancy);
+	Coordinate getCoordinate(adjacency::Adjacency);
 
-	Coordinate getCoordinateBehind(Occupancy);
 
 public:
-	enum Action {
-		FORWARD,
-		LEFT,
-		RIGHT,
-		EAT,
-		ATTACK,
-		FORTIFY,
-		MATURE,
-		GROW_BABY,
-		GIVE_BIRTH,
-		DIE
-	};
-	static short actionCost[10];
-
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
 	bool isEnergyAvailable(Agent::Action action);
@@ -100,6 +125,10 @@ public:
 	static Ant generateRandomAnt();
 
 	void placeAntInEnvironment(Environment &, Coordinate);
+
+	int calculateDistance(Coordinate, Coordinate);
+
+	excitation getSensation(sensor::Sensor, percept::Percept);
 };
 
 

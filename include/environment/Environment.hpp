@@ -31,6 +31,8 @@ public:
 
 	Energy getTotalEnergy();
 
+	void clearCharacterGrid();
+
 	void randomize();
 };
 

@@ -94,11 +94,13 @@ public:
 
 	void observeEnvironment(Environment &);
 
-	Agent::Action getSelectAction();
+	Agent::Action getSelectedAction();
 
 	Agent::Action performAction(Agent::Action);
 
 	void affectEnvironment(Environment &);
+
+	static void realizeAntsAction(vector<Ant> &, Environment &);
 
 	Coordinate getCoordinate();
 

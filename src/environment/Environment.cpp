@@ -62,6 +62,9 @@ Energy Environment::getTotalEnergy() {
 	return totalEnergy;
 }
 
+void Environment::clearCharacterGrid() {
+	//TODO Implement stub
+}
 
 void Environment::randomize() {
 	const Energy HYPOTHETICAL_MAX_ENERGY = 10;

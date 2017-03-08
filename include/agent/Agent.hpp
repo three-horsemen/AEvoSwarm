@@ -35,7 +35,7 @@ public:
 
 	virtual void developBrain()=0;
 
-	virtual Action getSelectAction()=0;
+	virtual Action getSelectedAction()=0;
 
 	virtual Action performAction(Agent::Action)=0;
 

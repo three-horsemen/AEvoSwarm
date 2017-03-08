@@ -59,15 +59,6 @@ target_link_libraries(
 		shared
 )
 
-add_executable(
-		unit_test_neural_network
-		src/unit_test/brain/unit_test_neural_network.cpp
-)
-target_link_libraries(
-		unit_test_neural_network
-		brain
-)
-
 ###Environment Module
 add_library(environment
 		src/environment/Coordinate.cpp
@@ -77,20 +68,8 @@ add_library(environment
 		)
 target_link_libraries(
 		environment
-		agent
 		shared
 )
-
-add_executable(
-		unit_test_mpi_map_comm
-		src/unit_test/map/unit_test_mpi_map_comm.cpp
-)
-target_link_libraries(
-		unit_test_mpi_map_comm
-		environment
-		${MPI_LIBRARIES}
-)
-
 
 ###Agent module
 add_library(agent
@@ -107,23 +86,12 @@ target_link_libraries(
 
 ###Ant module
 add_library(ant
-		src/agent/Ant.cpp
-		src/unit_test/agent/unit_test_ant_rules.cpp)
+		src/agent/Ant.cpp)
 target_link_libraries(
 		ant
 		${Boost_LIBRARIES}
 		pthread
 		agent
-)
-
-add_executable(
-		unit_test_ant_rules
-		src/unit_test/agent/unit_test_ant_rules.cpp
-)
-target_link_libraries(
-		unit_test_ant_rules
-		ant
-		ui
 )
 
 ###UI module
@@ -132,8 +100,38 @@ add_library(ui
 		)
 target_link_libraries(
 		ui
-		environment
-		agent
+		ant
+)
+
+
+###Unit tests
+
+add_executable(
+		unit_test_mpi_map_comm
+		src/unit_test/map/unit_test_mpi_map_comm.cpp
+)
+target_link_libraries(
+		unit_test_mpi_map_comm
+		${MPI_LIBRARIES}
+		ui
+)
+
+add_executable(
+		unit_test_neural_network
+		src/unit_test/brain/unit_test_neural_network.cpp
+)
+target_link_libraries(
+		unit_test_neural_network
+		brain
+)
+
+add_executable(
+		unit_test_ant_rules
+		src/unit_test/agent/unit_test_ant_rules.cpp
+)
+target_link_libraries(
+		unit_test_ant_rules
+		ui
 )
 
 add_executable(
@@ -143,7 +141,6 @@ add_executable(
 target_link_libraries(
 		unit_test_asciienvironment
 		ui
-		shared
 )
 add_executable(unit_test_controlant
 		src/unit_test/ui/controlant.cpp
@@ -151,6 +148,4 @@ add_executable(unit_test_controlant
 target_link_libraries(
 		unit_test_controlant
 		ui
-		ant
-		shared
 )

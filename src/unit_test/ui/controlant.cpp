@@ -2,23 +2,25 @@
 // Created by soorya on 6/3/17.
 //
 
-#include "agent/Ant.hpp"
 #include "ui/AsciiEnvironment.hpp"
+#include <agent/Ant.hpp>
 
 using namespace std;
 
 int main() {
-	Coordinate randomCoordinate(5, 2);
-	Ant ant;
-	ant.randomize();
+	vector<Ant> ants(1);
+
+	ants[0].randomize();
 	Environment environment(10, 10);
 	environment.randomize();
-	ant.placeAntInEnvironment(environment, randomCoordinate);
+	Coordinate randomCoordinate(5, 2);
+	ants[0].placeAntInEnvironment(environment, randomCoordinate);
+
 	cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {
-				environment.setTile(ant >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
+				environment.setTile(ants[0] >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
 			}
 		}
 	}
@@ -33,10 +35,12 @@ int main() {
 		int choice;
 		cin >> choice;
 		action = (Ant::Action) choice;
-		ant.observeEnvironment(environment);
-		AsciiEnvironment::displayPerceptiveField(*ant.getPerceptiveField());
-		ant.performAction((Agent::Action) action);
-		AsciiEnvironment::displayPerceptiveField(*ant.getPerceptiveField());
+		ants[0].observeEnvironment(environment);
+		AsciiEnvironment::displayPerceptiveField(*ants[0].getPerceptiveField());
+		ants[0].performAction((Agent::Action) action);
+		AsciiEnvironment::displayPerceptiveField(*ants[0].getPerceptiveField());
+		Ant::realizeAntsAction(ants, environment);
+		ants[0].affectEnvironment(environment);
 	} while (action != 9);
 	return 0;
 }

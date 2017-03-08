@@ -151,12 +151,19 @@ void Ant::observeEnvironment(Environment &environment) {
 	}
 }
 
-Agent::Action Ant::getSelectAction() {
+Agent::Action Ant::getSelectedAction() {
 	//TODO Use brain and senses here
+	//TODO Return valid selected action
 }
 
 Agent::Action Ant::performAction(Agent::Action agentAction) {
+	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
 	Action action = (Action) agentAction;
+
+	Energy potentialEnergy = getPotential();
+	potentialEnergy -= actionCost[agentAction];
+	setPotential(potentialEnergy);
+
 	switch (action) {
 		case Ant::FORWARD:
 			moveForward();
@@ -172,8 +179,15 @@ Agent::Action Ant::performAction(Agent::Action agentAction) {
 	}
 }
 
-void Ant::affectEnvironment(Environment &) {
-	//TODO Turn ant fantasies into reality
+void Ant::affectEnvironment(Environment &environment) {
+	//TODO Blindly set character of agent onto map
+	//TODO Additively incorporate perceptive field energy changes onto environment
+}
+
+void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
+	for (int i = 0; i < ants.size(); i++) {
+		ants[i].affectEnvironment(environment);
+	}
 }
 
 void Ant::developBrain() {

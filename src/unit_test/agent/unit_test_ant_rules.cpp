@@ -2,22 +2,27 @@
 // Created by reuben on 5/3/17.
 //
 
+#include <vector>
+
 #include <ui/AsciiEnvironment.hpp>
 #include <agent/Ant.hpp>
 
 int main(int argc, char *argv[]) {
 
 	Coordinate randomCoordinate(5, 2);
-	Ant ant;
-	ant.randomize();
+
+	vector<Ant> ants(1);
+
+	ants[0].randomize();
 	Environment environment(10, 10);
 	environment.randomize();
-	ant.placeAntInEnvironment(environment, randomCoordinate);
+	ants[0].placeAntInEnvironment(environment, randomCoordinate);
+
 	cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {
-				environment.setTile(ant >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
+				environment.setTile(ants[0] >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
 			}
 		}
 	}
@@ -26,10 +31,12 @@ int main(int argc, char *argv[]) {
 	do {
 		AsciiEnvironment::displayAsciiEnvironment(environment);
 
-		ant.observeEnvironment(environment);
-		selectedAction = (Ant::Action) ant.getSelectAction();
-		ant.performAction((Agent::Action) selectedAction);
-		ant.affectEnvironment(environment);
+		ants[0].observeEnvironment(environment);
+		selectedAction = (Ant::Action) ants[0].getSelectedAction();
+		ants[0].performAction((Agent::Action) selectedAction);
+
+		environment.clearCharacterGrid();
+		Ant::realizeAntsAction(ants, environment);
 
 	} while (selectedAction != Ant::Action::DIE);
 	return 0;

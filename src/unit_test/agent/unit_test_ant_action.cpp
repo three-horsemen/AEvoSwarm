@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 		AsciiEnvironment::displayAsciiEnvironment(environment);
 
 		ants[0].observeEnvironment(environment);
+		ants[0].senseObservation(environment);
 		selectedAction = (Ant::Action) ants[0].getSelectedAction();
 		ants[0].performAction((Agent::Action) selectedAction);
 

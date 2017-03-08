@@ -57,6 +57,7 @@ protected:
 
 	//TODO Use Boost enum
 	static const short actionCount = 10;
+	static const short memoryCount = 15;
 	static short actionCost[actionCount];
 	excitation *sensoryInputs;
 

@@ -198,9 +198,13 @@ Agent::Action Ant::getSelectedAction() {
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
 	excitation *outputs = brain.getOutputLayer()->getOutputs();
+	for (int i = 15; i < brain.getOutputLayer()->outputSize; i++) {
+		sensoryInputs[i] = outputs[i];
+	}
 
-	assert(brain.getOutputLayer()->outputSize == actionCount);
+	assert(brain.getOutputLayer()->outputSize == actionCount + memoryCount);
 
+	outputs[DIE] = 0;
 	int mostExcitedValidAction = -1;
 	float maxExcitation = -1;
 	for (int action = 0; action < actionCount; action++) {
@@ -249,7 +253,7 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 }
 
 void Ant::developBrain() {
-	const short inputSize = 25, fC1Size = 24, fC2Size = 16, outputSize = 10;
+	const short inputSize = 25, fC1Size = 25, fC2Size = 25, outputSize = 25;
 	InputLayer *inputLayer = new InputLayer(inputSize);
 	excitation excitations[inputSize];
 	neuron::randomizeExcitation(inputSize, excitations);
@@ -520,5 +524,6 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	perceivedAverage /= totalWeightedDistance;
 	float maxPerceptValue = getMaxPerceptValue(percept);
 	excitation resultantExcitation = perceivedAverage / maxPerceptValue;
+
 	return resultantExcitation;
 }

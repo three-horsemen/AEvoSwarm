@@ -63,7 +63,13 @@ Energy Environment::getTotalEnergy() {
 }
 
 void Environment::clearCharacterGrid() {
-	//TODO Implement stub
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			Tile tile = getTile(Coordinate(i, j));
+			tile.setAgentCharacter(AgentCharacter());
+			setTile(tile, Coordinate(i, j));
+		}
+	}
 }
 
 void Environment::randomize() {

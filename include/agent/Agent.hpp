@@ -11,11 +11,6 @@
 
 #include <brain/NeuralNetwork.hpp>
 
-//TODO Remove redundant Action enum
-enum Action {
-
-};
-
 class Agent {
 protected:
 	PerceptiveField perceptiveField;

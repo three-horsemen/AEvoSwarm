@@ -87,7 +87,7 @@ add_executable(
 )
 target_link_libraries(
 		unit_test_mpi_map_comm
-		map
+		environment
 		${MPI_LIBRARIES}
 )
 

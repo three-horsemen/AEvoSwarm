@@ -6,16 +6,11 @@
 #define SFTP_PERCEPTIVEFIELD_HPP
 
 
-#include <environment/Tile.hpp>
+#include <environment/Environment.hpp>
 
-class PerceptiveField {
+class PerceptiveField : public Environment {
 public:
-	static const short WIDTH = 5, HEIGHT = 5;
-	Tile tile[WIDTH][HEIGHT];
-
-	PerceptiveField();
-
-	Tile getTile(Coordinate);
+	PerceptiveField(short, short);
 };
 
 

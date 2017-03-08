@@ -23,9 +23,10 @@ namespace ascii_environment {
 	}
 }
 
-AsciiEnvironment::AsciiEnvironment(Environment &newEnvironment) {
-	for (int i = 0; i < Environment::MAX_X; i++) {
-		for (int j = 0; j < Environment::MAX_Y; j++) {
+AsciiEnvironment::AsciiEnvironment(Environment &newEnvironment) : environment(newEnvironment.width,
+																			  newEnvironment.height) {
+	for (int i = 0; i < newEnvironment.width; i++) {
+		for (int j = 0; j < newEnvironment.height; j++) {
 			environment.setTile(
 					Tile(newEnvironment.getTile(Coordinate(i, j))),
 					Coordinate(i, j));
@@ -43,19 +44,19 @@ void AsciiEnvironment::setEnvironment(Environment newEnvironment) {
 
 void AsciiEnvironment::displayAsciiEnvironment(Environment &environment) {
 
-	for (int i = 0; i < Environment::MAX_X; i++) {
+	for (int i = 0; i < environment.height; i++) {
 		cout << "----";
 	}
 	cout << "-" << endl;
-	for (int i = 0; i < Environment::MAX_X; i++) {
-		for (int j = 0; j < Environment::MAX_Y; j++) {
+	for (int i = 0; i < environment.height; i++) {
+		for (int j = 0; j < environment.width; j++) {
 			cout << "| "
 				 << ascii_environment::getCharForOccupancy(
-						 environment.getTile(Coordinate(i, j)).getAgentCharacter().getOccupancy())
+						 environment.getTile(Coordinate(j, i)).getAgentCharacter().getOccupancy())
 				 << " ";
 		}
 		cout << "|" << endl;
-		for (int j = 0; j < Environment::MAX_Y; j++) {
+		for (int j = 0; j < environment.width; j++) {
 			cout << "----";
 		}
 		cout << "-" << endl;
@@ -65,19 +66,19 @@ void AsciiEnvironment::displayAsciiEnvironment(Environment &environment) {
 
 void AsciiEnvironment::displayPerceptiveField(PerceptiveField &perceptiveField) {
 
-	for (int i = 0; i < PerceptiveField::WIDTH; i++) {
+	for (int i = 0; i < perceptiveField.width; i++) {
 		cout << "----";
 	}
 	cout << "-" << endl;
-	for (int i = 0; i < PerceptiveField::WIDTH; i++) {
-		for (int j = 0; j < PerceptiveField::HEIGHT; j++) {
+	for (int i = 0; i < perceptiveField.height; i++) {
+		for (int j = 0; j < perceptiveField.width; j++) {
 			cout << "| "
 				 << ascii_environment::getCharForOccupancy(
-						 perceptiveField.tile[i][j].getAgentCharacter().getOccupancy())
+						 perceptiveField.getTile(Coordinate(j, i)).getAgentCharacter().getOccupancy())
 				 << " ";
 		}
 		cout << "|" << endl;
-		for (int j = 0; j < PerceptiveField::HEIGHT; j++) {
+		for (int j = 0; j < perceptiveField.height; j++) {
 			cout << "----";
 		}
 		cout << "-" << endl;

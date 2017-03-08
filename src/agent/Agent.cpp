@@ -4,7 +4,8 @@
 
 #include <agent/Agent.hpp>
 
-Agent::Agent() {
+Agent::Agent(short perceptiveFieldWidth, short perceptiveFieldHeight) : perceptiveField(perceptiveFieldWidth,
+																						perceptiveFieldHeight) {
 
 }
 

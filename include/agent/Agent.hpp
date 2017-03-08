@@ -8,6 +8,8 @@
 #include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
 
+#include <brain/NeuralNetwork.hpp>
+
 enum Action {
 
 };
@@ -16,17 +18,26 @@ class Agent {
 protected:
 	PerceptiveField perceptiveField;
 	Coordinate coordinate;
+	NeuralNetwork brain;
 public:
 	enum Action {
 	};
 
-	Agent();
+	Agent(short, short);
 
 	virtual bool isEnergyAvailable(Agent::Action action)=0;
 
 	virtual bool isActionValid(Action action)=0;
 
 	virtual void observeEnvironment(Environment &)=0;
+
+	virtual void developBrain()=0;
+
+	virtual Action getSelectAction()=0;
+
+	virtual Action performAction(Agent::Action)=0;
+
+	virtual void affectEnvironment(Environment &)=0;
 
 	PerceptiveField *getPerceptiveField();
 };

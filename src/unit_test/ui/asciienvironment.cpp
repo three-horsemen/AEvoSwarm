@@ -9,9 +9,9 @@ int main() {
 	Trait randomTrait = 3;
 	Occupancy randomOccupancy = OCCUPANCY_EAST;
 	Energy randomEnergy = 10;
-	Environment environment;
-	for (int i = 0; i < Environment::MAX_X; i++) {
-		for (int j = 0; j < Environment::MAX_Y; j++) {
+	Environment environment(10, 10);
+	for (int i = 0; i < environment.width; i++) {
+		for (int j = 0; j < environment.height; j++) {
 			environment.setTile(
 					Tile(
 							Coordinate(i, j),

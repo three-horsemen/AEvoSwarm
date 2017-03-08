@@ -5,10 +5,6 @@
 #include "agent/PerceptiveField.hpp"
 
 
-PerceptiveField::PerceptiveField() {
+PerceptiveField::PerceptiveField(short width, short height) : Environment(width, height) {
 
-}
-
-Tile PerceptiveField::getTile(Coordinate coordinate) {
-	return tile[coordinate.getX()][coordinate.getY()];
 }

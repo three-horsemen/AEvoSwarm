@@ -14,24 +14,34 @@
 #include <environment/Coordinate.hpp>
 #include <environment/Energy.hpp>
 
+#include <brain/InputLayer.hpp>
+#include <brain/OutputLayer.hpp>
+
 using namespace std;
 
 class Ant : public Agent {
 protected:
-	Coordinate coordinate;
 	Energy potential;
 	Energy shield;
 	Energy fertility;
 	Energy baby;
 	AgentCharacter character;
 
-	Coordinate getCoordinateAhead(Coordinate, Occupancy);
+	static Coordinate getCoordinateAhead(Coordinate, Occupancy);
 
 	Coordinate getCoordinateAhead(Occupancy);
 
-	Coordinate getCoordinateBehind(Coordinate, Occupancy);
+	Coordinate getCoordinateAhead();
+
+	static Coordinate getCoordinateBehind(Coordinate, Occupancy);
 
 	Coordinate getCoordinateBehind(Occupancy);
+
+	void moveForward();
+
+	void turnLeft();
+
+	void turnRight();
 
 public:
 	enum Action {
@@ -48,13 +58,23 @@ public:
 	};
 	static short actionCost[10];
 
+	Ant();
+
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
 	bool isEnergyAvailable(Agent::Action action);
 
 	bool isActionValid(Agent::Action action);
 
+	void developBrain();
+
 	void observeEnvironment(Environment &);
+
+	Agent::Action getSelectAction();
+
+	Agent::Action performAction(Agent::Action);
+
+	void affectEnvironment(Environment &);
 
 	Coordinate getCoordinate();
 
@@ -90,14 +110,7 @@ public:
 
 	Tile operator<(Tile);
 
-	void moveForward(Environment &);
-
-	void turnLeft(Environment &);
-
-	void turnRight(Environment &);
-
-
-	static Ant generateRandomAnt();
+	void randomize();
 
 	void placeAntInEnvironment(Environment &, Coordinate);
 };

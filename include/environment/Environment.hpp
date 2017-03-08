@@ -6,18 +6,24 @@
 #define SFTP_ENVIRONMENT_HPP
 
 #include "environment/Tile.hpp"
+
+#include <vector>
 #include <time.h>
 
-class Environment {
-public:
-	static const short MAX_X = 10;
-	static const short MAX_Y = 10;
-protected:
-	Tile tiles[MAX_X][MAX_X];
-public:
-	Environment();
+using namespace std;
 
-	Environment(Tile Tiles[MAX_X][MAX_X]);
+class Environment {
+protected:
+	short _width, _height;
+	vector<vector<Tile> > tiles;
+public:
+	short &width, &height;
+
+	Environment(Environment &);
+
+	void operator=(Environment &);
+
+	Environment(short, short);
 
 	Tile getTile(Coordinate);
 
@@ -25,7 +31,7 @@ public:
 
 	Energy getTotalEnergy();
 
-	static Environment generateRandomEnvironment();
+	void randomize();
 };
 
 #endif //SFTP_ENVIRONMENT_HPP

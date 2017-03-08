@@ -99,8 +99,8 @@ void Ant::observeEnvironment(Environment &environment) {
 		 i < PerceptiveField::WIDTH / 2; i++) {
 		for (int j = -PerceptiveField::HEIGHT / 2;
 			 j < +PerceptiveField::HEIGHT / 2; j++) {
-			int x = Utils::modulo(coordinate.getX() + i, Map::MAX_X), y = Utils::modulo(coordinate.getY() + j,
-																						Map::MAX_Y);
+			int x = Utils::modulo(coordinate.getX() + i, Environment::MAX_X), y = Utils::modulo(coordinate.getY() + j,
+																								Environment::MAX_Y);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.tile[i + PerceptiveField::WIDTH / 2][j + PerceptiveField::HEIGHT / 2] = tile;
 		}
@@ -165,13 +165,12 @@ Tile Ant::operator>>(Tile tile) {
 	tile.setAgentCharacter(character);
 	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
 	coordinate = tile.getCoordinate();
-//	this->setCoordinate(tile.getCoordinate());
 	return tile;
 }
 
 Tile Ant::operator>(Tile tile) {
 	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy;
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
 	if (currentOccupancy == OCCUPANCY_NORTH)
 		newOccupancy = OCCUPANCY_EAST;
 	else if (currentOccupancy == OCCUPANCY_EAST)
@@ -189,7 +188,7 @@ Tile Ant::operator>(Tile tile) {
 
 Tile Ant::operator<(Tile tile) {
 	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy;
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
 	if (currentOccupancy == OCCUPANCY_NORTH)
 		newOccupancy = OCCUPANCY_WEST;
 	else if (currentOccupancy == OCCUPANCY_EAST)
@@ -205,31 +204,72 @@ Tile Ant::operator<(Tile tile) {
 	return tile;
 }
 
-void Ant::moveForward(Map &map) {
+void Ant::moveForward(Environment &environment) {
 	Coordinate destinationCoordinate = coordinate;
 	Occupancy occupancy = character.getOccupancy();
 	if (occupancy == OCCUPANCY_NORTH)
-		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() - 1), Map::MAX_X));
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() - 1), Environment::MAX_X));
 	else if (occupancy == OCCUPANCY_EAST)
-		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() + 1), Map::MAX_Y));
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() + 1), Environment::MAX_Y));
 	else if (occupancy == OCCUPANCY_SOUTH)
-		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() + 1), Map::MAX_X));
+		destinationCoordinate.setX(Utils::modulo((destinationCoordinate.getX() + 1), Environment::MAX_X));
 	else if (occupancy == OCCUPANCY_WEST)
-		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() - 1), Map::MAX_Y));
-	map.setTile(
-			(*this << map.getTile(coordinate)),
+		destinationCoordinate.setY(Utils::modulo((destinationCoordinate.getY() - 1), Environment::MAX_Y));
+	environment.setTile(
+			(*this << environment.getTile(coordinate)),
 			coordinate
 	);
-	map.setTile(
-			(*this >> map.getTile(destinationCoordinate)),
+	environment.setTile(
+			(*this >> environment.getTile(destinationCoordinate)),
 			destinationCoordinate
 	);
 }
 
-void Ant::turnLeft(Map &map) {
-	map.setTile(*this < map.getTile(coordinate), coordinate);
+void Ant::turnLeft(Environment &environment) {
+	environment.setTile(*this < environment.getTile(coordinate), coordinate);
 }
 
-void Ant::turnRight(Map &map) {
-	map.setTile(*this > map.getTile(coordinate), coordinate);
+void Ant::turnRight(Environment &environment) {
+	environment.setTile(*this > environment.getTile(coordinate), coordinate);
+}
+
+Ant Ant::generateRandomAnt() {
+	srand((unsigned int) time(NULL));
+	const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 50;
+	const Attitude HYPOTHETICAL_MAX_ATTITUDE = 256;
+	const Attitude HYPOTHETICAL_MAX_TRAIT = 256;
+	const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
+	Occupancy occupancy;
+	int val = rand() % HYPOTHETICAL_MAX_OCCUPANCY_VAL;
+	if (val == 0)
+		occupancy = OCCUPANCY_NORTH;
+	else if (val == 1)
+		occupancy = OCCUPANCY_EAST;
+	else if (val == 2)
+		occupancy = OCCUPANCY_SOUTH;
+	else
+		occupancy = OCCUPANCY_WEST;
+	Ant ant(
+			Coordinate(-1, -1),
+			(Energy) (rand() % HYPOTHETICAL_MAX_POTENTIAL_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_SHIELD_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_FERTILITY_ENERGY),
+			(Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY),
+			AgentCharacter(
+					(Attitude) (rand() % HYPOTHETICAL_MAX_ATTITUDE),
+					(Trait) (rand() % HYPOTHETICAL_MAX_TRAIT),
+					occupancy
+			)
+	);
+	return ant;
+}
+
+void Ant::placeAntInEnvironment(Environment &environment, Coordinate coordinate) {
+	environment.setTile(
+			(*this >> environment.getTile(coordinate)),
+			coordinate
+	);
 }

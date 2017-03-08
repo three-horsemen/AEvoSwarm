@@ -11,8 +11,8 @@
 #include <agent/Agent.hpp>
 #include <agent/AgentCharacter.hpp>
 
-#include <map/Coordinate.hpp>
-#include <map/Energy.hpp>
+#include <environment/Coordinate.hpp>
+#include <environment/Energy.hpp>
 
 using namespace std;
 
@@ -47,7 +47,6 @@ public:
 		DIE
 	};
 	static short actionCost[10];
-//	static constexpr short actionCost[10] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
@@ -91,11 +90,16 @@ public:
 
 	Tile operator<(Tile);
 
-	void moveForward(Map &);
+	void moveForward(Environment &);
 
-	void turnLeft(Map &);
+	void turnLeft(Environment &);
 
-	void turnRight(Map &);
+	void turnRight(Environment &);
+
+
+	static Ant generateRandomAnt();
+
+	void placeAntInEnvironment(Environment &, Coordinate);
 };
 
 

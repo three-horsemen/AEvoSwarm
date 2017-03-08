@@ -6,7 +6,7 @@
 #define SFTP_PERCEPTIVEFIELD_HPP
 
 
-#include <map/Tile.hpp>
+#include <environment/Tile.hpp>
 
 class PerceptiveField {
 public:

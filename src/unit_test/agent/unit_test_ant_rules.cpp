@@ -2,7 +2,7 @@
 // Created by reuben on 5/3/17.
 //
 
-#include <ui/AsciiMap.hpp>
+#include <ui/AsciiEnvironment.hpp>
 #include <agent/Ant.hpp>
 
 int main(int argc, char *argv[]) {
@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
 	Energy newBaby = 8;
 	Ant ant(randomCoordinate, newPotential, newShield, newFertility, newBaby, AgentCharacter(0, 0, OCCUPANCY_NORTH));
 
-	for (int i = 0; i < Map::MAX_X; i++) {
-		for (int j = 0; j < Map::MAX_Y; j++) {
+	for (int i = 0; i < Environment::MAX_X; i++) {
+		for (int j = 0; j < Environment::MAX_Y; j++) {
 			environment.setTile(
 					Tile(
 							Coordinate(i, j),
@@ -47,12 +47,10 @@ int main(int argc, char *argv[]) {
 			Energy(randomEnergy)
 						),
 						Coordinate(0, 1));
-//	AsciiMap asciiMap(environment);
-//	asciiMap.displayAsciiMap();
-	AsciiMap::displayAsciiMap(environment);
+	AsciiEnvironment::displayAsciiEnvironment(environment);
 
 	ant.observeEnvironment(environment);
-	AsciiMap::displayPerceptiveField(*ant.getPerceptiveField());
+	AsciiEnvironment::displayPerceptiveField(*ant.getPerceptiveField());
 
 	return 0;
 }

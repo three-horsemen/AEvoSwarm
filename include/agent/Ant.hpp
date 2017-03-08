@@ -18,6 +18,31 @@
 #include <brain/OutputLayer.hpp>
 
 using namespace std;
+namespace ant {
+	namespace sensor {
+		enum Sensor {
+			FRONT,
+			LEFT,
+			RIGHT
+		};
+	}
+	namespace percept {
+		enum Percept {
+			ATTITUDE,
+			TRAIT,
+			ENERGY
+		};
+	}
+	namespace adjacency {
+		enum Adjacency {
+			AHEAD,
+			LEFT,
+			RIGHT,
+			BEHIND
+		};
+	}
+}
+using namespace ant;
 
 class Ant : public Agent {
 protected:
@@ -27,15 +52,14 @@ protected:
 	Energy baby;
 	AgentCharacter character;
 
-	static Coordinate getCoordinateAhead(Coordinate, Occupancy);
+	static short actionCost[10];
 
-	Coordinate getCoordinateAhead(Occupancy);
+	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
-	Coordinate getCoordinateAhead();
+	Coordinate getCoordinate(Occupancy, adjacency::Adjacency);
 
-	static Coordinate getCoordinateBehind(Coordinate, Occupancy);
+	Coordinate getCoordinate(adjacency::Adjacency);
 
-	Coordinate getCoordinateBehind(Occupancy);
 
 	void moveForward();
 
@@ -44,6 +68,7 @@ protected:
 	void turnRight();
 
 public:
+
 	enum Action {
 		FORWARD,
 		LEFT,
@@ -56,7 +81,6 @@ public:
 		GIVE_BIRTH,
 		DIE
 	};
-	static short actionCost[10];
 
 	Ant();
 
@@ -113,6 +137,10 @@ public:
 	void randomize();
 
 	void placeAntInEnvironment(Environment &, Coordinate);
+
+	int calculateDistance(Coordinate, Coordinate);
+
+	excitation getSensation(sensor::Sensor, percept::Percept);
 };
 
 

@@ -7,9 +7,11 @@
 
 #include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
+#include <brain/NeuralNetwork.hpp>
 
 #include <brain/NeuralNetwork.hpp>
 
+//TODO Remove redundant Action enum
 enum Action {
 
 };

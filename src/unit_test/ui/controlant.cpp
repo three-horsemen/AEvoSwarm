@@ -26,9 +26,9 @@ int main() {
 	do {
 		AsciiEnvironment::displayAsciiEnvironment(environment);
 		cout << "What action to perform? (Press 9 to exit)" << endl <<
-			 Ant::FORWARD << ". FORWARD,\n" <<
-			 Ant::LEFT << ". LEFT,\n" <<
-			 Ant::RIGHT << ". RIGHT\n" <<
+			 Ant::Action::FORWARD << ". FORWARD,\n" <<
+			 Ant::Action::LEFT << ". LEFT,\n" <<
+			 Ant::Action::RIGHT << ". RIGHT\n" <<
 			 "::";
 		int choice;
 		cin >> choice;

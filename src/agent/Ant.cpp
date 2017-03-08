@@ -23,20 +23,48 @@ Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy
 	developBrain();
 }
 
-Coordinate Ant::getCoordinateAhead(Coordinate coordinate, Occupancy occupancy) {
+Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjacency::Adjacency adjacency) {
 	int x = coordinate.getX(), y = coordinate.getY();
 	switch (occupancy) {
 		case OCCUPANCY_NORTH:
-			y--;
+			if (adjacency == adjacency::AHEAD)
+				y--;
+			else if (adjacency == adjacency::BEHIND)
+				y++;
+			else if (adjacency == adjacency::LEFT)
+				x--;
+			else
+				x++;
 			break;
 		case OCCUPANCY_SOUTH:
-			y++;
+			if (adjacency == adjacency::AHEAD)
+				y++;
+			else if (adjacency == adjacency::BEHIND)
+				y--;
+			else if (adjacency == adjacency::LEFT)
+				x++;
+			else
+				x--;
 			break;
 		case OCCUPANCY_EAST:
-			x++;
+			if (adjacency == adjacency::AHEAD)
+				x++;
+			else if (adjacency == adjacency::BEHIND)
+				x--;
+			else if (adjacency == adjacency::LEFT)
+				y--;
+			else
+				y++;
 			break;
 		case OCCUPANCY_WEST:
-			x--;
+			if (adjacency == adjacency::AHEAD)
+				x--;
+			else if (adjacency == adjacency::BEHIND)
+				x++;
+			else if (adjacency == adjacency::LEFT)
+				y++;
+			else
+				y--;
 			break;
 		default:
 			throw invalid_argument("Unknown occupancy specified");
@@ -44,47 +72,43 @@ Coordinate Ant::getCoordinateAhead(Coordinate coordinate, Occupancy occupancy) {
 	return Coordinate(x, y);
 }
 
-Coordinate Ant::getCoordinateAhead(Occupancy occupancy) {
-	return getCoordinateAhead(coordinate, occupancy);
+Coordinate Ant::getCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
+	return getCoordinate(coordinate, occupancy, adjacency);
 }
 
-Coordinate Ant::getCoordinateAhead() {
-	return getCoordinateAhead(coordinate, getCharacter().getOccupancy());
-}
-
-Coordinate Ant::getCoordinateBehind(Coordinate coordinate, Occupancy occupancy) {
-	return getCoordinateAhead(coordinate, (Occupancy) (occupancy ^ 1));
-}
-
-Coordinate Ant::getCoordinateBehind(Occupancy occupancy) {
-	return getCoordinateAhead(coordinate, (Occupancy) (occupancy ^ 1));
+Coordinate Ant::getCoordinate(adjacency::Adjacency adjacency) {
+	return getCoordinate(coordinate, character.getOccupancy(), adjacency);
 }
 
 bool Ant::isEnergyAvailable(Agent::Action action) {
 	return getPotential() > actionCost[action];
 }
 
-bool Ant::isActionValid(Agent::Action action) {
-	if (!isEnergyAvailable(action)) return false;
+bool Ant::isActionValid(Agent::Action agentAction) {
+	if (!isEnergyAvailable(agentAction)) return false;
+
+	Ant::Action action = (Action) agentAction;
 
 	Coordinate coordinateAhead;
-	switch ((Ant::Action) action) {
-		case FORWARD:
+	switch (action) {
+		case Ant::FORWARD:
 			if (perceptiveField.getTile(
-					getCoordinateAhead(getCharacter().getOccupancy())).getAgentCharacter().getOccupancy() !=
+					getCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy() !=
 				OCCUPANCY_DEAD)
 				return false;
-			coordinateAhead = getCoordinateAhead();
+			coordinateAhead = getCoordinate(adjacency::AHEAD);
 			for (int direction = OCCUPANCY_NORTH;
 				 direction <= ((int) OCCUPANCY_WEST); direction++) {
-				Coordinate potentialPredatorCoordinate = getCoordinateAhead(coordinateAhead, (Occupancy) direction);
+				Coordinate potentialPredatorCoordinate = getCoordinate(coordinateAhead, (Occupancy) direction,
+																	   adjacency::AHEAD);
 				Tile potentialPredatorTile = perceptiveField.getTile(potentialPredatorCoordinate);
 
 				if (potentialPredatorCoordinate != this->coordinate
 					&& potentialPredatorTile.getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD) {
-					Coordinate rangeOfImpactCoordinate = getCoordinateAhead(potentialPredatorCoordinate,
-																			potentialPredatorTile
-																					.getAgentCharacter().getOccupancy());
+					Coordinate rangeOfImpactCoordinate = getCoordinate(potentialPredatorCoordinate,
+																	   potentialPredatorTile
+																			   .getAgentCharacter().getOccupancy(),
+																	   adjacency::AHEAD);
 					if (rangeOfImpactCoordinate == coordinateAhead &&
 						potentialPredatorTile.getTotalEnergy() >= this->getTotalEnergy()) {
 						return false;
@@ -92,23 +116,23 @@ bool Ant::isActionValid(Agent::Action action) {
 				}
 			}
 			return true;
-		case LEFT:
-		case RIGHT:
+		case Ant::LEFT:
+		case Ant::RIGHT:
 			return true;
-		case EAT:
+		case Ant::EAT:
 			return perceptiveField.getTile(this->coordinate).getTotalEnergy() > getTotalEnergy();
-		case ATTACK:
+		case Ant::ATTACK:
 			return perceptiveField.getTile(
-					getCoordinateAhead(getCharacter().getOccupancy())).getAgentCharacter().getOccupancy();
-		case FORTIFY:
-		case MATURE:
-		case GROW_BABY:
+					getCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy();
+		case Ant::FORTIFY:
+		case Ant::MATURE:
+		case Ant::GROW_BABY:
 			return true;
-		case GIVE_BIRTH:
+		case Ant::GIVE_BIRTH:
 			return !perceptiveField.getTile(
-					getCoordinateBehind(getCharacter().getOccupancy())).getAgentCharacter().getOccupancy();
-		case DIE:
-			return getPotential() > actionCost[EAT];
+					getCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();
+		case Ant::DIE:
+			return getPotential() > actionCost[Ant::EAT];
 		default:
 			throw invalid_argument("Unknown action specified");
 	}
@@ -284,8 +308,8 @@ Tile Ant::operator<(Tile tile) {
 
 void Ant::moveForward() {
 	Coordinate perceivedSourceCoordinate(perceptiveField.width / 2, perceptiveField.height / 2);
-	Coordinate perceivedDestinationCoordinate = getCoordinateAhead(perceivedSourceCoordinate,
-																   getCharacter().getOccupancy());
+	Coordinate perceivedDestinationCoordinate = getCoordinate(perceivedSourceCoordinate,
+															  getCharacter().getOccupancy(), adjacency::AHEAD);
 
 	perceptiveField.setTile(
 			(*this << perceptiveField.getTile(perceivedSourceCoordinate)),
@@ -343,4 +367,49 @@ void Ant::placeAntInEnvironment(Environment &environment, Coordinate coordinate)
 			(*this >> environment.getTile(coordinate)),
 			coordinate
 	);
+}
+
+int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
+	int distanceX1 = Utils::modulo(abs(c1.getX() - c2.getX()), perceptiveField.width);
+	int distanceX2 = Utils::modulo(abs(c2.getX() - c2.getX()), perceptiveField.width);
+	int distanceX = min(distanceX1, distanceX2);
+	int distanceY1 = Utils::modulo(abs(c1.getY() - c2.getY()), perceptiveField.height);
+	int distanceY2 = Utils::modulo(abs(c2.getY() - c1.getY()), perceptiveField.height);
+	int distanceY = min(distanceY1, distanceY2);
+	return distanceX + distanceY;
+
+}
+
+excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
+	int maxHeight = perceptiveField.height;
+	int maxWidth = perceptiveField.width;
+	adjacency::Adjacency adjacency;
+	if (sensor == sensor::FRONT)
+		adjacency = adjacency::Adjacency::AHEAD;
+	else if (sensor == sensor::LEFT)
+		adjacency = adjacency::Adjacency::LEFT;
+	else
+		adjacency = adjacency::Adjacency::RIGHT;
+
+	Coordinate sensoryCoordinate = getCoordinate(adjacency);
+	int distance;
+	float totalWeightedDistance = 0;
+	float perceivedAverage = 0;
+	for (int i = 0; i < maxWidth; i++) {
+		for (int j = 0; j < maxHeight; j++) {
+			distance = 1 + calculateDistance(perceptiveField.getTile(Coordinate(i, j)).getCoordinate(),
+											 sensoryCoordinate);
+			totalWeightedDistance += (1.f / distance);
+			if (percept == percept::ATTITUDE)
+				perceivedAverage +=
+						perceptiveField.getTile(Coordinate(i, j)).getAgentCharacter().getAttitude() * (1.f / distance);
+			else if (percept == percept::TRAIT)
+				perceivedAverage +=
+						perceptiveField.getTile(Coordinate(i, j)).getAgentCharacter().getTrait() * (1.f / distance);
+			else if (percept == percept::ENERGY)
+				perceivedAverage += perceptiveField.getTile(Coordinate(i, j)).getTotalEnergy() * (1.f / distance);
+		}
+	}
+	perceivedAverage /= totalWeightedDistance;
+	return perceivedAverage;
 }

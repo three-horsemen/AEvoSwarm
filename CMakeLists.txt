@@ -11,9 +11,12 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
 find_package(Boost 1.54 COMPONENTS log log_setup thread system date_time REQUIRED)
 
+find_package(MPI REQUIRED)
+
 include_directories(
 		include
 		${Boost_INCLUDE_DIRS}
+		${MPI_INCLUDE_PATH}
 )
 
 #find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h)
@@ -77,6 +80,17 @@ target_link_libraries(
 		agent
 		shared
 )
+
+add_executable(
+		unit_test_mpi_map_comm
+		src/unit_test/map/unit_test_mpi_map_comm.cpp
+)
+target_link_libraries(
+		unit_test_mpi_map_comm
+		map
+		${MPI_LIBRARIES}
+)
+
 
 ###Agent module
 add_library(agent

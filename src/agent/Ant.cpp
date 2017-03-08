@@ -77,12 +77,21 @@ Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjace
 	return Coordinate(x, y);
 }
 
-Coordinate Ant::getCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
+Coordinate Ant::getGlobalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
 	return getCoordinate(coordinate, occupancy, adjacency);
 }
 
-Coordinate Ant::getCoordinate(adjacency::Adjacency adjacency) {
+Coordinate Ant::getGlobalCoordinate(adjacency::Adjacency adjacency) {
 	return getCoordinate(coordinate, character.getOccupancy(), adjacency);
+}
+
+Coordinate Ant::getLocalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
+	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), occupancy, adjacency);
+}
+
+Coordinate Ant::getLocalCoordinate(adjacency::Adjacency adjacency) {
+	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), character.getOccupancy(),
+						 adjacency);
 }
 
 bool Ant::isEnergyAvailable(Agent::Action action) {
@@ -98,10 +107,10 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 	switch (action) {
 		case Ant::FORWARD:
 			if (perceptiveField.getTile(
-					getCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy() !=
+					getLocalCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy() !=
 				OCCUPANCY_DEAD)
 				return false;
-			coordinateAhead = getCoordinate(adjacency::AHEAD);
+			coordinateAhead = getLocalCoordinate(adjacency::AHEAD);
 			for (int direction = OCCUPANCY_NORTH;
 				 direction <= ((int) OCCUPANCY_WEST); direction++) {
 				Coordinate potentialPredatorCoordinate = getCoordinate(coordinateAhead, (Occupancy) direction,
@@ -125,17 +134,19 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 		case Ant::RIGHT:
 			return true;
 		case Ant::EAT:
-			return perceptiveField.getTile(this->coordinate).getTotalEnergy() > getTotalEnergy();
+			return perceptiveField.getTile(
+					Coordinate(perceptiveField.width / 2, perceptiveField.height / 2)).getTotalEnergy() >
+				   getTotalEnergy();
 		case Ant::ATTACK:
 			return perceptiveField.getTile(
-					getCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy();
+					getLocalCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy();
 		case Ant::FORTIFY:
 		case Ant::MATURE:
 		case Ant::GROW_BABY:
 			return true;
 		case Ant::GIVE_BIRTH:
 			return !perceptiveField.getTile(
-					getCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();
+					getLocalCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();
 		case Ant::DIE:
 			return true;
 		default:
@@ -222,7 +233,7 @@ void Ant::performAction(Agent::Action agentAction) {
 			turnRight();
 			break;
 		default:
-			break;
+			throw invalid_argument("Undefined action selected to be performed");
 	}
 }
 
@@ -404,7 +415,7 @@ void Ant::turnRight() {
 
 void Ant::randomize() {
 	srand((unsigned int) time(NULL));
-	const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 50;
+	const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 150;
 	const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 50;
 	const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 50;
 	const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 50;
@@ -476,7 +487,6 @@ unsigned long Ant::getMaxPerceptValue(percept::Percept percept) {
 }
 
 
-
 excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	int maxHeight = perceptiveField.height;
 	int maxWidth = perceptiveField.width;
@@ -488,7 +498,7 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	else
 		adjacency = adjacency::Adjacency::RIGHT;
 
-	Coordinate sensoryCoordinate = getCoordinate(adjacency);
+	Coordinate sensoryCoordinate = getLocalCoordinate(adjacency);
 	int distance;
 	float totalWeightedDistance = 0;
 	excitation perceivedAverage = 0;

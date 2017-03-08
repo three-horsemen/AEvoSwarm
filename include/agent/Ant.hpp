@@ -62,9 +62,13 @@ protected:
 
 	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
-	Coordinate getCoordinate(Occupancy, adjacency::Adjacency);
+	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
 
-	Coordinate getCoordinate(adjacency::Adjacency);
+	Coordinate getGlobalCoordinate(adjacency::Adjacency);
+
+	Coordinate getLocalCoordinate(Occupancy, adjacency::Adjacency);
+
+	Coordinate getLocalCoordinate(adjacency::Adjacency);
 
 
 	void moveForward();

@@ -12,7 +12,7 @@ Ant::Ant() : Agent(5, 5) {
 
 Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newBaby,
 		 AgentCharacter newCharacter) : Agent(5, 5) {
-	coordinate = newCoordinate;
+	globalCoordinate = newCoordinate;
 	potential = newPotential;
 	shield = newShield;
 	fertility = newFertility;
@@ -116,7 +116,7 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 																	   adjacency::AHEAD);
 				Tile potentialPredatorTile = perceptiveField.getTile(potentialPredatorCoordinate);
 
-				if (potentialPredatorCoordinate != this->coordinate
+				if (potentialPredatorCoordinate != this->globalCoordinate
 					&& potentialPredatorTile.getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD) {
 					Coordinate rangeOfImpactCoordinate = getCoordinate(potentialPredatorCoordinate,
 																	   potentialPredatorTile
@@ -157,8 +157,8 @@ void Ant::observeEnvironment(Environment &environment) {
 	int x, y;
 	for (int i = -perceptiveField.height / 2; i < +perceptiveField.height / 2; i++) {
 		for (int j = -perceptiveField.width / 2; j < +perceptiveField.width / 2; j++) {
-			x = Utils::modulo(coordinate.getX() + j, environment.width);
-			y = Utils::modulo(coordinate.getY() + i, environment.width);
+			x = Utils::modulo(globalCoordinate.getX() + j, environment.width);
+			y = Utils::modulo(globalCoordinate.getY() + i, environment.width);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.setTile(tile, Coordinate(j + perceptiveField.width / 2, i + perceptiveField.height / 2));
 		}
@@ -323,15 +323,15 @@ void Ant::resorbBrain() {
 }
 
 Coordinate Ant::getGlobalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
-	return getCoordinate(coordinate, occupancy, adjacency);
+	return getCoordinate(globalCoordinate, occupancy, adjacency);
 }
 
 Coordinate Ant::getGlobalCoordinate(adjacency::Adjacency adjacency) {
-	return getCoordinate(coordinate, character.getOccupancy(), adjacency);
+	return getCoordinate(globalCoordinate, character.getOccupancy(), adjacency);
 }
 
 Coordinate Ant::getGlobalCoordinate() {
-	return coordinate;
+	return globalCoordinate;
 }
 
 Energy Ant::getPotential() {
@@ -355,7 +355,7 @@ AgentCharacter Ant::getCharacter() {
 }
 
 void Ant::setCoordinate(Coordinate newCoordinate) {
-	coordinate = newCoordinate;
+	globalCoordinate = newCoordinate;
 }
 
 void Ant::setPotential(Energy newPotential) {
@@ -393,7 +393,7 @@ Tile Ant::operator<<(Tile tile) {
 Tile Ant::operator>>(Tile tile) {
 	tile.setAgentCharacter(character);
 	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
-	coordinate = tile.getGlobalCoordinate();
+	globalCoordinate = tile.getGlobalCoordinate();
 	return tile;
 }
 

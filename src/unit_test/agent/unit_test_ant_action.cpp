@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 		selectedAction = (Ant::Action) ants[0].getSelectedAction();
 		ants[0].performAction((Agent::Action) selectedAction);
 
-		environment.clearCharacterGrid();
+
 		Ant::realizeAntsAction(ants, environment);
 
 	} while (selectedAction != Ant::Action::DIE);

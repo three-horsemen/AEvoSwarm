@@ -121,7 +121,9 @@ public:
 
 	void performAction(Agent::Action);
 
-	void affectEnvironment(Environment &);
+	void affectEnvironment(vector<Ant> &, Environment &);
+
+	static void eraseDeadAnts(vector<Ant> &);
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 

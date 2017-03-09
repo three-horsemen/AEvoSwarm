@@ -17,7 +17,7 @@ public:
 	};
 protected:
 	PerceptiveField perceptiveField;
-	Coordinate coordinate;
+	Coordinate coordinate; //TODO Rename this to globalCoordinate.
 	NeuralNetwork brain;
 	Action selectedAction;
 public:

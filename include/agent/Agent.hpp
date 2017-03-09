@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_AGENT_HPP
-#define SFTP_AGENT_HPP
+#ifndef AEVO_AGENT_HPP
+#define AEVO_AGENT_HPP
 
 #include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
@@ -54,4 +54,4 @@ public:
 };
 
 
-#endif //SFTP_AGENT_HPP
+#endif //AEVO_AGENT_HPP

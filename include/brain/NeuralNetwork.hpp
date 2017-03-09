@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_NEURALNETWORK_HPP
-#define SFTP_NEURALNETWORK_HPP
+#ifndef AEVO_NEURALNETWORK_HPP
+#define AEVO_NEURALNETWORK_HPP
 
 #include <vector>
 
@@ -37,4 +37,4 @@ public:
 };
 
 
-#endif //SFTP_NEURALNETWORK_HPP
+#endif //AEVO_NEURALNETWORK_HPP

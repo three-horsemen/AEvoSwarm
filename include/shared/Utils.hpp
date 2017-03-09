@@ -2,8 +2,8 @@
 // Created by reubenjohn on 9/11/16.
 //
 
-#ifndef SFTP_UTILS_HPP
-#define SFTP_UTILS_HPP
+#ifndef AEVO_UTILS_HPP
+#define AEVO_UTILS_HPP
 
 #include <string>
 #include <termios.h>
@@ -32,4 +32,4 @@ public:
 };
 
 
-#endif //SFTP_UTILS_HPP
+#endif //AEVO_UTILS_HPP

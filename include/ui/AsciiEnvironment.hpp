@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_ASCIIENVIRONMENT_HPP
-#define SFTP_ASCIIENVIRONMENT_HPP
+#ifndef AEVO_ASCIIENVIRONMENT_HPP
+#define AEVO_ASCIIENVIRONMENT_HPP
 
 #include "environment/Environment.hpp"
 #include <agent/PerceptiveField.hpp>
@@ -23,4 +23,4 @@ public:
 	static void displayPerceptiveField(PerceptiveField &);
 };
 
-#endif //SFTP_ASCIIENVIRONMENT_HPP
+#endif //AEVO_ASCIIENVIRONMENT_HPP

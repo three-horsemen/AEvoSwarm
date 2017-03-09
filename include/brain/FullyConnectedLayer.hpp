@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_FULLYCONNECTEDLAYER_HPP
-#define SFTP_FULLYCONNECTEDLAYER_HPP
+#ifndef AEVO_FULLYCONNECTEDLAYER_HPP
+#define AEVO_FULLYCONNECTEDLAYER_HPP
 
 #include <brain/Layer.hpp>
 #include <brain/Neuron.hpp>
@@ -28,4 +28,4 @@ public:
 };
 
 
-#endif //SFTP_FULLYCONNECTEDLAYER_HPP
+#endif //AEVO_FULLYCONNECTEDLAYER_HPP

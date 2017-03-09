@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_INPUTLAYER_HPP
-#define SFTP_INPUTLAYER_HPP
+#ifndef AEVO_INPUTLAYER_HPP
+#define AEVO_INPUTLAYER_HPP
 
 
 #include "NeuralNetwork.hpp"
@@ -27,4 +27,4 @@ public:
 };
 
 
-#endif //SFTP_INPUTLAYER_HPP
+#endif //AEVO_INPUTLAYER_HPP

@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_TILE_HPP
-#define SFTP_TILE_HPP
+#ifndef AEVO_TILE_HPP
+#define AEVO_TILE_HPP
 
 #include "environment/Coordinate.hpp"
 #include "agent/AgentCharacter.hpp"
@@ -34,4 +34,4 @@ public:
 	void setTotalEnergy(Energy);
 };
 
-#endif //SFTP_TILE_HPP
+#endif //AEVO_TILE_HPP

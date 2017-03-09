@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_AGENTCHARACTER_HPP
-#define SFTP_AGENTCHARACTER_HPP
+#ifndef AEVO_AGENTCHARACTER_HPP
+#define AEVO_AGENTCHARACTER_HPP
 
 //#include "environment/Tile.hpp"
 
@@ -40,4 +40,4 @@ public:
 	void setOccupancy(Occupancy);
 };
 
-#endif //SFTP_AGENTCHARACTER_HPP
+#endif //AEVO_AGENTCHARACTER_HPP

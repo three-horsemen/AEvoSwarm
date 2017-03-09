@@ -2,8 +2,8 @@
 // Created by reuben on 6/3/17.
 //
 
-#ifndef SFTP_PERCEPTIVEFIELD_HPP
-#define SFTP_PERCEPTIVEFIELD_HPP
+#ifndef AEVO_PERCEPTIVEFIELD_HPP
+#define AEVO_PERCEPTIVEFIELD_HPP
 
 
 #include <environment/Environment.hpp>
@@ -14,4 +14,4 @@ public:
 };
 
 
-#endif //SFTP_PERCEPTIVEFIELD_HPP
+#endif //AEVO_PERCEPTIVEFIELD_HPP

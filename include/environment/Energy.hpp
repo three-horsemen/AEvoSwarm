@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_ENERGY_HPP
-#define SFTP_ENERGY_HPP
+#ifndef AEVO_ENERGY_HPP
+#define AEVO_ENERGY_HPP
 
 typedef unsigned short Energy;
 
@@ -13,4 +13,4 @@ typedef unsigned short Energy;
 //};
 //
 
-#endif //SFTP_ENERGY_HPP
+#endif //AEVO_ENERGY_HPP

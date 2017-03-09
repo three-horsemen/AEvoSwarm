@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_ANT_HPP
-#define SFTP_ANT_HPP
+#ifndef AEVO_ANT_HPP
+#define AEVO_ANT_HPP
 
 #include <shared/logger.hpp>
 #include <shared/Utils.hpp>
@@ -184,4 +184,4 @@ public:
 };
 
 
-#endif //SFTP_ANT_HPP
+#endif //AEVO_ANT_HPP

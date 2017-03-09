@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_NEURON_HPP
-#define SFTP_NEURON_HPP
+#ifndef AEVO_NEURON_HPP
+#define AEVO_NEURON_HPP
 
 #include <random>
 
@@ -35,4 +35,4 @@ namespace neuron {
 	void randomizeWeights(vector<vector<weight> > &);
 };
 
-#endif //SFTP_NEURON_HPP
+#endif //AEVO_NEURON_HPP

@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_OUTPUTLAYER_HPP
-#define SFTP_OUTPUTLAYER_HPP
+#ifndef AEVO_OUTPUTLAYER_HPP
+#define AEVO_OUTPUTLAYER_HPP
 
 #include <iostream>
 #include <brain/Layer.hpp>
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif //SFTP_OUTPUTLAYER_HPP
+#endif //AEVO_OUTPUTLAYER_HPP

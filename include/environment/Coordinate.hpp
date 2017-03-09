@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_COORDINATE_HPP
-#define SFTP_COORDINATE_HPP
+#ifndef AEVO_COORDINATE_HPP
+#define AEVO_COORDINATE_HPP
 
 class Coordinate {
 protected:
@@ -28,4 +28,4 @@ public:
 };
 
 
-#endif //SFTP_COORDINATE_HPP
+#endif //AEVO_COORDINATE_HPP

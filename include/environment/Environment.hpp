@@ -2,8 +2,8 @@
 // Created by soorya on 5/3/17.
 //
 
-#ifndef SFTP_ENVIRONMENT_HPP
-#define SFTP_ENVIRONMENT_HPP
+#ifndef AEVO_ENVIRONMENT_HPP
+#define AEVO_ENVIRONMENT_HPP
 
 #include "environment/Tile.hpp"
 
@@ -36,4 +36,4 @@ public:
 	void randomize();
 };
 
-#endif //SFTP_ENVIRONMENT_HPP
+#endif //AEVO_ENVIRONMENT_HPP

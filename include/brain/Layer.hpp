@@ -2,8 +2,8 @@
 // Created by reuben on 5/3/17.
 //
 
-#ifndef SFTP_LAYER_HPP
-#define SFTP_LAYER_HPP
+#ifndef AEVO_LAYER_HPP
+#define AEVO_LAYER_HPP
 
 #include <iostream>
 
@@ -49,4 +49,4 @@ public:
 };
 
 
-#endif //SFTP_LAYER_HPP
+#endif //AEVO_LAYER_HPP

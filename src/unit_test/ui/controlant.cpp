@@ -8,6 +8,8 @@
 using namespace std;
 
 int main() {
+	Ant::initialize();
+
 	vector<Ant> ants(1);
 
 	ants[0].randomize();

@@ -22,6 +22,8 @@ protected:
 	Action selectedAction;
 public:
 
+	static void initialize();
+
 	Agent(short, short);
 
 	virtual bool isEnergyAvailable(Agent::Action action)=0;

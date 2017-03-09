@@ -21,13 +21,13 @@ public:
 
 	Tile(Coordinate, AgentCharacter, Energy);
 
-	Coordinate getCoordinate();
+	Coordinate getGlobalCoordinate();
 
 	AgentCharacter getAgentCharacter();
 
 	Energy getTotalEnergy();
 
-	void setCoordinate(Coordinate);
+	void setGlobalCoordinate(Coordinate);
 
 	void setAgentCharacter(AgentCharacter);
 

@@ -13,7 +13,15 @@ class InputLayer : public Layer {
 public:
 	InputLayer(int);
 
+	InputLayer(InputLayer &);
+
 	~InputLayer();
+
+	void set(InputLayer &);
+
+	InputLayer operator=(InputLayer &);
+
+	Layer *getDeepCopy();
 
 	void compute();
 };

@@ -5,28 +5,20 @@
 #include "brain/Neuron.hpp"
 
 Neuron::Neuron() {
-	weights = 0;
 }
 
 Neuron::~Neuron() {
-	if (weights) {
-		delete[] weights;
-	}
 }
 
-void Neuron::setWeights(int inputSize, weight *weights) {
-	if (this->weights) {
-		delete[] this->weights;
+void Neuron::setWeights(vector<weight> &weights) {
+	this->inputSize = (int) weights.size();
 
-	}
-	this->inputSize = inputSize;
-	this->weights = new weight[inputSize];
-	this->inputSize = inputSize;
-	for (int i = 0; i < inputSize; i++)
-		this->weights[i] = weights[i];
+	this->weights.clear();
+	for (int i = 0; i < weights.size(); i++)
+		this->weights.push_back(weights[i]);
 }
 
-excitation Neuron::getExcitation(excitation *excitations) {
+excitation Neuron::getExcitation(vector<excitation> excitations) {
 	excitation excitation = 0;
 	for (int i = 0; i < inputSize; i++) {
 		excitation += excitations[i] * weights[i];
@@ -35,21 +27,21 @@ excitation Neuron::getExcitation(excitation *excitations) {
 }
 
 namespace neuron {
-	void randomizeExcitation(int size, excitation *excitations) {
-		for (int i = 0; i < size; i++) {
+	void randomizeExcitation(vector<excitation> &excitations) {
+		for (int i = 0; i < excitations.size(); i++) {
 			excitations[i] = ((float) rand()) / (RAND_MAX);
 		}
 	}
 
-	void randomizeWeights(int size, weight *weights) {
-		for (int i = 0; i < size; i++) {
+	void randomizeWeights(vector<weight> &weights) {
+		for (int i = 0; i < weights.size(); i++) {
 			weights[i] = 0.085f * ((float) rand()) / (RAND_MAX);
 		}
 	}
 
-	void randomizeWeights(int inputSize, int outputSize, weight *weights) {
-		for (int i = 0; i < outputSize; i++) {
-			randomizeWeights(inputSize, &weights[inputSize * i]);
+	void randomizeWeights(vector<vector<weight> > &weights) {
+		for (int i = 0; i < weights.size(); i++) {
+			randomizeWeights(weights[i]);
 		}
 	}
 }

@@ -3,48 +3,60 @@
 //
 
 #include "brain/Layer.hpp"
-#include <shared/logger.hpp>
 
-Layer::Layer(LayerType type, int inputSize, int outputSize) {
+Layer::Layer(LayerType type, int inputSize, int outputSize) :
+		inputs((unsigned long) inputSize),
+		outputs((unsigned long) outputSize) {
 	this->type = type;
 	this->inputSize = inputSize;
 	this->outputSize = outputSize;
-	inputs = new excitation[inputSize];
-	outputs = new excitation[outputSize];
+}
+
+Layer::Layer(Layer &layer) {
+	operator=(layer);
 }
 
 Layer::~Layer() {
 }
 
-void Layer::free() {
-	delete[] inputs;
-	delete[] outputs;
+void Layer::operator=(Layer &layer) {
+	this->type = layer.type;
+	this->inputSize = layer.inputSize;
+	this->outputSize = layer.outputSize;
+	inputs.clear();
+	for (int i = 0; i < inputSize; i++) {
+		inputs.push_back(layer.inputs[i]);
+	}
+	outputs.clear();
+	for (int i = 0; i < outputSize; i++) {
+		outputs.push_back(layer.outputs[i]);
+	}
+}
+
+void Layer::setInputs(vector<excitation> &excitations) {
+	for (int i = 0; i < inputSize; i++) {
+		inputs[i] = excitations[i];
+	}
+}
+
+void Layer::setOutputs(const vector<excitation> &excitations) {
+	for (int i = 0; i < outputSize; i++) {
+		outputs[i] = excitations[i];
+	}
+}
+
+vector<excitation> Layer::getInputs() {
+	return inputs;
+}
+
+vector<excitation> Layer::getOutputs() {
+	return outputs;
 }
 
 void Layer::displayOutputs() {
 	for (int i = 0; i < outputSize; i++) {
 		cout << outputs[i] << ' ';
 	}
-}
-
-void Layer::setInputs(excitation *excitations) {
-	for (int i = 0; i < inputSize; i++) {
-		inputs[i] = excitations[i];
-	}
-}
-
-void Layer::setOutputs(excitation *excitations) {
-	for (int i = 0; i < outputSize; i++) {
-		outputs[i] = excitations[i];
-	}
-}
-
-excitation *Layer::getInputs() {
-	return inputs;
-}
-
-excitation *Layer::getOutputs() {
-	return outputs;
 }
 
 void Layer::compute() {

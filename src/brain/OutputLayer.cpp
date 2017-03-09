@@ -16,6 +16,10 @@ void OutputLayer::compute() {
 	setOutputs(getInputs());
 }
 
+Layer *OutputLayer::getDeepCopy() {
+	return new OutputLayer(*this);
+}
+
 void OutputLayer::displayOutputs() {
 	for (int i = 0; i < outputSize; i++) {
 		cout << outputs[i] << ' ';

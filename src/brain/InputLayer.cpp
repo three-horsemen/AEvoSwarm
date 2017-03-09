@@ -9,7 +9,25 @@ InputLayer::InputLayer(int size)
 	this->inputSize = this->outputSize = size;
 }
 
+InputLayer::InputLayer(InputLayer &inputLayer)
+		: Layer(INPUT, inputLayer.inputSize, inputLayer.outputSize) {
+	set(inputLayer);
+}
+
 InputLayer::~InputLayer() {
+}
+
+void InputLayer::set(InputLayer &inputLayer) {
+	Layer::operator=(inputLayer);
+}
+
+InputLayer InputLayer::operator=(InputLayer &inputLayer) {
+	set(inputLayer);
+	return *this;
+}
+
+Layer *InputLayer::getDeepCopy() {
+	return new InputLayer(*this);
 }
 
 void InputLayer::compute() {

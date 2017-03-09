@@ -17,11 +17,17 @@ class NeuralNetwork {
 public:
 	NeuralNetwork();
 
+	NeuralNetwork(NeuralNetwork &);
+
 	~NeuralNetwork();
 
-	void freeLayers();
+	void operator=(NeuralNetwork &);
 
 	void compute();
+
+	size_t getDepth();
+
+	void resorb();
 
 	void addLayer(Layer &);
 

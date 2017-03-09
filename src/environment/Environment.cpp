@@ -7,13 +7,13 @@
 Environment::Environment(Environment &environment) :
 		_width(environment.width), _height(environment.height),
 		width(_width), height(_height) {
-	*this = environment;
+	operator=(environment);
 }
 
 void Environment::operator=(Environment &environment) {
 	_width = environment.width;
 	_height = environment._height;
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < tiles.size(); i++)
 		tiles[i].clear();
 	tiles.clear();
 

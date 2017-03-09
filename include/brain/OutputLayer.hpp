@@ -18,6 +18,8 @@ public:
 
 	void compute();
 
+	Layer *getDeepCopy();
+
 	void displayOutputs();
 };
 

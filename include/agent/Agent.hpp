@@ -26,6 +26,10 @@ public:
 
 	Agent(short, short);
 
+	Agent(Agent &);
+
+	void operator=(Agent &);
+
 	virtual bool isEnergyAvailable(Agent::Action action)=0;
 
 	virtual bool isActionValid(Action action)=0;

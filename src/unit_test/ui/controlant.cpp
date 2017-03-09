@@ -42,7 +42,6 @@ int main() {
 		ants[0].performAction((Agent::Action) action);
 		AsciiEnvironment::displayPerceptiveField(*ants[0].getPerceptiveField());
 		Ant::realizeAntsAction(ants, environment);
-		ants[0].affectEnvironment(environment);
 	} while (action != 9);
 	return 0;
 }

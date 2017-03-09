@@ -139,7 +139,7 @@ public:
 
 	Energy getFertility();
 
-	Energy getBaby();
+	Energy getFetal();
 
 	AgentCharacter getCharacter();
 

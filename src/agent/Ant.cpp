@@ -186,7 +186,7 @@ void Ant::senseObservation(Environment &environment) {
 	sensoryInputs[ptr++] = getPotential() / getMaxPerceptValue(percept::ENERGY);
 	sensoryInputs[ptr++] = getShield() / getMaxPerceptValue(percept::ENERGY);
 	sensoryInputs[ptr++] = getFertility() / getMaxPerceptValue(percept::ENERGY);
-	sensoryInputs[ptr++] = getBaby() / getMaxPerceptValue(percept::ENERGY);
+	sensoryInputs[ptr++] = getFetal() / getMaxPerceptValue(percept::ENERGY);
 	sensoryInputs[ptr++] = getCharacter().getAttitude() / maxAttitude;
 	sensoryInputs[ptr] = getCharacter().getTrait() / maxTrait;
 }
@@ -269,9 +269,10 @@ void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 }
 
 void Ant::eraseDeadAnts(vector<Ant> &ants) {
-	for (int i = 0; i < ants.size(); i++)
-		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0))
-			ants.erase(ants.begin() + i);
+	//TODO Fix compilation breakage
+//	for (int i = 0; i < ants.size(); i++)
+//		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0))
+//			ants.erase(ants.begin() + i);
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
@@ -345,7 +346,7 @@ Energy Ant::getFertility() {
 	return fertility;
 }
 
-Energy Ant::getBaby() {
+Energy Ant::getFetal() {
 	return baby;
 }
 

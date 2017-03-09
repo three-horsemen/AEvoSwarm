@@ -44,7 +44,7 @@ public:
 
 	virtual void performAction(Agent::Action)=0;
 
-	virtual void affectEnvironment(Environment &)=0;
+	//virtual void affectEnvironment(Environment &)=0;
 
 	PerceptiveField *getPerceptiveField();
 };

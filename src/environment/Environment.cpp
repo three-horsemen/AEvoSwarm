@@ -37,7 +37,7 @@ Environment::Environment(short width, short height) : _width(width), _height(hei
 		vector<Tile> row;
 		for (int j = 0; j < width; j++) {
 			Tile tile;
-			tile.setCoordinate(Coordinate(j, i));
+			tile.setGlobalCoordinate(Coordinate(j, i));
 			row.push_back(tile);
 		}
 		tiles.push_back(row);
@@ -78,7 +78,7 @@ void Environment::randomize() {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			tiles[i][j].setAgentCharacter(AgentCharacter());
-			tiles[i][j].setCoordinate(Coordinate(j, i));
+			tiles[i][j].setGlobalCoordinate(Coordinate(j, i));
 			tiles[i][j].setTotalEnergy((Energy) (rand() % HYPOTHETICAL_MAX_ENERGY));
 		}
 	}

@@ -17,7 +17,7 @@ Tile::Tile(Coordinate newCoordinate, AgentCharacter newAgentCharacter, Energy ne
 	totalEnergy = newTotalEnergy;
 }
 
-Coordinate Tile::getCoordinate() {
+Coordinate Tile::getGlobalCoordinate() {
 	return coordinate;
 }
 
@@ -35,7 +35,7 @@ void Tile::setAgentCharacter(AgentCharacter newAgentCharacter) {
 	agentCharacter.setTrait(newAgentCharacter.getTrait());
 }
 
-void Tile::setCoordinate(Coordinate newCoordinate) {
+void Tile::setGlobalCoordinate(Coordinate newCoordinate) {
 	coordinate = newCoordinate;
 }
 

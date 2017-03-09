@@ -363,7 +363,7 @@ Tile Ant::operator<<(Tile tile) {
 Tile Ant::operator>>(Tile tile) {
 	tile.setAgentCharacter(character);
 	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
-	coordinate = tile.getCoordinate();
+	coordinate = tile.getGlobalCoordinate();
 	return tile;
 }
 
@@ -429,7 +429,7 @@ void Ant::turnRight() {
 }
 
 void Ant::eat() {
-
+	//TODO Implement stub
 }
 
 void Ant::randomize() {
@@ -523,7 +523,7 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	excitation perceivedAverage = 0;
 	for (int i = 0; i < maxWidth; i++) {
 		for (int j = 0; j < maxHeight; j++) {
-			distance = 1 + calculateDistance(perceptiveField.getTile(Coordinate(i, j)).getCoordinate(),
+			distance = 1 + calculateDistance(perceptiveField.getTile(Coordinate(i, j)).getGlobalCoordinate(),
 											 sensoryCoordinate);
 			totalWeightedDistance += (1.f / distance);
 			if (percept == percept::ATTITUDE)

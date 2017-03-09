@@ -445,6 +445,8 @@ void Ant::eat() {
 	Energy potentialEnergy = getPotential();
 	Energy energyToEat = tileBeneath.getTotalEnergy() - getTotalEnergy();
 	energyToEat = (Energy) ceil(energyToEat * 0.1f);
+	tileBeneath.setTotalEnergy(tileBeneath.getTotalEnergy() - energyToEat);
+	perceptiveField.setTile(tileBeneath, getLocalCoordinate());
 	setPotential(potentialEnergy + energyToEat);
 }
 

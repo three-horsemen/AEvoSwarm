@@ -37,6 +37,7 @@ namespace ant {
 	}
 	namespace adjacency {
 		enum Adjacency {
+			UNDER,
 			AHEAD,
 			LEFT,
 			RIGHT,
@@ -61,15 +62,13 @@ protected:
 	static short actionCost[actionCount];
 	excitation *sensoryInputs;
 
-	Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
-
-	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
-
-	Coordinate getGlobalCoordinate(adjacency::Adjacency);
+	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
 	Coordinate getLocalCoordinate(Occupancy, adjacency::Adjacency);
 
 	Coordinate getLocalCoordinate(adjacency::Adjacency);
+
+	Coordinate getLocalCoordinate();
 
 
 	void moveForward();
@@ -77,6 +76,8 @@ protected:
 	void turnLeft();
 
 	void turnRight();
+
+	void eat();
 
 public:
 
@@ -119,7 +120,11 @@ public:
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
-	Coordinate getCoordinate();
+	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
+
+	Coordinate getGlobalCoordinate(adjacency::Adjacency);
+
+	Coordinate getGlobalCoordinate();
 
 	Energy getPotential();
 

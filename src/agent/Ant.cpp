@@ -29,6 +29,8 @@ Ant::~Ant() {
 }
 
 Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjacency::Adjacency adjacency) {
+	if (adjacency == adjacency::UNDER)
+		return coordinate;
 	int x = coordinate.getX(), y = coordinate.getY();
 	switch (occupancy) {
 		case OCCUPANCY_NORTH:
@@ -77,14 +79,6 @@ Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjace
 	return Coordinate(x, y);
 }
 
-Coordinate Ant::getGlobalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
-	return getCoordinate(coordinate, occupancy, adjacency);
-}
-
-Coordinate Ant::getGlobalCoordinate(adjacency::Adjacency adjacency) {
-	return getCoordinate(coordinate, character.getOccupancy(), adjacency);
-}
-
 Coordinate Ant::getLocalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
 	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), occupancy, adjacency);
 }
@@ -92,6 +86,11 @@ Coordinate Ant::getLocalCoordinate(Occupancy occupancy, adjacency::Adjacency adj
 Coordinate Ant::getLocalCoordinate(adjacency::Adjacency adjacency) {
 	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), character.getOccupancy(),
 						 adjacency);
+}
+
+Coordinate Ant::getLocalCoordinate() {
+	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), character.getOccupancy(),
+						 adjacency::UNDER);
 }
 
 bool Ant::isEnergyAvailable(Agent::Action action) {
@@ -135,7 +134,7 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 			return true;
 		case Ant::EAT:
 			return perceptiveField.getTile(
-					Coordinate(perceptiveField.width / 2, perceptiveField.height / 2)).getTotalEnergy() >
+					getLocalCoordinate()).getTotalEnergy() >
 				   getTotalEnergy();
 		case Ant::ATTACK:
 			return perceptiveField.getTile(
@@ -236,7 +235,11 @@ void Ant::performAction(Agent::Action agentAction) {
 		case Ant::RIGHT:
 			turnRight();
 			break;
+		case Ant::EAT:
+			eat();
+			break;
 		default:
+			//TODO Complete remaining actions
 			throw invalid_argument("Undefined action selected to be performed");
 	}
 }
@@ -289,7 +292,15 @@ void Ant::resorbBrain() {
 	brain.freeLayers();
 }
 
-Coordinate Ant::getCoordinate() {
+Coordinate Ant::getGlobalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
+	return getCoordinate(coordinate, occupancy, adjacency);
+}
+
+Coordinate Ant::getGlobalCoordinate(adjacency::Adjacency adjacency) {
+	return getCoordinate(coordinate, character.getOccupancy(), adjacency);
+}
+
+Coordinate Ant::getGlobalCoordinate() {
 	return coordinate;
 }
 
@@ -415,6 +426,10 @@ void Ant::turnLeft() {
 void Ant::turnRight() {
 	Coordinate perceivedCoordinate(perceptiveField.width / 2, perceptiveField.height / 2);
 	perceptiveField.setTile(*this > perceptiveField.getTile(perceivedCoordinate), perceivedCoordinate);
+}
+
+void Ant::eat() {
+
 }
 
 void Ant::randomize() {

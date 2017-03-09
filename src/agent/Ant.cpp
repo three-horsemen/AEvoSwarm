@@ -247,9 +247,14 @@ void Ant::performAction(Agent::Action agentAction) {
 		case Ant::FORTIFY:
 			fortify();
 			break;
+		case Ant::MATURE:
+		case Ant::GROW_BABY:
+		case Ant::GIVE_BIRTH:
+		case Ant::DIE:
 		default:
 			//TODO Complete remaining actions
 			throw invalid_argument("Undefined action selected to be performed");
+//			break;
 	}
 }
 
@@ -270,9 +275,11 @@ void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 
 void Ant::eraseDeadAnts(vector<Ant> &ants) {
 	//TODO Fix compilation breakage
-//	for (int i = 0; i < ants.size(); i++)
-//		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0))
+	for (int i = 0; i < ants.size(); i++)
+		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0)) {
 //			ants.erase(ants.begin() + i);
+		}
+
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
@@ -587,9 +594,9 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 		}
 	}
 	perceivedAverage /= totalWeightedDistance;
-//	perceivedAverage = log(perceivedAverage);
+	perceivedAverage = (excitation) log(perceivedAverage + exp(1.0)); //Trying to make excitation logarithmic.
+	//TODO Test the logarithmic nature..
 	float maxPerceptValue = getMaxPerceptValue(percept);
-	excitation resultantExcitation = (perceivedAverage / maxPerceptValue); //Log, base e.
-	//TODO Make excitation logarithmic in nature.
+	excitation resultantExcitation = (perceivedAverage / maxPerceptValue);
 	return resultantExcitation;
 }

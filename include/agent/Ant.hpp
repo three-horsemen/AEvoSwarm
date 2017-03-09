@@ -96,6 +96,7 @@ public:
 		GIVE_BIRTH,
 		DIE
 	};
+	//TODO Add action to change ATTITUDE attribute of Character.
 
 	Ant();
 

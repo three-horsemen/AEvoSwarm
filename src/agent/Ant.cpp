@@ -522,8 +522,9 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 		}
 	}
 	perceivedAverage /= totalWeightedDistance;
+//	perceivedAverage = log(perceivedAverage);
 	float maxPerceptValue = getMaxPerceptValue(percept);
-	excitation resultantExcitation = perceivedAverage / maxPerceptValue;
-
+	excitation resultantExcitation = (perceivedAverage / maxPerceptValue); //Log, base e.
+	//TODO Make excitation logarithmic in nature.
 	return resultantExcitation;
 }

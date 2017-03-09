@@ -154,12 +154,11 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 }
 
 void Ant::observeEnvironment(Environment &environment) {
-	for (int i = -perceptiveField.height / 2;
-		 i < perceptiveField.height / 2; i++) {
-		for (int j = -perceptiveField.width / 2;
-			 j < +perceptiveField.width / 2; j++) {
-			int x = Utils::modulo(coordinate.getX() + j, environment.width), y = Utils::modulo(coordinate.getY() + i,
-																							   environment.width);
+	int x, y;
+	for (int i = -perceptiveField.height / 2; i < +perceptiveField.height / 2; i++) {
+		for (int j = -perceptiveField.width / 2; j < +perceptiveField.width / 2; j++) {
+			x = Utils::modulo(coordinate.getX() + j, environment.width);
+			y = Utils::modulo(coordinate.getY() + i, environment.width);
 			Tile tile = environment.getTile(Coordinate(x, y));
 			perceptiveField.setTile(tile, Coordinate(j + perceptiveField.width / 2, i + perceptiveField.height / 2));
 		}
@@ -245,6 +244,8 @@ void Ant::performAction(Agent::Action agentAction) {
 }
 
 void Ant::affectEnvironment(Environment &environment) {
+	*this >> environment.getTile(getGlobalCoordinate());
+
 	//TODO Blindly set character of agent onto map
 	//TODO Additively incorporate perceptive field energy changes onto environment
 }
@@ -523,8 +524,7 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	excitation perceivedAverage = 0;
 	for (int i = 0; i < maxWidth; i++) {
 		for (int j = 0; j < maxHeight; j++) {
-			distance = 1 + calculateDistance(perceptiveField.getTile(Coordinate(i, j)).getGlobalCoordinate(),
-											 sensoryCoordinate);
+			distance = 1 + calculateDistance(Coordinate(i, j), sensoryCoordinate);
 			totalWeightedDistance += (1.f / distance);
 			if (percept == percept::ATTITUDE)
 				perceivedAverage +=

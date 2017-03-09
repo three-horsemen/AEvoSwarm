@@ -14,7 +14,7 @@
 class Agent {
 protected:
 	PerceptiveField perceptiveField;
-	Coordinate coordinate;
+	Coordinate coordinate; //TODO Rename this to globalCoordinate.
 	NeuralNetwork brain;
 public:
 	enum Action {

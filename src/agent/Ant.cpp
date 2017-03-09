@@ -243,17 +243,33 @@ void Ant::performAction(Agent::Action agentAction) {
 	}
 }
 
-void Ant::affectEnvironment(Environment &environment) {
-	*this >> environment.getTile(getGlobalCoordinate());
+void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
+	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
+	placeAntInEnvironment(environment, getGlobalCoordinate());
+	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
+	for (int x = 0; x < perceptiveField.width; x++) {
+		for (int y = 0; y < perceptiveField.height; y++) {
+			Tile perceptiveTile = perceptiveField.getTile(Coordinate(x, y));
+			Tile globalTile = environment.getTile(perceptiveTile.getGlobalCoordinate());
+			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - globalTile.getTotalEnergy();
+			globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
+			environment.setTile(globalTile, globalTile.getGlobalCoordinate());
+		}
+	}
+}
 
-	//TODO Blindly set character of agent onto map
-	//TODO Additively incorporate perceptive field energy changes onto environment
+void Ant::eraseDeadAnts(vector<Ant> &ants) {
+	for (int i = 0; i < ants.size(); i++)
+		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0))
+			ants.erase(ants.begin() + i);
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
+	environment.clearCharacterGrid();
 	for (int i = 0; i < ants.size(); i++) {
-		ants[i].affectEnvironment(environment);
+		ants[i].affectEnvironment(ants, environment);
 	}
+	eraseDeadAnts(ants);
 }
 
 void Ant::developBrain() {
@@ -465,10 +481,11 @@ void Ant::randomize() {
 }
 
 void Ant::placeAntInEnvironment(Environment &environment, Coordinate coordinate) {
-	environment.setTile(
-			(*this >> environment.getTile(coordinate)),
-			coordinate
-	);
+	if (getCharacter().getOccupancy() != OCCUPANCY_DEAD)
+		environment.setTile(
+				(*this >> environment.getTile(coordinate)),
+				coordinate
+		);
 }
 
 int Ant::calculateDistance(Coordinate c1, Coordinate c2) {

@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 
 		ants[0].observeEnvironment(environment);
 		ants[0].senseObservation(environment);
+		ants[0].selectAction();
 		selectedAction = (Ant::Action) ants[0].getSelectedAction();
 		ants[0].performAction((Agent::Action) selectedAction);
 

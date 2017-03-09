@@ -12,13 +12,15 @@
 #include <brain/NeuralNetwork.hpp>
 
 class Agent {
+public:
+	enum Action {
+	};
 protected:
 	PerceptiveField perceptiveField;
 	Coordinate coordinate;
 	NeuralNetwork brain;
+	Action selectedAction;
 public:
-	enum Action {
-	};
 
 	Agent(short, short);
 
@@ -33,6 +35,8 @@ public:
 	virtual void developBrain()=0;
 
 	virtual void resorbBrain()=0;
+
+	virtual void selectAction()=0;
 
 	virtual Action getSelectedAction()=0;
 

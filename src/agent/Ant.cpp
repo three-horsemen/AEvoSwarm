@@ -192,13 +192,13 @@ void Ant::senseObservation(Environment &environment) {
 	sensoryInputs[ptr] = getCharacter().getTrait() / maxTrait;
 }
 
-Agent::Action Ant::getSelectedAction() {
+void Ant::selectAction() {
 	//neuron::randomizeExcitation(brain.getLayer(0)->inputSize, sensoryInputs);
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
 	excitation *outputs = brain.getOutputLayer()->getOutputs();
-	for (int i = 15; i < brain.getOutputLayer()->outputSize; i++) {
-		sensoryInputs[i] = outputs[i];
+	for (int i = 0; i < memoryCount; i++) {
+		sensoryInputs[senseCount + i] = outputs[actionCount + i];
 	}
 
 	assert(brain.getOutputLayer()->outputSize == actionCount + memoryCount);
@@ -214,7 +214,11 @@ Agent::Action Ant::getSelectedAction() {
 	}
 
 	assert(mostExcitedValidAction != -1);
-	return (Agent::Action) mostExcitedValidAction;
+	selectedAction = (Agent::Action) mostExcitedValidAction;
+}
+
+Agent::Action Ant::getSelectedAction() {
+	return selectedAction;
 }
 
 void Ant::performAction(Agent::Action agentAction) {
@@ -238,6 +242,12 @@ void Ant::performAction(Agent::Action agentAction) {
 		case Ant::EAT:
 			eat();
 			break;
+		case Ant::ATTACK:
+			attack();
+			break;
+		case Ant::FORTIFY:
+			fortify();
+			break;
 		default:
 			//TODO Complete remaining actions
 			throw invalid_argument("Undefined action selected to be performed");
@@ -256,7 +266,9 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 }
 
 void Ant::developBrain() {
-	const short inputSize = 25, fC1Size = 25, fC2Size = 25, outputSize = 25;
+	const short inputSize = senseCount + memoryCount, fC1Size = (senseCount + memoryCount) * 9 / 10, fC2Size =
+			(senseCount + memoryCount) * 81 / 100, outputSize =
+			actionCount + memoryCount;
 	InputLayer *inputLayer = new InputLayer(inputSize);
 	excitation excitations[inputSize];
 	neuron::randomizeExcitation(inputSize, excitations);
@@ -429,7 +441,25 @@ void Ant::turnRight() {
 }
 
 void Ant::eat() {
-	//TODO Implement stub
+	Tile tileBeneath = perceptiveField.getTile(getLocalCoordinate());
+	Energy potentialEnergy = getPotential();
+	Energy energyToEat = tileBeneath.getTotalEnergy() - getTotalEnergy();
+	energyToEat = (Energy) ceil(energyToEat * 0.1f);
+	setPotential(potentialEnergy + energyToEat);
+}
+
+void Ant::attack() {
+	//Environment handles this :p
+}
+
+void Ant::fortify() {
+	Energy potential = getPotential();
+	Energy shieldEnergy = getShield();
+	Energy transferAmount = (Energy) ceil(potential * 0.05f);
+	potential -= transferAmount;
+	shieldEnergy += transferAmount;
+	setPotential(potential);
+	setShield(shieldEnergy);
 }
 
 void Ant::randomize() {

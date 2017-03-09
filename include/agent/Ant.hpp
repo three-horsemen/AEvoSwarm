@@ -57,8 +57,7 @@ protected:
 	AgentCharacter character;
 
 	//TODO Use Boost enum
-	static const short actionCount = 10;
-	static const short memoryCount = 15;
+	static const short actionCount = 10, senseCount = 15, memoryCount = 15;
 	static short actionCost[actionCount];
 	excitation *sensoryInputs;
 
@@ -78,6 +77,10 @@ protected:
 	void turnRight();
 
 	void eat();
+
+	void attack();
+
+	void fortify();
 
 public:
 
@@ -111,6 +114,8 @@ public:
 	void observeEnvironment(Environment &);
 
 	void senseObservation(Environment &);
+
+	void selectAction();
 
 	Agent::Action getSelectedAction();
 

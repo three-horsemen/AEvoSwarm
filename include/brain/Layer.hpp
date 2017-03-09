@@ -19,22 +19,27 @@ enum LayerType {
 
 class Layer {
 protected:
-	excitation *inputs, *outputs;
+	vector<excitation> inputs;
+	vector<excitation> outputs;
 public:
 	int inputSize, outputSize;
 	LayerType type;
 
 	Layer(LayerType, int, int);
 
-	void setInputs(excitation *);
+	Layer(Layer &);
 
-	void setOutputs(excitation *);
+	void operator=(Layer &);
 
-	excitation *getInputs();
+	virtual Layer *getDeepCopy()=0;
 
-	excitation *getOutputs();
+	void setInputs(vector<excitation> &);
 
-	void free();
+	void setOutputs(const vector<excitation> &);
+
+	vector<excitation> getInputs();
+
+	vector<excitation> getOutputs();
 
 	virtual void displayOutputs();
 

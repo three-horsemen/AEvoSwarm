@@ -15,24 +15,24 @@ typedef float excitation;
 //TODO Convert "weight" to "Weight" convention
 
 class Neuron {
-	int inputSize;
-	weight *weights;
+	int inputSize;    //TODO Not needed because VECTOR
+	vector<weight> weights;
 public:
 	Neuron();
 
 	~Neuron();
 
-	void setWeights(int, weight *);
+	void setWeights(vector<weight> &);
 
-	excitation getExcitation(excitation[]);
+	excitation getExcitation(vector<excitation>);
 };
 
 namespace neuron {
-	void randomizeExcitation(int, excitation *);
+	void randomizeExcitation(vector<excitation> &);
 
-	void randomizeWeights(int, weight *);
+	void randomizeWeights(vector<weight> &);
 
-	void randomizeWeights(int, int, weight *);
+	void randomizeWeights(vector<vector<weight> > &);
 };
 
 #endif //SFTP_NEURON_HPP

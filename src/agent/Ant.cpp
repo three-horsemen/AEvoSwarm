@@ -6,21 +6,42 @@
 
 short Ant::actionCost[actionCount] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
 
-Ant::Ant() : Agent(5, 5) {
+
+Ant::Ant() :
+//Perceptive field size
+		Agent(5, 5) {
 	developBrain();
 }
 
-Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newBaby,
+Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newFetal,
 		 AgentCharacter newCharacter) : Agent(5, 5) {
 	globalCoordinate = newCoordinate;
 	potential = newPotential;
 	shield = newShield;
 	fertility = newFertility;
-	baby = newBaby;
+	fetal = newFetal;
 	character = newCharacter;
 	if (newCharacter.getOccupancy() == OCCUPANCY_DEAD)
 		throw invalid_argument("An ant can't be born dead!");
 
+	developBrain();
+}
+
+Ant::Ant(Ant &ant) : Agent(ant) {
+	operator=(ant);
+}
+
+void Ant::operator=(Ant &ant) {
+	Agent::operator=(ant);
+	globalCoordinate = ant.globalCoordinate;
+	potential = ant.potential;
+	shield = ant.shield;
+	fertility = ant.fertility;
+	fetal = ant.fetal;
+	character = ant.character;
+	if (ant.getCharacter().getOccupancy() == OCCUPANCY_DEAD)
+		throw invalid_argument("An ant can't be born dead!");
+	resorbBrain();
 	developBrain();
 }
 
@@ -144,8 +165,10 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 		case Ant::GROW_BABY:
 			return true;
 		case Ant::GIVE_BIRTH:
+			//TODO Also check if the baby has enough energy to be born with
+			//Is there space behind me:
 			return !perceptiveField.getTile(
-					getLocalCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();
+					getLocalCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();;
 		case Ant::DIE:
 			return true;
 		default:
@@ -192,10 +215,10 @@ void Ant::senseObservation(Environment &environment) {
 }
 
 void Ant::selectAction() {
-	//neuron::randomizeExcitation(brain.getLayer(0)->inputSize, sensoryInputs);
+	neuron::randomizeExcitation(sensoryInputs);
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
-	excitation *outputs = brain.getOutputLayer()->getOutputs();
+	vector<excitation> outputs = brain.getOutputLayer()->getOutputs();
 	for (int i = 0; i < memoryCount; i++) {
 		sensoryInputs[senseCount + i] = outputs[actionCount + i];
 	}
@@ -249,7 +272,8 @@ void Ant::performAction(Agent::Action agentAction) {
 			break;
 		default:
 			//TODO Complete remaining actions
-			throw invalid_argument("Undefined action selected to be performed");
+//			throw invalid_argument("Undefined action selected to be performed");
+			break;
 	}
 }
 
@@ -283,43 +307,48 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 	eraseDeadAnts(ants);
 }
 
+Ant Ant::getNewborn() {
+	Ant newBorn(*this);
+	return newBorn;
+}
+
 void Ant::developBrain() {
-	const short inputSize = senseCount + memoryCount, fC1Size = (senseCount + memoryCount) * 9 / 10, fC2Size =
-			(senseCount + memoryCount) * 81 / 100, outputSize =
-			actionCount + memoryCount;
-	InputLayer *inputLayer = new InputLayer(inputSize);
-	excitation excitations[inputSize];
-	neuron::randomizeExcitation(inputSize, excitations);
-	inputLayer->setInputs((excitation *) excitations);
-	brain.addLayer((Layer &) *inputLayer);
+	const short inputSize = senseCount + memoryCount;
+	const short fC1Size = (senseCount + memoryCount) * 9 / 10;
+	const short fC2Size = (senseCount + memoryCount) * 81 / 100;
+	const short outputSize = actionCount + memoryCount;
 
-	weight weights1[fC1Size][inputSize];
-	neuron::randomizeWeights(inputSize, fC1Size, (weight *) weights1);
-	FullyConnectedLayer *fullyConnectedLayer1 = new FullyConnectedLayer(inputSize, fC1Size, (weight *) weights1);
-	brain.addLayer((Layer &) *fullyConnectedLayer1);
+	if (brain.getDepth() > 0) {
+		throw runtime_error("Cannot develop already developed brain");
+	}
 
-	weight weights2[fC2Size][fC1Size];
-	neuron::randomizeWeights(fC1Size, fC2Size, (weight *) weights2);
-	FullyConnectedLayer *fullyConnectedLayer2 = new FullyConnectedLayer(fC1Size, fC2Size, (weight *) weights2);
-	brain.addLayer((Layer &) *fullyConnectedLayer2);
+	InputLayer inputLayer(inputSize);
+	brain.addLayer((Layer &) inputLayer);
 
-	weight weights3[outputSize][fC2Size];
-	neuron::randomizeWeights(fC2Size, outputSize, (weight *) weights3);
-	FullyConnectedLayer *fullyConnectedLayer3 = new FullyConnectedLayer(fC2Size, outputSize, (weight *) weights3);
-	brain.addLayer((Layer &) *fullyConnectedLayer3);
+	vector<vector<weight> > weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
+	neuron::randomizeWeights(weights1);
+	FullyConnectedLayer fullyConnectedLayer1(weights1);
+	brain.addLayer((Layer &) fullyConnectedLayer1);
 
-	OutputLayer *outputLayer = new OutputLayer(outputSize);
-	brain.addLayer((Layer &) *outputLayer);
+	vector<vector<weight> > weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
+	neuron::randomizeWeights(weights2);
+	FullyConnectedLayer fullyConnectedLayer2(weights2);
+	brain.addLayer((Layer &) fullyConnectedLayer2);
 
-	sensoryInputs = new excitation[inputSize];
-	neuron::randomizeExcitation(inputSize, excitations);
-	inputLayer->setInputs((excitation *) excitations);
-	brain.compute();
+	vector<vector<weight> > weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
+	neuron::randomizeWeights(weights3);
+	FullyConnectedLayer fullyConnectedLayer3(weights3);
+	brain.addLayer((Layer &) fullyConnectedLayer3);
+
+	OutputLayer outputLayer(outputSize);
+	brain.addLayer((Layer &) outputLayer);
+
+	sensoryInputs = vector<excitation>((unsigned long) inputSize);
+	brain.compute();//TODO Remove me
 }
 
 void Ant::resorbBrain() {
-	delete[] sensoryInputs;
-	brain.freeLayers();
+	brain.resorb();
 }
 
 Coordinate Ant::getGlobalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
@@ -347,7 +376,7 @@ Energy Ant::getFertility() {
 }
 
 Energy Ant::getFetal() {
-	return baby;
+	return fetal;
 }
 
 AgentCharacter Ant::getCharacter() {
@@ -370,8 +399,8 @@ void Ant::setFertility(Energy newFertility) {
 	fertility = newFertility;
 }
 
-void Ant::setBaby(Energy newBaby) {
-	baby = newBaby;
+void Ant::setFetal(Energy newFetal) {
+	fetal = newFetal;
 }
 
 void Ant::setCharacter(AgentCharacter newCharacter) {
@@ -381,7 +410,7 @@ void Ant::setCharacter(AgentCharacter newCharacter) {
 }
 
 Energy Ant::getTotalEnergy() {
-	return potential + shield + fertility + baby;
+	return potential + shield + fertility + fetal;
 }
 
 Tile Ant::operator<<(Tile tile) {
@@ -505,7 +534,7 @@ void Ant::randomize() {
 	setPotential((Energy) (rand() % HYPOTHETICAL_MAX_POTENTIAL_ENERGY));
 	setShield((Energy) (rand() % HYPOTHETICAL_MAX_SHIELD_ENERGY));
 	setFertility((Energy) (rand() % HYPOTHETICAL_MAX_FERTILITY_ENERGY));
-	setBaby((Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY));
+	setFetal((Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY));
 	setCharacter(AgentCharacter(
 			(Attitude) (rand() % HYPOTHETICAL_MAX_ATTITUDE),
 			(Trait) (rand() % HYPOTHETICAL_MAX_TRAIT),

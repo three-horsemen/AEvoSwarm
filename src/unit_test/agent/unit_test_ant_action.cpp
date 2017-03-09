@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
 	environment.randomize();
 	ants[0].placeAntInEnvironment(environment, randomCoordinate);
 
-	cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {
@@ -30,6 +29,7 @@ int main(int argc, char *argv[]) {
 
 	Ant::Action selectedAction;
 	do {
+		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 		AsciiEnvironment::displayAsciiEnvironment(environment);
 
 		ants[0].observeEnvironment(environment);

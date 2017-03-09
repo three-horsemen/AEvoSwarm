@@ -6,15 +6,23 @@
 #define SFTP_FULLYCONNECTEDLAYER_HPP
 
 #include <brain/Layer.hpp>
-#include <brain/WeightMatrix.hpp>
 #include <brain/Neuron.hpp>
 
 class FullyConnectedLayer : public Layer {
-	Neuron *neurons;
 public:
-	FullyConnectedLayer(int, int, weight *);
+	vector<Neuron> neurons;//TODO Make private
+	FullyConnectedLayer(vector<vector<weight> > &);
+
+	FullyConnectedLayer(FullyConnectedLayer &);
 
 	~FullyConnectedLayer();
+
+	void set(FullyConnectedLayer &);
+
+	FullyConnectedLayer operator=(FullyConnectedLayer &);
+
+	Layer *getDeepCopy();
+
 
 	void compute();
 };

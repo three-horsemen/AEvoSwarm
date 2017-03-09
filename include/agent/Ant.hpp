@@ -53,13 +53,13 @@ protected:
 	Energy potential;
 	Energy shield;
 	Energy fertility;
-	Energy baby;
+	Energy fetal;
 	AgentCharacter character;
 
 	//TODO Use Boost enum
 	static const short actionCount = 10, senseCount = 15, memoryCount = 15;
 	static short actionCost[actionCount];
-	excitation *sensoryInputs;
+	vector<excitation> sensoryInputs;
 
 	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
@@ -101,7 +101,11 @@ public:
 
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
+	Ant(Ant &);
+
 	~Ant();
+
+	void operator=(Ant &);
 
 	bool isEnergyAvailable(Agent::Action action);
 
@@ -127,6 +131,8 @@ public:
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
+	Ant getNewborn();
+
 	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
 
 	Coordinate getGlobalCoordinate(adjacency::Adjacency);
@@ -151,7 +157,7 @@ public:
 
 	void setFertility(Energy newFertility);
 
-	void setBaby(Energy newBaby);
+	void setFetal(Energy newBaby);
 
 	void setCharacter(AgentCharacter newCharacter);
 

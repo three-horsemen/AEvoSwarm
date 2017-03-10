@@ -13,6 +13,9 @@ Ant::Ant() :
 //Perceptive field size
 		Agent(5, 5) {
 	developBrain();
+
+	//TODO Remove me.
+	character.setAttitude((Attitude) rand());
 }
 
 Ant::Ant(const Ant &ant) : Agent(ant) {
@@ -625,13 +628,6 @@ void Ant::die() {
 
 void Ant::randomize() {
 	srand((unsigned int) time(NULL));
-	const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 150;
-	const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 50;
-	const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 50;
-	const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 50;
-	const Attitude HYPOTHETICAL_MAX_ATTITUDE = 256;
-	const Attitude HYPOTHETICAL_MAX_TRAIT = 256;
-	const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
 	Occupancy occupancy;
 	int val = rand() % HYPOTHETICAL_MAX_OCCUPANCY_VAL;
 	if (val == 0)
@@ -648,7 +644,7 @@ void Ant::randomize() {
 	setFertility((Energy) (rand() % HYPOTHETICAL_MAX_FERTILITY_ENERGY));
 	setFetal((Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY));
 	setCharacter(AgentCharacter(
-			(Attitude) (rand() % HYPOTHETICAL_MAX_ATTITUDE),
+			(Attitude) ((rand() % (HYPOTHETICAL_MAX_ATTITUDE - HYPOTHETICAL_MIN_ATTITUDE)) + HYPOTHETICAL_MIN_ATTITUDE),
 			(Trait) (rand() % HYPOTHETICAL_MAX_TRAIT),
 			occupancy
 	));

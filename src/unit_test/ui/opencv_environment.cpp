@@ -3,26 +3,46 @@
 //
 
 #include <ui/OpenCV.hpp>
+#include <agent/Ant.hpp>
 
 int main() {
-	Attitude randomAttitude = 2;
-	Trait randomTrait = 3;
-	Occupancy randomOccupancy = OCCUPANCY_EAST;
-	Energy randomEnergy = 10;
-	Environment environment(100, 100);
+
+	Agent::initialize();
+
+	Coordinate randomCoordinate(5, 2);
+
+	vector<Ant> ants(1);
+
+	ants[0].randomize();
+	ants[0].setPotential(30000);
+	Environment environment(20, 20);
+	environment.randomize();
+
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
-			environment.setTile(
-					Tile(
-							Coordinate(i, j),
-							AgentCharacter(Attitude(randomAttitude), Trait(randomTrait), Occupancy(randomOccupancy)),
-							Energy(randomEnergy)
-					),
-					Coordinate(i, j)
-			);
+			if (randomCoordinate == Coordinate(i, j)) {
+				Ant::placeInEnvironment(ants[0], environment, Coordinate(i, j));
+			}
 		}
 	}
 	ui::OpenCV openCVEnvironment(environment);
-	openCVEnvironment.displayEnvironment();
+
+
+	Ant::Action selectedAction;
+	do {
+		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
+		openCVEnvironment.displayEnvironment();
+		waitKey();
+		ants[0].observeEnvironment(environment);
+		ants[0].senseObservation(environment);
+		ants[0].selectAction();
+		cout << "Ant[0] selected action: " << ants[0].getSelectedAction() << endl;
+		selectedAction = (Ant::Action) ants[0].getSelectedAction();
+		ants[0].performAction((Agent::Action) selectedAction);
+
+
+		Ant::realizeAntsAction(ants, environment);
+
+	} while (selectedAction != Ant::Action::DIE);//TODO Change this condition when there are multiple ants
 	return 0;
 }

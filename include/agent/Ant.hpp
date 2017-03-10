@@ -52,6 +52,18 @@ namespace ant {
 using namespace ant;
 
 class Ant : public Agent {
+public:
+	static const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_ENERGY =
+			HYPOTHETICAL_MAX_POTENTIAL_ENERGY + HYPOTHETICAL_MAX_SHIELD_ENERGY + HYPOTHETICAL_MAX_FERTILITY_ENERGY +
+			HYPOTHETICAL_MAX_BABY_ENERGY;
+	static const Attitude HYPOTHETICAL_MAX_ATTITUDE = 256;
+	static const Attitude HYPOTHETICAL_MIN_ATTITUDE = 128;
+	static const Attitude HYPOTHETICAL_MAX_TRAIT = 256;
+	static const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
 protected:
 	Energy potential;
 	Energy shield;

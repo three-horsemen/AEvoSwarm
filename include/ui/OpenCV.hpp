@@ -19,15 +19,13 @@ namespace ui {
 		const static unsigned short WINDOW_HEIGHT = 800;
 		unsigned short TILE_SIDE_PIXEL_WIDTH;
 		unsigned short TILE_SIDE_PIXEL_HEIGHT;
-		Environment environment;
+		const Environment &environment;
 	public:
 		vector<vector<OpenCVTile> > tiles;
 
 		OpenCV(Environment &);
 
 		Environment getEnvironment() const;
-
-		void setEnvironment(const Environment &);
 
 		void displayEnvironment();
 

@@ -3,7 +3,7 @@
 //
 
 #include <ui/OpenCV.hpp>
-
+#include <agent/Ant.hpp>
 
 namespace opencv_environment {
 	char getCharForOccupancy(Occupancy occupancy) {
@@ -20,54 +20,43 @@ namespace opencv_environment {
 	}
 }
 
-ui::OpenCV::OpenCV(Environment &newEnvironment) : environment(newEnvironment.width,
-															  newEnvironment.height) {
+ui::OpenCV::OpenCV(Environment &newEnvironment) : environment(newEnvironment) {
 	TILE_SIDE_PIXEL_WIDTH = WINDOW_WIDTH / environment.width;
 	TILE_SIDE_PIXEL_HEIGHT = WINDOW_HEIGHT / environment.height;
 	image = Mat::zeros(WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_WIDTH, WINDOW_WIDTH + 2 * TILE_SIDE_PIXEL_HEIGHT, CV_8UC3);
-
-
-	for (int i = 0; i < tiles.size(); i++)
-		tiles[i].clear();
-	tiles.clear();
-	vector<OpenCVTile> row;
-	for (int i = 0; i < newEnvironment.width; i++) {
-		row.clear();
-		for (int j = 0; j < newEnvironment.height; j++) {
-			environment.setTile(
-					Tile(newEnvironment.getTile(Coordinate(i, j))),
-					Coordinate(i, j));
-			OpenCVTile tile;
-			tile.topLeft = Coordinate(TILE_SIDE_PIXEL_WIDTH * (j + 1), TILE_SIDE_PIXEL_HEIGHT * (i + 1));
-			tile.topRight = Coordinate(TILE_SIDE_PIXEL_WIDTH * (j + 1), TILE_SIDE_PIXEL_HEIGHT * (i + 2));
-			tile.bottomLeft = Coordinate(TILE_SIDE_PIXEL_WIDTH * (j + 2), TILE_SIDE_PIXEL_HEIGHT * (i + 1));
-			tile.bottomRight = Coordinate(TILE_SIDE_PIXEL_WIDTH * (j + 2), TILE_SIDE_PIXEL_HEIGHT * (i + 2));
-			row.push_back(tile);
-		}
-		tiles.push_back(row);
-	}
 }
 
 Environment ui::OpenCV::getEnvironment() const {
 	return environment;
 }
 
-void ui::OpenCV::setEnvironment(const Environment &newEnvironment) {
-	environment = newEnvironment;
-}
-
 void ui::OpenCV::displayEnvironment() {
 	int i = 0, j = 0;
+	Rect2d tileRect(0, 0, TILE_SIDE_PIXEL_WIDTH, TILE_SIDE_PIXEL_HEIGHT);
+	Coordinate tileCoordinate;
+	AgentCharacter character;
+	Tile tile;
 	for (i = 0; i < environment.height; i++) {
 		for (j = 0; j < environment.width; j++) {
-			tiles[i][j].drawOpenCVTile(image);
+			tile = environment.getTile(Coordinate(j, i));
+			character = tile.getAgentCharacter();
+			tileCoordinate = tile.getGlobalCoordinate();
+			tileRect.x = (1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH;
+			tileRect.y = (1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT;
+			rectangle(
+					image,
+					tileRect,
+					Scalar(character.getTrait(), (tile.getTotalEnergy() / Ant::HYPOTHETICAL_MAX_ENERGY),
+						   character.getAttitude()),
+//					CV
+					1,
+					8
+			);
 		}
 	}
-
 //	cout << "| " << opencv_environment::getCharForOccupancy(
 //			environment.getTile(Coordinate(j, i)).getAgentCharacter().getOccupancy()) << " ";
-
+	cvtColor(image, image, CV_HSV2BGR_FULL);
 	imshow("OpenCV-Environment", image);
-	waitKey();
-
+//	waitKey();
 }

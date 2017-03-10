@@ -17,7 +17,10 @@
 #include <brain/InputLayer.hpp>
 #include <brain/OutputLayer.hpp>
 
+#include <iostream>
+
 using namespace std;
+
 namespace ant {
 	namespace sensor {
 		enum Sensor {
@@ -57,12 +60,17 @@ protected:
 	AgentCharacter character;
 
 	//TODO Use Boost enum
-	static const short actionCount = 10, senseCount = 15, memoryCount = 15;
-	static short actionCost[actionCount];
+	static const short actionCount, senseCount = 15, memoryCount = 15;
 	vector<excitation> sensoryInputs;
 
-	static const int ATTACK_DAMAGE = 10;
-	static const int NEWBORN_SHIELD = ATTACK_DAMAGE * 4;
+	static const Energy MAX_DAMAGE = 10;
+	static const Energy NEWBORN_SHIELD = MAX_DAMAGE * 4;
+	static const Energy NEWBORN_POTENTIAL;
+	static const Energy NEWBORN_TOTAL_ENERGY;
+	static const int GROUND_ATTITUDE = 0, GROUND_TRAIT = 0;
+	static constexpr float FORTIFY_FACTOR = 0.05f, MATURE_FACTOR = 0.05f, FETAL_DEVELOPMENT_FACTOR = 0.05f;
+
+	Energy bornFetalEnergy;
 
 	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
@@ -83,9 +91,32 @@ protected:
 
 	void attack();
 
+	void beAttacked(Energy);
+
 	void fortify();
 
+	void mature();
+
+	void growBaby();
+
+	void pushOutNewborn();
+
+	void die();
+
+	Tile operator<<(Tile);
+
+	Tile operator>>(Tile);
+
+	Tile operator>=(Tile);
+
+	Tile operator<=(Tile);
+
+	Tile operator>(Tile);
+
+	Tile operator<(Tile);
+
 public:
+	static vector<Energy> actionCost;
 
 	enum Action {
 		FORWARD,
@@ -102,8 +133,6 @@ public:
 	//TODO Add action to change ATTITUDE attribute of Character.
 
 	Ant();
-
-	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
 	Ant(const Ant &);
 
@@ -135,7 +164,7 @@ public:
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
-	Ant getNewborn();
+	Ant pullOutNewborn();
 
 	void mutate();
 
@@ -169,21 +198,17 @@ public:
 
 	Energy getTotalEnergy();
 
-	Tile operator<<(Tile);
-
-	Tile operator>>(Tile);
-
-	Tile operator>(Tile);
-
-	Tile operator<(Tile);
+	void dissipateEnergy(Energy);
 
 	void randomize();
 
-	void placeAntInEnvironment(Environment &, Coordinate);
+	static void placeInEnvironment(Ant &, Environment &, Coordinate);
+
+	static void placeCharacterInEnvironment(Ant &, Environment &, Coordinate);
 
 	int calculateDistance(Coordinate, Coordinate);
 
-	unsigned long getMaxPerceptValue(percept::Percept);
+	excitation getMaxPerceptValue(percept::Percept);
 
 	excitation getSensation(sensor::Sensor, percept::Percept);
 };

@@ -16,13 +16,12 @@ int main() {
 	Environment environment(10, 10);
 	environment.randomize();
 	Coordinate randomCoordinate(5, 2);
-	ants[0].placeAntInEnvironment(environment, randomCoordinate);
 
 	cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {
-				environment.setTile(ants[0] >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
+				ants[0].placeInEnvironment(ants[0], environment, randomCoordinate);
 			}
 		}
 	}
@@ -38,9 +37,7 @@ int main() {
 		cin >> choice;
 		action = (Ant::Action) choice;
 		ants[0].observeEnvironment(environment);
-		AsciiEnvironment::displayPerceptiveField(*ants[0].getPerceptiveField());
 		ants[0].performAction((Agent::Action) action);
-		AsciiEnvironment::displayPerceptiveField(*ants[0].getPerceptiveField());
 		Ant::realizeAntsAction(ants, environment);
 	} while (action != 9);
 	return 0;

@@ -17,12 +17,11 @@ int main(int argc, char *argv[]) {
 	ants[0].randomize();
 	Environment environment(10, 10);
 	environment.randomize();
-	ants[0].placeAntInEnvironment(environment, randomCoordinate);
 
 	for (int i = 0; i < environment.width; i++) {
 		for (int j = 0; j < environment.height; j++) {
 			if (randomCoordinate == Coordinate(i, j)) {
-				environment.setTile(ants[0] >> environment.getTile(Coordinate(i, j)), Coordinate(i, j));
+				Ant::placeInEnvironment(ants[0], environment, Coordinate(i, j));
 			}
 		}
 	}
@@ -41,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 		Ant::realizeAntsAction(ants, environment);
 
-	} while (selectedAction != Ant::Action::DIE);
+	} while (selectedAction != Ant::Action::DIE);//TODO Change this condition when there are multiple ants
 	return 0;
 }
 

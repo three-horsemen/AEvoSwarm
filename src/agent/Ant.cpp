@@ -4,26 +4,14 @@
 
 #include <agent/Ant.hpp>
 
-short Ant::actionCost[actionCount] = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
-
+vector<Energy> Ant::actionCost = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
+const short Ant::actionCount = (const short) Ant::actionCost.size();
+const Energy Ant::NEWBORN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 20);
+const Energy Ant::NEWBORN_TOTAL_ENERGY = NEWBORN_POTENTIAL + NEWBORN_SHIELD;
 
 Ant::Ant() :
 //Perceptive field size
 		Agent(5, 5) {
-	developBrain();
-}
-
-Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy newFertility, Energy newFetal,
-		 AgentCharacter newCharacter) : Agent(5, 5) {
-	globalCoordinate = newCoordinate;
-	potential = newPotential;
-	shield = newShield;
-	fertility = newFertility;
-	fetal = newFetal;
-	character = newCharacter;
-	if (newCharacter.getOccupancy() == OCCUPANCY_DEAD)
-		throw invalid_argument("An ant can't be born dead!");
-
 	developBrain();
 }
 
@@ -115,7 +103,7 @@ Coordinate Ant::getLocalCoordinate() {
 }
 
 bool Ant::isEnergyAvailable(Agent::Action action) {
-	return getPotential() > actionCost[action];
+	return getPotential() >= actionCost[action];
 }
 
 bool Ant::isActionValid(Agent::Action agentAction) {
@@ -126,27 +114,25 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 	Coordinate coordinateAhead;
 	switch (action) {
 		case Ant::FORWARD:
-			if (perceptiveField.getTile(
-					getLocalCoordinate(adjacency::AHEAD)).getAgentCharacter().getOccupancy() !=
-				OCCUPANCY_DEAD)
-				return false;
 			coordinateAhead = getLocalCoordinate(adjacency::AHEAD);
-			for (int direction = OCCUPANCY_NORTH;
-				 direction <= ((int) OCCUPANCY_WEST); direction++) {
-				Coordinate potentialPredatorCoordinate = getCoordinate(coordinateAhead, (Occupancy) direction,
-																	   adjacency::AHEAD);
+			if (perceptiveField.getTile(coordinateAhead).getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD)
+				return false;
+			for (int adjacent = adjacency::AHEAD;
+				 adjacent <= adjacency::RIGHT; adjacent++) {
+				Coordinate potentialPredatorCoordinate = getCoordinate(coordinateAhead,
+																	   (Occupancy) getCharacter().getOccupancy(),
+																	   (adjacency::Adjacency) adjacent);
 				Tile potentialPredatorTile = perceptiveField.getTile(potentialPredatorCoordinate);
 
-				if (potentialPredatorCoordinate != this->globalCoordinate
-					&& potentialPredatorTile.getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD) {
-					Coordinate rangeOfImpactCoordinate = getCoordinate(potentialPredatorCoordinate,
-																	   potentialPredatorTile
-																			   .getAgentCharacter().getOccupancy(),
-																	   adjacency::AHEAD);
-					if (rangeOfImpactCoordinate == coordinateAhead &&
-						potentialPredatorTile.getTotalEnergy() >= this->getTotalEnergy()) {
+				if (potentialPredatorCoordinate != getLocalCoordinate() //TODO This condition can be removed
+					&& potentialPredatorTile.getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD
+					&& potentialPredatorTile.getTotalEnergy() >= this->getTotalEnergy()) {
+
+					if (coordinateAhead == getCoordinate(potentialPredatorCoordinate,
+														 potentialPredatorTile
+																 .getAgentCharacter().getOccupancy(),
+														 adjacency::AHEAD))
 						return false;
-					}
 				}
 			}
 			return true;
@@ -168,7 +154,8 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 			//TODO Also check if the baby has enough energy to be born with
 			//Is there space behind me:
 			return !perceptiveField.getTile(
-					getLocalCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy();;
+					getLocalCoordinate(adjacency::BEHIND)).getAgentCharacter().getOccupancy()
+				   && getFetal() >= NEWBORN_TOTAL_ENERGY;
 		case Ant::DIE:
 			return true;
 		default:
@@ -178,8 +165,9 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 
 void Ant::observeEnvironment(Environment &environment) {
 	int x, y;
-	for (int i = -perceptiveField.height / 2; i < +perceptiveField.height / 2; i++) {
-		for (int j = -perceptiveField.width / 2; j < +perceptiveField.width / 2; j++) {
+	//TODO Handle even dimensional perceptive fields
+	for (int i = -(perceptiveField.height / 2); i <= +perceptiveField.height / 2; i++) {
+		for (int j = -(perceptiveField.width / 2); j <= +perceptiveField.width / 2; j++) {
 			x = Utils::modulo(globalCoordinate.getX() + j, environment.width);
 			y = Utils::modulo(globalCoordinate.getY() + i, environment.width);
 			Tile tile = environment.getTile(Coordinate(x, y));
@@ -206,15 +194,16 @@ void Ant::senseObservation(Environment &environment) {
 			sensoryInputs[ptr++] = getSensation((sensor::Sensor) i, (percept::Percept) j);
 		}
 	}
-	sensoryInputs[ptr++] = getPotential() / getMaxPerceptValue(percept::ENERGY);
-	sensoryInputs[ptr++] = getShield() / getMaxPerceptValue(percept::ENERGY);
-	sensoryInputs[ptr++] = getFertility() / getMaxPerceptValue(percept::ENERGY);
-	sensoryInputs[ptr++] = getFetal() / getMaxPerceptValue(percept::ENERGY);
-	sensoryInputs[ptr++] = getCharacter().getAttitude() / maxAttitude;
-	sensoryInputs[ptr] = getCharacter().getTrait() / maxTrait;
+	sensoryInputs[ptr++] = (excitation) (log(getPotential()) / getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = (excitation) (log(getShield()) / getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = (excitation) (log(getFertility()) / getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = (excitation) (log(getFetal()) / getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = (excitation) (log(getCharacter().getAttitude()) / log(maxAttitude));
+	sensoryInputs[ptr] = (excitation) (log(getCharacter().getTrait()) / log(maxTrait));
 }
 
 void Ant::selectAction() {
+//	mutate();
 //	Neuron::randomizeExcitation(sensoryInputs);
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
@@ -236,7 +225,7 @@ void Ant::selectAction() {
 	}
 
 	assert(mostExcitedValidAction != -1);
-	selectedAction = (Agent::Action) mostExcitedValidAction;
+	selectedAction = (Agent::Action) mostExcitedValidAction;;
 }
 
 Agent::Action Ant::getSelectedAction() {
@@ -247,12 +236,9 @@ void Ant::performAction(Agent::Action agentAction) {
 	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
 	Action action = (Action) agentAction;
 
-	Tile tile = perceptiveField.getTile(getLocalCoordinate());
-	Energy tileEnergy = tile.getTotalEnergy();
-	Energy potentialEnergy = getPotential();
+	potential -= actionCost[agentAction];
 
-	setPotential(potentialEnergy - actionCost[agentAction]);
-	tile.setTotalEnergy(tileEnergy + actionCost[agentAction]);
+	dissipateEnergy(actionCost[agentAction]);
 
 	switch (action) {
 		case Ant::FORWARD:
@@ -274,9 +260,17 @@ void Ant::performAction(Agent::Action agentAction) {
 			fortify();
 			break;
 		case Ant::MATURE:
+			mature();
+			break;
 		case Ant::GROW_BABY:
+			growBaby();
+			break;
 		case Ant::GIVE_BIRTH:
+			pushOutNewborn();
+			break;
 		case Ant::DIE:
+			die();
+			break;
 		default:
 			//TODO Complete remaining actions
 //			throw invalid_argument("Undefined action selected to be performed");
@@ -287,21 +281,31 @@ void Ant::performAction(Agent::Action agentAction) {
 void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
 
+	Energy priorEnergy = environment.getTotalEnergy();
+
 	//Special effect of GIVE_BIRTH
 	if ((Ant::Action) getSelectedAction() == Ant::GIVE_BIRTH) {
-		ants.push_back(getNewborn());
+		ants.push_back(pullOutNewborn());
 	}
 
-	placeAntInEnvironment(environment, getGlobalCoordinate());
+	placeCharacterInEnvironment(*this, environment, getGlobalCoordinate());
 	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
 	for (int x = 0; x < perceptiveField.width; x++) {
 		for (int y = 0; y < perceptiveField.height; y++) {
 			Tile perceptiveTile = perceptiveField.getTile(Coordinate(x, y));
 			Tile globalTile = environment.getTile(perceptiveTile.getGlobalCoordinate());
 			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - globalTile.getTotalEnergy();
-			globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
-			environment.setTile(globalTile, globalTile.getGlobalCoordinate());
+			if (differentialEnergyValue) {
+				globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
+				environment.setTile(globalTile, globalTile.getGlobalCoordinate());
+			}
 		}
+	}
+
+	//TODO Remove once confident the energy is conserved
+	if (environment.getTotalEnergy() != priorEnergy) {
+		cout << "Environment energy is not conserved from " << priorEnergy << " to " << environment.getTotalEnergy()
+			 << " after action " << getSelectedAction() << endl;
 	}
 }
 
@@ -317,19 +321,22 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 	environment.clearCharacterGrid();
 	unsigned long currentAntCount = ants.size(); //This may change if ants are born, or if they die.
 	for (int i = 0; i < currentAntCount; i++) {
+//		environment.setTile((ants[i] << environment.getTile(ants[i].getGlobalCoordinate()), ants[i].getGlobalCoordinate());
 		ants[i].affectEnvironment(ants, environment);
 	}
 	eraseDeadAnts(ants);
 }
 
-Ant Ant::getNewborn() {
+Ant Ant::pullOutNewborn() {
+	if (bornFetalEnergy >= NEWBORN_TOTAL_ENERGY) {
+		throw runtime_error("Can only spawn one newborn after one birth");
+	}
 	Ant newBorn(*this);
 
-	Energy fetal = getFetal();
-	fetal -= NEWBORN_SHIELD;
 	newBorn.setShield(NEWBORN_SHIELD);
-	newBorn.setPotential(fetal);
-	setFetal(0);
+	newBorn.setPotential(bornFetalEnergy - NEWBORN_SHIELD);
+
+	bornFetalEnergy = (Energy) 0;
 
 	newBorn.mutate();
 	return newBorn;
@@ -346,6 +353,7 @@ void Ant::mutate() {
 			}
 		}
 	}
+	//TODO Update trait here
 }
 
 void Ant::developBrain() {
@@ -462,6 +470,17 @@ Tile Ant::operator>>(Tile tile) {
 	return tile;
 }
 
+Tile Ant::operator<=(Tile tile) {
+	tile.setAgentCharacter(AgentCharacter());
+	return tile;
+}
+
+Tile Ant::operator>=(Tile tile) {
+	tile.setAgentCharacter(character);
+	globalCoordinate = tile.getGlobalCoordinate();
+	return tile;
+}
+
 Tile Ant::operator>(Tile tile) {
 	Occupancy currentOccupancy = character.getOccupancy();
 	Occupancy newOccupancy = OCCUPANCY_DEAD;
@@ -476,7 +495,6 @@ Tile Ant::operator>(Tile tile) {
 	character.setOccupancy(newOccupancy);
 
 	tile.setAgentCharacter(character);
-	tile.setTotalEnergy(this->getTotalEnergy());
 	return tile;
 }
 
@@ -494,57 +512,115 @@ Tile Ant::operator<(Tile tile) {
 	character.setOccupancy(newOccupancy);
 
 	tile.setAgentCharacter(character);
-	tile.setTotalEnergy(this->getTotalEnergy());
 	return tile;
 }
 
+void Ant::dissipateEnergy(Energy energy) {
+	Tile tile = perceptiveField.getTile(getLocalCoordinate());
+	tile.setTotalEnergy(tile.getTotalEnergy() - energy);
+	perceptiveField.setTile(tile, getLocalCoordinate());
+
+	tile = perceptiveField.getTile(getLocalCoordinate(adjacency::BEHIND));
+	tile.setTotalEnergy(tile.getTotalEnergy() + energy);
+	perceptiveField.setTile(tile, getLocalCoordinate(adjacency::BEHIND));
+}
+
 void Ant::moveForward() {
-	Coordinate perceivedSourceCoordinate(perceptiveField.width / 2, perceptiveField.height / 2);
-	Coordinate perceivedDestinationCoordinate = getCoordinate(perceivedSourceCoordinate,
-															  getCharacter().getOccupancy(), adjacency::AHEAD);
+	Coordinate localCoordinate = getLocalCoordinate();
+	Coordinate destinationCoordinate = getLocalCoordinate(adjacency::AHEAD);
 
 	perceptiveField.setTile(
-			(*this << perceptiveField.getTile(perceivedSourceCoordinate)),
-			perceivedSourceCoordinate
+			(*this << perceptiveField.getTile(localCoordinate)),
+			localCoordinate
 	);
 	perceptiveField.setTile(
-			(*this >> perceptiveField.getTile(perceivedDestinationCoordinate)),
-			perceivedDestinationCoordinate
+			(*this >> perceptiveField.getTile(destinationCoordinate)),
+			destinationCoordinate
 	);
 }
 
 void Ant::turnLeft() {
-	Coordinate perceivedCoordinate(perceptiveField.width / 2, perceptiveField.height / 2);
-	perceptiveField.setTile(*this < perceptiveField.getTile(perceivedCoordinate), perceivedCoordinate);
+	Coordinate localCoordinate = getLocalCoordinate();
+	perceptiveField.setTile(*this < perceptiveField.getTile(localCoordinate), localCoordinate);
 }
 
 void Ant::turnRight() {
-	Coordinate perceivedCoordinate(perceptiveField.width / 2, perceptiveField.height / 2);
-	perceptiveField.setTile(*this > perceptiveField.getTile(perceivedCoordinate), perceivedCoordinate);
+	Coordinate localCoordinate = getLocalCoordinate();
+	perceptiveField.setTile(*this > perceptiveField.getTile(localCoordinate), localCoordinate);
 }
 
 void Ant::eat() {
 	Tile tileBeneath = perceptiveField.getTile(getLocalCoordinate());
-	Energy potentialEnergy = getPotential();
-	Energy energyToEat = tileBeneath.getTotalEnergy() - getTotalEnergy();
-	energyToEat = (Energy) ceil(energyToEat * 0.1f);
-	tileBeneath.setTotalEnergy(tileBeneath.getTotalEnergy() - energyToEat);
-	perceptiveField.setTile(tileBeneath, getLocalCoordinate());
-	setPotential(potentialEnergy + energyToEat);
+	Energy energyToEat = (Energy) ceil((tileBeneath.getTotalEnergy() - getTotalEnergy()) * 0.1f);
+	setPotential(getPotential() + energyToEat);
 }
 
 void Ant::attack() {
 	//Environment handles this :p
 }
 
+void Ant::beAttacked(Energy damage) {
+	damage = min(getShield(), damage);
+	setShield(getShield() - damage);
+
+	dissipateEnergy(damage);
+
+	assert(getShield() >= 0);
+
+	if (getShield() == 0) {
+		die();
+	}
+
+}
+
 void Ant::fortify() {
 	Energy potential = getPotential();
 	Energy shieldEnergy = getShield();
-	Energy transferAmount = (Energy) ceil(potential * 0.05f);
+	Energy transferAmount = (Energy) ceil(potential * FORTIFY_FACTOR);
 	potential -= transferAmount;
 	shieldEnergy += transferAmount;
 	setPotential(potential);
 	setShield(shieldEnergy);
+}
+
+void Ant::mature() {
+	Energy potential = getPotential();
+	Energy fertilityEnergy = getFertility();
+	Energy transferAmount = (Energy) ceil(potential * MATURE_FACTOR);
+	potential -= transferAmount;
+	fertilityEnergy += transferAmount;
+	setPotential(potential);
+	setFertility(fertilityEnergy);
+}
+
+void Ant::growBaby() {
+	Energy potential = getPotential();
+	Energy fetalEnergy = getFetal();
+	Energy transferAmount = (Energy) ceil(potential * FETAL_DEVELOPMENT_FACTOR);
+	potential -= transferAmount;
+	fetalEnergy += transferAmount;
+	setPotential(potential);
+	setFetal(fetalEnergy);
+}
+
+void Ant::pushOutNewborn() {
+	if (bornFetalEnergy != 0) {
+		throw runtime_error("Cannot push new born until previous is pulled out");
+	}
+	bornFetalEnergy = getFetal();
+	setFetal(0);
+}
+
+void Ant::die() {
+	setPotential(0);
+	setShield(0);
+	setFertility(0);
+	setFetal(0);
+	dissipateEnergy(getTotalEnergy());
+
+	character.setOccupancy(OCCUPANCY_DEAD);
+	character.setAttitude(GROUND_ATTITUDE);
+	character.setTrait(GROUND_TRAIT);
 }
 
 void Ant::randomize() {
@@ -578,12 +654,18 @@ void Ant::randomize() {
 	));
 }
 
-void Ant::placeAntInEnvironment(Environment &environment, Coordinate coordinate) {
-	if (getCharacter().getOccupancy() != OCCUPANCY_DEAD)
-		environment.setTile(
-				(*this >> environment.getTile(coordinate)),
-				coordinate
-		);
+void Ant::placeInEnvironment(Ant &ant, Environment &environment, Coordinate coordinate) {
+	environment.setTile(
+			(ant >> environment.getTile(coordinate)),
+			coordinate
+	);
+}
+
+void Ant::placeCharacterInEnvironment(Ant &ant, Environment &environment, Coordinate coordinate) {
+	environment.setTile(
+			(ant >= environment.getTile(coordinate)),
+			coordinate
+	);
 }
 
 int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
@@ -597,7 +679,7 @@ int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
 
 }
 
-unsigned long Ant::getMaxPerceptValue(percept::Percept percept) {
+excitation Ant::getMaxPerceptValue(percept::Percept percept) {
 	unsigned long maxPerceptVal = 0;
 	if (percept == percept::ENERGY) {
 		Energy e = 0;
@@ -618,7 +700,7 @@ unsigned long Ant::getMaxPerceptValue(percept::Percept percept) {
 		} while (e < 0);
 		maxPerceptVal = e;
 	}
-	return maxPerceptVal;
+	return (excitation) log(maxPerceptVal);
 }
 
 
@@ -653,8 +735,6 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	}
 	perceivedAverage /= totalWeightedDistance;
 	perceivedAverage = (excitation) log(perceivedAverage + exp(1.0)); //Trying to make excitation logarithmic.
-	//TODO Test the logarithmic nature..
-	float maxPerceptValue = getMaxPerceptValue(percept);
-	excitation resultantExcitation = (perceivedAverage / maxPerceptValue);
+	excitation resultantExcitation = (perceivedAverage / getMaxPerceptValue(percept));
 	return resultantExcitation;
 }

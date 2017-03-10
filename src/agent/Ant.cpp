@@ -283,6 +283,16 @@ void Ant::performAction(Agent::Action agentAction) {
 
 void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
+
+	//Put the expended energy behind the ant.
+	//TODO Scatter the energy all around the ant.
+	Coordinate coordinateBehindAnt = getLocalCoordinate(adjacency::BEHIND);
+	Tile tileBehindAnt = perceptiveField.getTile(coordinateBehindAnt);
+	Energy energyBehindAnt = tileBehindAnt.getTotalEnergy();
+	energyBehindAnt += actionCost[getSelectedAction()];
+	tileBehindAnt.setTotalEnergy(energyBehindAnt);
+	perceptiveField.setTile(tileBehindAnt, coordinateBehindAnt);
+
 	placeAntInEnvironment(environment, getGlobalCoordinate());
 	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
 	for (int x = 0; x < perceptiveField.width; x++) {

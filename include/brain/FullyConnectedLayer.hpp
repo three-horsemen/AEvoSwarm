@@ -9,8 +9,9 @@
 #include <brain/Neuron.hpp>
 
 class FullyConnectedLayer : public Layer {
-public:
+protected:
 	vector<Neuron> neurons;//TODO Make private
+public:
 	FullyConnectedLayer(vector<vector<weight> > &);
 
 	FullyConnectedLayer(FullyConnectedLayer &);

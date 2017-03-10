@@ -17,11 +17,11 @@ class NeuralNetwork {
 public:
 	NeuralNetwork();
 
-	NeuralNetwork(NeuralNetwork &);
+	NeuralNetwork(const NeuralNetwork &);
 
 	~NeuralNetwork();
 
-	void operator=(NeuralNetwork &);
+	void operator=(const NeuralNetwork &);
 
 	void compute();
 

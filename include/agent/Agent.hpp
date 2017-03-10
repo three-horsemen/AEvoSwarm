@@ -26,9 +26,9 @@ public:
 
 	Agent(short, short);
 
-	Agent(Agent &);
+	Agent(const Agent &);
 
-	void operator=(Agent &);
+	void operator=(const Agent &);
 
 	virtual bool isEnergyAvailable(Agent::Action action)=0;
 

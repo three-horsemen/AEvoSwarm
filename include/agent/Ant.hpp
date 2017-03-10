@@ -102,11 +102,11 @@ public:
 
 	Ant(Coordinate, Energy, Energy, Energy, Energy, AgentCharacter);
 
-	Ant(Ant &);
+	Ant(const Ant &);
 
 	~Ant();
 
-	void operator=(Ant &);
+	void operator=(const Ant &);
 
 	bool isEnergyAvailable(Agent::Action action);
 

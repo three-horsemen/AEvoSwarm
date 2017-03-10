@@ -19,13 +19,13 @@ protected:
 public:
 	short &width, &height;
 
-	Environment(Environment &);
+	Environment(const Environment &);
 
-	void operator=(Environment &);
+	void operator=(const Environment &);
 
 	Environment(short, short);
 
-	Tile getTile(Coordinate);
+	Tile getTile(Coordinate) const;
 
 	void setTile(Tile, Coordinate);
 

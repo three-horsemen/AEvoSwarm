@@ -7,7 +7,7 @@
 NeuralNetwork::NeuralNetwork() {
 }
 
-NeuralNetwork::NeuralNetwork(NeuralNetwork &neuralNetwork) {
+NeuralNetwork::NeuralNetwork(const NeuralNetwork &neuralNetwork) {
 	operator=(neuralNetwork);
 }
 
@@ -15,7 +15,7 @@ NeuralNetwork::~NeuralNetwork() {
 	resorb();
 }
 
-void NeuralNetwork::operator=(NeuralNetwork &neuralNetwork) {
+void NeuralNetwork::operator=(const NeuralNetwork &neuralNetwork) {
 	for (int i = 0; i < layers.size(); i++) {
 		delete layers[i];
 	}

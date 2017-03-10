@@ -247,9 +247,12 @@ void Ant::performAction(Agent::Action agentAction) {
 	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
 	Action action = (Action) agentAction;
 
+	Tile tile = perceptiveField.getTile(getLocalCoordinate());
+	Energy tileEnergy = tile.getTotalEnergy();
 	Energy potentialEnergy = getPotential();
-	potentialEnergy -= actionCost[agentAction];
-	setPotential(potentialEnergy);
+
+	setPotential(potentialEnergy - actionCost[agentAction]);
+	tile.setTotalEnergy(tileEnergy + actionCost[agentAction]);
 
 	switch (action) {
 		case Ant::FORWARD:
@@ -276,8 +279,8 @@ void Ant::performAction(Agent::Action agentAction) {
 		case Ant::DIE:
 		default:
 			//TODO Complete remaining actions
-			throw invalid_argument("Undefined action selected to be performed");
-//			break;
+//			throw invalid_argument("Undefined action selected to be performed");
+			break;
 	}
 }
 

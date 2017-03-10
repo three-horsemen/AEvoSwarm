@@ -61,6 +61,9 @@ protected:
 	static short actionCost[actionCount];
 	vector<excitation> sensoryInputs;
 
+	static const int ATTACK_DAMAGE = 10;
+	static const int NEWBORN_SHIELD = ATTACK_DAMAGE * 4;
+
 	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
 	Coordinate getLocalCoordinate(Occupancy, adjacency::Adjacency);
@@ -133,6 +136,8 @@ public:
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
 	Ant getNewborn();
+
+	void mutate();
 
 	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
 

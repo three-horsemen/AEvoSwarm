@@ -21,6 +21,11 @@ FullyConnectedLayer::FullyConnectedLayer(FullyConnectedLayer &layer) : Layer(lay
 FullyConnectedLayer::~FullyConnectedLayer() {
 }
 
+FullyConnectedLayer FullyConnectedLayer::operator=(FullyConnectedLayer &layer) {
+	//TODO Use simple assignment of vectors below
+	set(layer);
+}
+
 void FullyConnectedLayer::set(FullyConnectedLayer &layer) {
 	Layer::operator=(layer);
 	neurons.clear();
@@ -29,9 +34,12 @@ void FullyConnectedLayer::set(FullyConnectedLayer &layer) {
 	}
 }
 
-FullyConnectedLayer FullyConnectedLayer::operator=(FullyConnectedLayer &layer) {
-	//TODO Use simple assignment of vectors below
-	set(layer);
+vector<weight> FullyConnectedLayer::getNeuronWeights(int i) {
+	return neurons[i].getWeights();
+}
+
+vector<weight> FullyConnectedLayer::setNeuronWeights(int i, vector<weight> &weights) {
+	neurons[i].setWeights(weights);
 }
 
 Layer *FullyConnectedLayer::getDeepCopy() {

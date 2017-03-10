@@ -14,22 +14,22 @@ int main(int argc, char *argv[]) {
 	const short inputSize = 25, fC1Size = 24, fC2Size = 16, outputSize = 10;
 	InputLayer inputLayer(inputSize);
 	vector<excitation> excitations(inputSize);
-	neuron::randomizeExcitation(excitations);
+	Neuron::randomizeExcitation(excitations);
 	inputLayer.setInputs(excitations);
 	brain.addLayer((Layer &) inputLayer);
 
 	vector<vector<weight> > weights1(fC1Size, vector<weight>(inputSize));
-	neuron::randomizeWeights(weights1);
+	Neuron::randomizeWeights(weights1);
 	FullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
 	vector<vector<weight> > weights2(fC2Size, vector<weight>(fC1Size));
-	neuron::randomizeWeights(weights2);
+	Neuron::randomizeWeights(weights2);
 	FullyConnectedLayer fullyConnectedLayer2(weights2);
 	brain.addLayer((Layer &) fullyConnectedLayer2);
 
 	vector<vector<weight> > weights3(outputSize, vector<weight>(fC2Size));
-	neuron::randomizeWeights(weights3);
+	Neuron::randomizeWeights(weights3);
 	FullyConnectedLayer fullyConnectedLayer3(weights3);
 	brain.addLayer((Layer &) fullyConnectedLayer3);
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	brain.addLayer((Layer &) outputLayer);
 
 	for (int i = 0; i < 1000000; i++) {
-		neuron::randomizeExcitation(excitations);
+		Neuron::randomizeExcitation(excitations);
 		inputLayer.setInputs(excitations);
 		brain.compute();
 		//brain.getOutputLayer()->displayOutputs();

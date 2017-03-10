@@ -215,7 +215,7 @@ void Ant::senseObservation(Environment &environment) {
 }
 
 void Ant::selectAction() {
-	neuron::randomizeExcitation(sensoryInputs);
+//	Neuron::randomizeExcitation(sensoryInputs);
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
 	vector<excitation> outputs = brain.getOutputLayer()->getOutputs();
@@ -315,7 +315,28 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 
 Ant Ant::getNewborn() {
 	Ant newBorn(*this);
+
+	Energy fetal = getFetal();
+	fetal -= NEWBORN_SHIELD;
+	newBorn.setShield(NEWBORN_SHIELD);
+	newBorn.setPotential(fetal);
+	setFetal(0);
+
+	newBorn.mutate();
 	return newBorn;
+}
+
+void Ant::mutate() {
+	for (int i = 0; i < brain.getDepth(); i++) {
+		if (brain.getLayer(i)->type == FULLY_CONNECTED) {
+			FullyConnectedLayer *layer = (FullyConnectedLayer *) brain.getLayer(i);
+			for (int j = 0; j < layer->outputSize; j++) {
+				vector<weight> weights = layer->getNeuronWeights(j);
+				Neuron::mutateWeights(weights, 0.06f);
+				layer->setNeuronWeights(j, weights);
+			}
+		}
+	}
 }
 
 void Ant::developBrain() {
@@ -332,17 +353,17 @@ void Ant::developBrain() {
 	brain.addLayer((Layer &) inputLayer);
 
 	vector<vector<weight> > weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
-	neuron::randomizeWeights(weights1);
+	Neuron::randomizeWeights(weights1);
 	FullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
 	vector<vector<weight> > weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
-	neuron::randomizeWeights(weights2);
+	Neuron::randomizeWeights(weights2);
 	FullyConnectedLayer fullyConnectedLayer2(weights2);
 	brain.addLayer((Layer &) fullyConnectedLayer2);
 
 	vector<vector<weight> > weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
-	neuron::randomizeWeights(weights3);
+	Neuron::randomizeWeights(weights3);
 	FullyConnectedLayer fullyConnectedLayer3(weights3);
 	brain.addLayer((Layer &) fullyConnectedLayer3);
 

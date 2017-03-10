@@ -24,15 +24,17 @@ public:
 
 	void setWeights(vector<weight> &);
 
+	vector<weight> getWeights();
+
 	excitation getExcitation(vector<excitation>);
-};
 
-namespace neuron {
-	void randomizeExcitation(vector<excitation> &);
+	static void randomizeExcitation(vector<excitation> &);
 
-	void randomizeWeights(vector<weight> &);
+	static void randomizeWeights(vector<weight> &);
 
-	void randomizeWeights(vector<vector<weight> > &);
+	static void randomizeWeights(vector<vector<weight> > &);
+
+	static void mutateWeights(vector<weight> &, float);
 };
 
 #endif //AEVO_NEURON_HPP

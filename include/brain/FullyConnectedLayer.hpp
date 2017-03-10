@@ -17,9 +17,13 @@ public:
 
 	~FullyConnectedLayer();
 
+	FullyConnectedLayer operator=(FullyConnectedLayer &);
+
 	void set(FullyConnectedLayer &);
 
-	FullyConnectedLayer operator=(FullyConnectedLayer &);
+	vector<weight> getNeuronWeights(int i);
+
+	vector<weight> setNeuronWeights(int i, vector<weight> &);
 
 	Layer *getDeepCopy();
 

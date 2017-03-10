@@ -27,11 +27,11 @@ Ant::Ant(Coordinate newCoordinate, Energy newPotential, Energy newShield, Energy
 	developBrain();
 }
 
-Ant::Ant(Ant &ant) : Agent(ant) {
+Ant::Ant(const Ant &ant) : Agent(ant) {
 	operator=(ant);
 }
 
-void Ant::operator=(Ant &ant) {
+void Ant::operator=(const Ant &ant) {
 	Agent::operator=(ant);
 	globalCoordinate = ant.globalCoordinate;
 	potential = ant.potential;
@@ -39,7 +39,7 @@ void Ant::operator=(Ant &ant) {
 	fertility = ant.fertility;
 	fetal = ant.fetal;
 	character = ant.character;
-	if (ant.getCharacter().getOccupancy() == OCCUPANCY_DEAD)
+	if (ant.character.getOccupancy() == OCCUPANCY_DEAD)
 		throw invalid_argument("An ant can't be born dead!");
 	resorbBrain();
 	developBrain();
@@ -284,14 +284,10 @@ void Ant::performAction(Agent::Action agentAction) {
 void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
 
-	//Put the expended energy behind the ant.
-	//TODO Scatter the energy all around the ant.
-	Coordinate coordinateBehindAnt = getLocalCoordinate(adjacency::BEHIND);
-	Tile tileBehindAnt = perceptiveField.getTile(coordinateBehindAnt);
-	Energy energyBehindAnt = tileBehindAnt.getTotalEnergy();
-	energyBehindAnt += actionCost[getSelectedAction()];
-	tileBehindAnt.setTotalEnergy(energyBehindAnt);
-	perceptiveField.setTile(tileBehindAnt, coordinateBehindAnt);
+	//Special effect of GIVE_BIRTH
+	if ((Ant::Action) getSelectedAction() == Ant::GIVE_BIRTH) {
+		ants.push_back(getNewborn());
+	}
 
 	placeAntInEnvironment(environment, getGlobalCoordinate());
 	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
@@ -307,17 +303,17 @@ void Ant::affectEnvironment(vector<Ant> &ants, Environment &environment) {
 }
 
 void Ant::eraseDeadAnts(vector<Ant> &ants) {
-	//TODO Fix compilation breakage
 	for (int i = 0; i < ants.size(); i++)
 		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0)) {
-//			ants.erase(ants.begin() + i);
+			ants.erase(ants.begin() + i);
 		}
 
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 	environment.clearCharacterGrid();
-	for (int i = 0; i < ants.size(); i++) {
+	unsigned long currentAntCount = ants.size(); //This may change if ants are born, or if they die.
+	for (int i = 0; i < currentAntCount; i++) {
 		ants[i].affectEnvironment(ants, environment);
 	}
 	eraseDeadAnts(ants);

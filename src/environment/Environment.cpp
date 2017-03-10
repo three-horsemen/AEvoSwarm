@@ -4,13 +4,13 @@
 
 #include "environment/Environment.hpp"
 
-Environment::Environment(Environment &environment) :
+Environment::Environment(const Environment &environment) :
 		_width(environment.width), _height(environment.height),
 		width(_width), height(_height) {
 	operator=(environment);
 }
 
-void Environment::operator=(Environment &environment) {
+void Environment::operator=(const Environment &environment) {
 	_width = environment.width;
 	_height = environment._height;
 	for (int i = 0; i < tiles.size(); i++)
@@ -38,7 +38,7 @@ Environment::Environment(short width, short height) : _width(width), _height(hei
 	}
 }
 
-Tile Environment::getTile(Coordinate coordinate) {
+Tile Environment::getTile(Coordinate coordinate) const {
 	return tiles[coordinate.getY()][coordinate.getX()];
 }
 

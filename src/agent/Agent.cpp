@@ -13,13 +13,13 @@ Agent::Agent(short perceptiveFieldWidth, short perceptiveFieldHeight) : percepti
 
 }
 
-Agent::Agent(Agent &agent) :
+Agent::Agent(const Agent &agent) :
 		perceptiveField(agent.perceptiveField),
 		brain(agent.brain) {
 	operator=(agent);
 }
 
-void Agent::operator=(Agent &agent) {
+void Agent::operator=(const Agent &agent) {
 	perceptiveField = agent.perceptiveField;
 	globalCoordinate = agent.globalCoordinate;
 	brain = agent.brain;

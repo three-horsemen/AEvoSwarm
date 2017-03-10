@@ -2,9 +2,7 @@
 // Created by soorya on 5/3/17.
 //
 
-#include <iostream>
-#include <agent/PerceptiveField.hpp>
-#include "ui/AsciiEnvironment.hpp"
+#include <ui/AsciiEnvironment.hpp>
 
 using namespace std;
 

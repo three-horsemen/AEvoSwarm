@@ -5,7 +5,8 @@
 #ifndef AEVO_ASCIIENVIRONMENT_HPP
 #define AEVO_ASCIIENVIRONMENT_HPP
 
-#include "environment/Environment.hpp"
+#include <iostream>
+#include <environment/Environment.hpp>
 #include <agent/PerceptiveField.hpp>
 
 class AsciiEnvironment {

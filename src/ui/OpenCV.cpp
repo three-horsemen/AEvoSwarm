@@ -11,9 +11,17 @@ ui::OpenCV::OpenCV(Environment &newEnvironment) : environment(newEnvironment) {
 	AGENT_WIDTH_DISPLAY_PADDING = 2;
 	HUD_HEIGHT_MARGIN = 15;
 	HUD_HEIGHT_PADDING = 7;
-	image = Mat::zeros(WINDOW_HEIGHT + (2 * TILE_SIDE_PIXEL_WIDTH) + (HUD_HEIGHT_MARGIN + 2 * HUD_HEIGHT_PADDING),
-					   WINDOW_WIDTH + 2 * TILE_SIDE_PIXEL_HEIGHT,
-					   CV_8UC3);
+	image = Mat::zeros(
+			WINDOW_HEIGHT + (2 * TILE_SIDE_PIXEL_HEIGHT) + (HUD_HEIGHT_MARGIN + 2 * HUD_HEIGHT_PADDING),
+			WINDOW_WIDTH + (2 * TILE_SIDE_PIXEL_WIDTH),
+			CV_8UC3
+	);
+	HUDBackdrop = Rect2d(0, 0,
+						 WINDOW_WIDTH + (2 * TILE_SIDE_PIXEL_WIDTH),
+						 (TILE_SIDE_PIXEL_HEIGHT) + (HUD_HEIGHT_MARGIN + 2 * HUD_HEIGHT_PADDING)
+	);
+	HUDBackdrop.x = 0;
+	HUDBackdrop.y = WINDOW_HEIGHT + TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_PADDING;
 }
 
 Environment ui::OpenCV::getEnvironment() const {
@@ -53,7 +61,6 @@ char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 					CV_FILLED,
 					8
 			);
-
 			//If an agent exists, draw it here.
 			if (occupancy != OCCUPANCY_DEAD) {
 				if (occupancy == OCCUPANCY_NORTH) {
@@ -134,20 +141,33 @@ char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 				npts = Mat(contour).rows;
 
 				polylines(image, &pts, &npts, 1,
-						  true,            // draw closed contour (i.e. joint end to start)
-						  Scalar(0, 255, 0),// colour RGB ordering (here = green)
-						  1,                // line thickness
+						  true,
+						  Scalar(0, 255, 0),
+						  1,
 						  CV_AA, 0);
 			}
 		}
 	}
-
 	//Draw the HUD.
+	string populationLabel = "Population: ";
+	string iterationLabel = "Iteration: ";
+	rectangle(image, HUDBackdrop, Scalar(0, 0, 0), CV_FILLED, 8); //Clean the backdrop of the HUD.
 	putText(image,
-			"Sample text for the AEvoSwarm HUD.",
+			populationLabel + to_string(ants.size()),
 			Point(
 					5,
-					WINDOW_HEIGHT + HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING
+					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.5,
+			Scalar(0, 200, 200),
+			1
+	);
+	putText(image,
+			iterationLabel + to_string(iterationCount),
+			Point(
+					(int) (WINDOW_WIDTH - 9 * (iterationLabel.length() + to_string(iterationCount).length())),
+					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
 			),
 			FONT_HERSHEY_SIMPLEX,
 			0.5,
@@ -155,7 +175,6 @@ char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 			1
 	);
 	cvtColor(image, image, CV_HSV2BGR_FULL);
-	imshow("OpenCV-Environment", image);
-
+	imshow("AEvoSwarm-Environment", image);
 	return (char) waitKeyResult;
 }

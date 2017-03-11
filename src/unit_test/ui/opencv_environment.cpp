@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
 
 	ants[0].randomize();
 	ants[0].setPotential(Ant::HYPOTHETICAL_MAX_ENERGY - 100);
-	Environment environment(75, 75);
-//	Environment environment(10, 10);
+	Environment environment(80, 80);
+//	Environment environment(6, 6);
 	environment.randomize();
 
 	for (int i = 0; i < environment.width; i++) {

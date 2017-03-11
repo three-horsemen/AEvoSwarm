@@ -19,6 +19,7 @@ namespace ui {
 	class OpenCV {
 	protected:
 		Mat image;
+		Rect2d HUDBackdrop;
 		const static unsigned short WINDOW_WIDTH = 800;
 		const static unsigned short WINDOW_HEIGHT = 800;
 		unsigned short TILE_SIDE_PIXEL_WIDTH;

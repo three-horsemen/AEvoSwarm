@@ -53,10 +53,10 @@ using namespace ant;
 
 class Ant : public Agent {
 public:
-	static const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 2000;
-	static const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 2000;
-	static const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 2000;
-	static const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 2000;
+	static const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 10000;
 	static const Energy HYPOTHETICAL_MAX_ENERGY =
 			HYPOTHETICAL_MAX_POTENTIAL_ENERGY + HYPOTHETICAL_MAX_SHIELD_ENERGY + HYPOTHETICAL_MAX_FERTILITY_ENERGY +
 			HYPOTHETICAL_MAX_BABY_ENERGY;
@@ -64,21 +64,22 @@ public:
 	static const Attitude HYPOTHETICAL_MIN_ATTITUDE = 128;
 	static const Attitude HYPOTHETICAL_MAX_TRAIT = 256;
 	static const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
-protected:
-	Energy potential;
-	Energy shield;
-	Energy fertility;
-	Energy fetal;
-	AgentCharacter character;
-
-	//TODO Use Boost enum
-	static const short actionCount, senseCount = 15, memoryCount = 15;
-	vector<excitation> sensoryInputs;
 
 	static const Energy MAX_DAMAGE = 10;
 	static const Energy NEWBORN_MIN_SHIELD = MAX_DAMAGE * 4;
 	static const Energy NEWBORN_MIN_POTENTIAL;
 	static const Energy NEWBORN_MIN_TOTAL_ENERGY;
+protected:
+	Energy potential;
+	Energy shield;
+	Energy fertility;
+	Energy fetal;
+
+	AgentCharacter character;
+	//TODO Use Boost enum
+	static const short actionCount, senseCount = 15, memoryCount = 15;
+
+	vector<excitation> sensoryInputs;
 	static const int GROUND_ATTITUDE = 0, GROUND_TRAIT = 0;
 	static constexpr float FORTIFY_FACTOR = 0.05f, MATURE_FACTOR = 0.05f, FETAL_DEVELOPMENT_FACTOR = 0.05f;
 
@@ -92,7 +93,7 @@ protected:
 
 	Coordinate getLocalCoordinate();
 
-	static bool isInImpactRange(Environment &, Coordinate);
+	bool isThereBirthSpace();
 
 	void moveForward();
 
@@ -153,6 +154,8 @@ public:
 
 	void operator=(const Ant &);
 
+	static bool isInImpactRange(Environment &, Coordinate);
+
 	bool isEnergyAvailable(Agent::Action action);
 
 	bool isActionValid(Agent::Action action);
@@ -177,13 +180,15 @@ public:
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
-	void pullOutNewborn(Ant &);
+	void pullOutNewborn(Environment &, Ant &);
 
 	void mutate();
 
-	Coordinate getGlobalCoordinate(Occupancy, adjacency::Adjacency);
+	static Coordinate getGlobalCoordinate(Environment &, Coordinate, Occupancy, adjacency::Adjacency);
 
-	Coordinate getGlobalCoordinate(adjacency::Adjacency);
+	Coordinate getGlobalCoordinate(Environment &, Occupancy, adjacency::Adjacency);
+
+	Coordinate getGlobalCoordinate(Environment &, adjacency::Adjacency);
 
 	Coordinate getGlobalCoordinate();
 

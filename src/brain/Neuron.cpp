@@ -51,8 +51,16 @@ void Neuron::randomizeWeights(vector<vector<weight> > &weights) {
 
 void Neuron::mutateWeights(vector<weight> &weights, float variance) {
 	std::default_random_engine generator;
-	normal_distribution<float> distribution(1, variance);
+	normal_distribution<float> distribution(0.9, variance);
 	for (int i = 0; i < weights.size(); i++) {
-		weights[i] *= distribution(generator);
+//		weights[i] *= distribution(generator);
+		//TODO Find more elegant weight mutation method
+		if (rand() % 2) {
+			weights[i] *= 1.01;
+			weights[i] = min(weights[i], 1.f);
+		} else {
+			weights[i] *= 0.99;
+			weights[i] = max(weights[i], 0.f);
+		}
 	}
 }

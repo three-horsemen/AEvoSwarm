@@ -53,10 +53,10 @@ using namespace ant;
 
 class Ant : public Agent {
 public:
-	static const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 10000;
-	static const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 10000;
-	static const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 10000;
-	static const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 10000;
+	static const Energy HYPOTHETICAL_MAX_POTENTIAL_ENERGY = 2000;
+	static const Energy HYPOTHETICAL_MAX_SHIELD_ENERGY = 2000;
+	static const Energy HYPOTHETICAL_MAX_FERTILITY_ENERGY = 2000;
+	static const Energy HYPOTHETICAL_MAX_BABY_ENERGY = 2000;
 	static const Energy HYPOTHETICAL_MAX_ENERGY =
 			HYPOTHETICAL_MAX_POTENTIAL_ENERGY + HYPOTHETICAL_MAX_SHIELD_ENERGY + HYPOTHETICAL_MAX_FERTILITY_ENERGY +
 			HYPOTHETICAL_MAX_BABY_ENERGY;
@@ -76,13 +76,13 @@ protected:
 	vector<excitation> sensoryInputs;
 
 	static const Energy MAX_DAMAGE = 10;
-	static const Energy NEWBORN_SHIELD = MAX_DAMAGE * 4;
-	static const Energy NEWBORN_POTENTIAL;
-	static const Energy NEWBORN_TOTAL_ENERGY;
+	static const Energy NEWBORN_MIN_SHIELD = MAX_DAMAGE * 4;
+	static const Energy NEWBORN_MIN_POTENTIAL;
+	static const Energy NEWBORN_MIN_TOTAL_ENERGY;
 	static const int GROUND_ATTITUDE = 0, GROUND_TRAIT = 0;
 	static constexpr float FORTIFY_FACTOR = 0.05f, MATURE_FACTOR = 0.05f, FETAL_DEVELOPMENT_FACTOR = 0.05f;
 
-	Energy bornFetalEnergy;
+	Energy pushedFetalEnergy;
 
 	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
@@ -92,6 +92,7 @@ protected:
 
 	Coordinate getLocalCoordinate();
 
+	static bool isInImpactRange(Environment &, Coordinate);
 
 	void moveForward();
 
@@ -170,13 +171,13 @@ public:
 
 	void performAction(Agent::Action);
 
-	void affectEnvironment(vector<Ant> &, Environment &);
+	static void affectEnvironment(vector<Ant> &, unsigned short, Environment &);
 
 	static void eraseDeadAnts(vector<Ant> &);
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
-	Ant pullOutNewborn();
+	void pullOutNewborn(Ant &);
 
 	void mutate();
 
@@ -196,7 +197,7 @@ public:
 
 	AgentCharacter getCharacter();
 
-	void setCoordinate(Coordinate);
+	void setGlobalCoordinate(Coordinate);
 
 	void setPotential(Energy newPotential);
 
@@ -205,6 +206,8 @@ public:
 	void setFertility(Energy newFertility);
 
 	void setFetal(Energy newBaby);
+
+	void setPushedFetalEnergy(Energy);
 
 	void setCharacter(AgentCharacter newCharacter);
 

@@ -231,8 +231,13 @@ void Ant::selectAction() {
 	selectedAction = (Agent::Action) mostExcitedValidAction;;
 }
 
-Agent::Action Ant::getSelectedAction() {
+Agent::Action Ant::getSelectedAction() const {
 	return selectedAction;
+}
+
+void Ant::setSelectedAction(Agent::Action action, bool overrideDeath) {
+	if ((selectedAction != (Agent::Action) Ant::DIE) || overrideDeath)
+		selectedAction = action;
 }
 
 void Ant::performAction(Agent::Action agentAction) {
@@ -331,7 +336,7 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 }
 
 Ant Ant::pullOutNewborn() {
-	if (bornFetalEnergy >= NEWBORN_TOTAL_ENERGY) {
+	if (bornFetalEnergy < NEWBORN_TOTAL_ENERGY) {
 		throw runtime_error("Can only spawn one newborn after one birth");
 	}
 	Ant newBorn(*this);

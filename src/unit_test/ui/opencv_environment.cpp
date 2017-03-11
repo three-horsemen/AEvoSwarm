@@ -3,7 +3,6 @@
 //
 
 #include <ui/OpenCV.hpp>
-#include <agent/Ant.hpp>
 
 int main() {
 
@@ -15,7 +14,8 @@ int main() {
 
 	ants[0].randomize();
 	ants[0].setPotential(30000);
-	Environment environment(20, 20);
+	Environment environment(200, 200);
+//	Environment environment(10, 10);
 	environment.randomize();
 
 	for (int i = 0; i < environment.width; i++) {
@@ -27,22 +27,26 @@ int main() {
 	}
 	ui::OpenCV openCVEnvironment(environment);
 
-
+	char escapeKey = char(27);
+	char pressedKey;
 	Ant::Action selectedAction;
+	unsigned long long iterationCount = 0;
 	do {
-		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
-		openCVEnvironment.displayEnvironment();
-		waitKey();
+//		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
+
+		pressedKey = openCVEnvironment.displayEnvironment(ants, iterationCount);
+
 		ants[0].observeEnvironment(environment);
 		ants[0].senseObservation(environment);
 		ants[0].selectAction();
-		cout << "Ant[0] selected action: " << ants[0].getSelectedAction() << endl;
+		ants[0].setSelectedAction((Agent::Action) Ant::Action::FORWARD); //TODO Remove me.
+//		cout << "Ant[0] selected action: " << ants[0].getSelectedAction() << endl;
 		selectedAction = (Ant::Action) ants[0].getSelectedAction();
 		ants[0].performAction((Agent::Action) selectedAction);
-
-
 		Ant::realizeAntsAction(ants, environment);
 
-	} while (selectedAction != Ant::Action::DIE);//TODO Change this condition when there are multiple ants
+		iterationCount++;
+	} while ((selectedAction != Ant::Action::DIE) && (pressedKey != escapeKey));
+	//TODO Change this condition when there are multiple ants
 	return 0;
 }

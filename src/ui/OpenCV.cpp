@@ -3,60 +3,158 @@
 //
 
 #include <ui/OpenCV.hpp>
-#include <agent/Ant.hpp>
-
-namespace opencv_environment {
-	char getCharForOccupancy(Occupancy occupancy) {
-		if (occupancy == OCCUPANCY_DEAD)
-			return ' ';
-		else if (occupancy == OCCUPANCY_NORTH)
-			return '^';
-		else if (occupancy == OCCUPANCY_SOUTH)
-			return 'v';
-		else if (occupancy == OCCUPANCY_EAST)
-			return '>';
-		else //if (occupancy == OCCUPANCY_WEST)
-			return '<';
-	}
-}
 
 ui::OpenCV::OpenCV(Environment &newEnvironment) : environment(newEnvironment) {
 	TILE_SIDE_PIXEL_WIDTH = WINDOW_WIDTH / environment.width;
 	TILE_SIDE_PIXEL_HEIGHT = WINDOW_HEIGHT / environment.height;
-	image = Mat::zeros(WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_WIDTH, WINDOW_WIDTH + 2 * TILE_SIDE_PIXEL_HEIGHT, CV_8UC3);
+	AGENT_HEIGHT_DISPLAY_PADDING = 2;
+	AGENT_WIDTH_DISPLAY_PADDING = 2;
+	HUD_HEIGHT_MARGIN = 15;
+	HUD_HEIGHT_PADDING = 7;
+	image = Mat::zeros(WINDOW_HEIGHT + (2 * TILE_SIDE_PIXEL_WIDTH) + (HUD_HEIGHT_MARGIN + 2 * HUD_HEIGHT_PADDING),
+					   WINDOW_WIDTH + 2 * TILE_SIDE_PIXEL_HEIGHT,
+					   CV_8UC3);
 }
 
 Environment ui::OpenCV::getEnvironment() const {
 	return environment;
 }
 
-void ui::OpenCV::displayEnvironment() {
+char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long &iterationCount) {
 	int i = 0, j = 0;
 	Rect2d tileRect(0, 0, TILE_SIDE_PIXEL_WIDTH, TILE_SIDE_PIXEL_HEIGHT);
 	Coordinate tileCoordinate;
 	AgentCharacter character;
+	Occupancy occupancy;
 	Tile tile;
+	Point agentCorners[1][3];
+	vector<Point> contour(3);
+	int npt[] = {3};
+	int npts;
 	for (i = 0; i < environment.height; i++) {
 		for (j = 0; j < environment.width; j++) {
 			tile = environment.getTile(Coordinate(j, i));
 			character = tile.getAgentCharacter();
+			occupancy = character.getOccupancy();
 			tileCoordinate = tile.getGlobalCoordinate();
 			tileRect.x = (1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH;
 			tileRect.y = (1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT;
+
 			rectangle(
 					image,
 					tileRect,
-					Scalar(character.getTrait(), (tile.getTotalEnergy() / Ant::HYPOTHETICAL_MAX_ENERGY),
-						   character.getAttitude()),
-//					CV
-					1,
+					Scalar(
+							128,
+							0,
+							(log(tile.getTotalEnergy()) / log(Ant::HYPOTHETICAL_MAX_ENERGY)) * 255
+					),
+					CV_FILLED,
 					8
 			);
+
+			//If an agent exists, draw it here.
+			if (occupancy != OCCUPANCY_DEAD) {
+				if (occupancy == OCCUPANCY_NORTH) {
+					//Bottom-left.
+					agentCorners[0][0] = Point(
+							(1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH + AGENT_WIDTH_DISPLAY_PADDING,
+							(2 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT - AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Bottom-right.
+					agentCorners[0][1] = Point(
+							(2 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH - AGENT_WIDTH_DISPLAY_PADDING,
+							(2 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT - AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Top-center.
+					agentCorners[0][2] = Point((int) ((1.5 + (float) tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH),
+											   (1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT +
+											   AGENT_HEIGHT_DISPLAY_PADDING
+					);
+				} else if (occupancy == OCCUPANCY_SOUTH) {
+					//Top-left.
+					agentCorners[0][0] = Point(
+							(1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH + AGENT_WIDTH_DISPLAY_PADDING,
+							(1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT + AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Top-right.
+					agentCorners[0][1] = Point(
+							(2 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH - AGENT_WIDTH_DISPLAY_PADDING,
+							(1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT + AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Bottom-center.
+					agentCorners[0][2] = Point((int) ((1.5 + (float) tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH),
+											   (2 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT -
+											   AGENT_HEIGHT_DISPLAY_PADDING
+					);
+				} else if (occupancy == OCCUPANCY_EAST) {
+					//Top-left.
+					agentCorners[0][0] = Point(
+							(1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH + AGENT_WIDTH_DISPLAY_PADDING,
+							(1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT + AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Bottom-left.
+					agentCorners[0][1] = Point(
+							(1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH + AGENT_WIDTH_DISPLAY_PADDING,
+							(2 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT - AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Right-center.
+					agentCorners[0][2] = Point(
+							(2 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH - AGENT_WIDTH_DISPLAY_PADDING,
+							(int) ((1.5 + (float) tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT)
+					);
+				} else { //Looking west.
+					//Top-right.
+					agentCorners[0][0] = Point(
+							(2 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH - AGENT_WIDTH_DISPLAY_PADDING,
+							(1 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT + AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Bottom-right.
+					agentCorners[0][1] = Point(
+							(2 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH - AGENT_WIDTH_DISPLAY_PADDING,
+							(2 + tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT - AGENT_HEIGHT_DISPLAY_PADDING
+					);
+					//Left-center.
+					agentCorners[0][2] = Point(
+							(1 + tileCoordinate.getX()) * TILE_SIDE_PIXEL_WIDTH + AGENT_WIDTH_DISPLAY_PADDING,
+							(int) ((1.5 + (float) tileCoordinate.getY()) * TILE_SIDE_PIXEL_HEIGHT)
+					);
+				}
+				const Point *ppt[1] = {agentCorners[0]};
+
+				fillPoly(image, ppt, npt, 1, Scalar(
+						character.getTrait(),
+						tile.getTotalEnergy(),
+						character.getAttitude()
+				), 8);
+
+				contour = {agentCorners[0][0], agentCorners[0][1], agentCorners[0][2]};
+				const cv::Point *pts = (const cv::Point *) Mat(contour).data;
+				npts = Mat(contour).rows;
+
+				polylines(image, &pts, &npts, 1,
+						  true,            // draw closed contour (i.e. joint end to start)
+						  Scalar(0, 255, 0),// colour RGB ordering (here = green)
+						  1,                // line thickness
+						  CV_AA, 0);
+			}
 		}
 	}
-//	cout << "| " << opencv_environment::getCharForOccupancy(
-//			environment.getTile(Coordinate(j, i)).getAgentCharacter().getOccupancy()) << " ";
+
+	//Draw the HUD.
+	putText(image,
+			"Sample text for the AEvoSwarm HUD.",
+			Point(
+					5,
+					WINDOW_HEIGHT + HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.5,
+			Scalar(0, 200, 200),
+			1
+	);
 	cvtColor(image, image, CV_HSV2BGR_FULL);
 	imshow("OpenCV-Environment", image);
-//	waitKey();
+
+//	return (char) waitKey(1000);
+	return (char) waitKey(1);
 }

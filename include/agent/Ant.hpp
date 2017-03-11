@@ -132,16 +132,16 @@ public:
 	static vector<Energy> actionCost;
 
 	enum Action {
-		FORWARD,
-		LEFT,
-		RIGHT,
-		EAT,
-		ATTACK,
-		FORTIFY,
-		MATURE,
-		GROW_BABY,
-		GIVE_BIRTH,
-		DIE
+		FORWARD, //0
+		LEFT, //1
+		RIGHT, //2
+		EAT, //3
+		ATTACK, //4
+		FORTIFY, //5
+		MATURE, //6
+		GROW_BABY, //7
+		GIVE_BIRTH, //8
+		DIE //9
 	};
 	//TODO Add action to change ATTITUDE attribute of Character.
 
@@ -167,7 +167,9 @@ public:
 
 	void selectAction();
 
-	Agent::Action getSelectedAction();
+	Agent::Action getSelectedAction() const;
+
+	void setSelectedAction(Agent::Action, bool = false);
 
 	void performAction(Agent::Action);
 

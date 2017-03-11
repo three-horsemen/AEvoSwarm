@@ -244,7 +244,7 @@ void Ant::selectAction() {
 
 	outputs[DIE] = -1;
 	int mostExcitedValidAction = -1;
-	float maxExcitation = -1;
+	float maxExcitation = -2;
 	for (int action = 0; action < actionCount; action++) {
 		if (isActionValid((Agent::Action) action) && outputs[action] > maxExcitation) {
 			mostExcitedValidAction = action;
@@ -253,12 +253,17 @@ void Ant::selectAction() {
 	}
 
 	assert(mostExcitedValidAction != -1);
-	assert(getPotential() > 0 && mostExcitedValidAction != DIE);
-	selectedAction = (Agent::Action) mostExcitedValidAction;;
+//	assert(getPotential() > 0 && mostExcitedValidAction != DIE);
+	selectedAction = (Agent::Action) mostExcitedValidAction;
 }
 
-Agent::Action Ant::getSelectedAction() {
+Agent::Action Ant::getSelectedAction() const {
 	return selectedAction;
+}
+
+void Ant::setSelectedAction(Agent::Action action, bool overrideDeath) {
+	if ((selectedAction != (Agent::Action) Ant::DIE) || overrideDeath)
+		selectedAction = action;
 }
 
 void Ant::performAction(Agent::Action agentAction) {

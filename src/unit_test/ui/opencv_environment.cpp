@@ -3,7 +3,6 @@
 //
 
 #include <ui/OpenCV.hpp>
-#include <agent/Ant.hpp>
 
 int main(int argc, char *argv[]) {
 	Agent::initialize();
@@ -14,7 +13,8 @@ int main(int argc, char *argv[]) {
 
 	ants[0].randomize();
 	ants[0].setPotential(Ant::HYPOTHETICAL_MAX_ENERGY - 100);
-	Environment environment(20, 20);
+	Environment environment(75, 75);
+//	Environment environment(10, 10);
 	environment.randomize();
 
 	for (int i = 0; i < environment.width; i++) {
@@ -26,14 +26,16 @@ int main(int argc, char *argv[]) {
 	}
 	ui::OpenCV openCVEnvironment(environment);
 
-
-	Ant::Action selectedAction = Ant::FORWARD;
-	for (int i = 0; i < 10000000 && selectedAction != Ant::Action::DIE; i++) {
+	char escapeKey = char(27);
+	char pressedKey = 0;
+	Ant::Action selectedAction = Ant::Action::FORWARD;
+	for (unsigned long long i = 0; i < 10000000 && ants.size() > 0 && (pressedKey != escapeKey); i++) {
 //		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
-		unsigned long antCount = ants.size();
-		for (unsigned long j = 0; j < antCount; j++) {
-			if (i % 101 == 0) {
-				openCVEnvironment.displayEnvironment();
+		unsigned long long antCount = ants.size();
+		for (unsigned long long j = 0; j < antCount; j++) {
+//			ants[j].setSelectedAction((Agent::Action)Ant::Action::FORTIFY);
+			if (i % 1 == 0) {
+				pressedKey = openCVEnvironment.displayEnvironment(ants, i);
 				waitKey(1);
 				cout << "ants[" << j << "] selected action: " << ants[j].getSelectedAction() << " with potential: "
 					 << ants[j].getPotential() << endl;
@@ -47,14 +49,14 @@ int main(int argc, char *argv[]) {
 			if (i % 51 == 0) {
 				ants[j].mutate();
 			}
-
-			if (ants[j].getPotential() < 100) {
-				ants[j].setPotential(Ant::HYPOTHETICAL_MAX_ENERGY - 100);
-			}
+//			if (ants[j].getPotential() < 100) {
+//				ants[j].setPotential(Ant::HYPOTHETICAL_MAX_ENERGY - 100);
+//			}
 
 		}
 		Ant::realizeAntsAction(ants, environment);
 		//TODO Check for total system conservation
 	}
+	waitKey();
 	return 0;
 }

@@ -67,7 +67,7 @@ void Environment::clearCharacterGrid() {
 }
 
 void Environment::randomize() {
-	const Energy HYPOTHETICAL_MAX_ENERGY = 10;
+	const Energy HYPOTHETICAL_MAX_ENERGY = 500;
 	srand((unsigned int) time(NULL));
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {

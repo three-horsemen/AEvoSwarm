@@ -20,8 +20,8 @@ namespace ui {
 	protected:
 		Mat image;
 		Rect2d HUDBackdrop;
-		const static unsigned short WINDOW_WIDTH = 800;
-		const static unsigned short WINDOW_HEIGHT = 800;
+		const static unsigned short WINDOW_WIDTH = 600;
+		const static unsigned short WINDOW_HEIGHT = 600;
 		unsigned short TILE_SIDE_PIXEL_WIDTH;
 		unsigned short TILE_SIDE_PIXEL_HEIGHT;
 		unsigned short AGENT_HEIGHT_DISPLAY_PADDING;

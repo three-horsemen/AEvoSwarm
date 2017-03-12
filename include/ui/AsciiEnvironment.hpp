@@ -15,11 +15,15 @@ protected:
 public:
 	AsciiEnvironment(Environment &);
 
-	Environment getEnvironment();
+	Environment getEnvironment() const;
 
 	void setEnvironment(Environment);
 
 	static void displayAsciiEnvironment(Environment &);
+
+	static void displayEnergyMatrix(Environment &);
+
+	static void displayEnergyDeltas(const Environment &, const Environment &);
 
 	static void displayPerceptiveField(PerceptiveField &);
 };

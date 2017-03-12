@@ -106,7 +106,7 @@ Coordinate Ant::getLocalCoordinate() {
 }
 
 bool Ant::isInImpactRange(Environment &environment, Coordinate coordinate) {
-
+//TODO Look here for bug bounty.
 	for (int adjacent = adjacency::AHEAD;
 		 adjacent <= adjacency::RIGHT; adjacent++) {
 		Coordinate potentialPredatorCoordinate = getGlobalCoordinate(environment, coordinate,
@@ -118,8 +118,8 @@ bool Ant::isInImpactRange(Environment &environment, Coordinate coordinate) {
 					.getOccupancy() != OCCUPANCY_DEAD
 			&& (coordinate == getCoordinate(potentialPredatorCoordinate,
 											environment
-												   .getTile(potentialPredatorCoordinate)
-												   .getAgentCharacter().getOccupancy(),
+													.getTile(potentialPredatorCoordinate)
+													.getAgentCharacter().getOccupancy(),
 											adjacency::AHEAD)
 				|| coordinate == getCoordinate(potentialPredatorCoordinate,
 											   environment
@@ -252,6 +252,7 @@ void Ant::selectAction() {
 	assert(brain.getOutputLayer()->outputSize == actionCount + memoryCount);
 
 	outputs[DIE] = -1;
+	outputs[GIVE_BIRTH] += 0.2;
 	int mostExcitedValidAction = -1;
 	float maxExcitation = -2;
 	for (int action = 0; action < actionCount; action++) {
@@ -459,7 +460,7 @@ Coordinate Ant::getGlobalCoordinate(Environment &environment, Occupancy occupanc
 	int x = potentialOutOfBoundsCoordinate.getX();
 	int y = potentialOutOfBoundsCoordinate.getY();
 	potentialOutOfBoundsCoordinate.setX(Utils::modulo(x, environment.width));
-	potentialOutOfBoundsCoordinate.setX(Utils::modulo(y, environment.height));
+	potentialOutOfBoundsCoordinate.setY(Utils::modulo(y, environment.height));
 	return potentialOutOfBoundsCoordinate;
 }
 

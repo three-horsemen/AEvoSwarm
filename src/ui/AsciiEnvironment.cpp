@@ -32,7 +32,7 @@ AsciiEnvironment::AsciiEnvironment(Environment &newEnvironment) : environment(ne
 	}
 }
 
-Environment AsciiEnvironment::getEnvironment() {
+Environment AsciiEnvironment::getEnvironment() const {
 	return environment;
 }
 
@@ -51,6 +51,7 @@ void AsciiEnvironment::displayAsciiEnvironment(Environment &environment) {
 			cout << "| "
 				 << ascii_environment::getCharForOccupancy(
 						 environment.getTile(Coordinate(j, i)).getAgentCharacter().getOccupancy())
+				 //				 << environment.getTile(Coordinate(j, i)).getTotalEnergy()
 				 << " ";
 		}
 		cout << "|" << endl;
@@ -58,6 +59,37 @@ void AsciiEnvironment::displayAsciiEnvironment(Environment &environment) {
 			cout << "----";
 		}
 		cout << "-" << endl;
+	}
+	cout << endl;
+}
+
+void AsciiEnvironment::displayEnergyMatrix(Environment &environment) {
+
+	for (int i = 0; i < environment.height; i++) {
+		cout << "----";
+	}
+	cout << endl;
+	for (int i = 0; i < environment.height; i++) {
+		for (int j = 0; j < environment.width; j++) {
+			cout << environment.getTile(Coordinate(j, i)).getTotalEnergy() << "\t";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
+
+void AsciiEnvironment::displayEnergyDeltas(const Environment &oldEnvironment, const Environment &newEnvironment) {
+
+	for (int i = 0; i < oldEnvironment.height; i++) {
+		cout << "----";
+	}
+	cout << endl;
+	for (int i = 0; i < oldEnvironment.height; i++) {
+		for (int j = 0; j < oldEnvironment.width; j++) {
+			cout << newEnvironment.getTile(Coordinate(j, i)).getTotalEnergy() -
+					oldEnvironment.getTile(Coordinate(j, i)).getTotalEnergy() << "\t";
+		}
+		cout << endl;
 	}
 	cout << endl;
 }

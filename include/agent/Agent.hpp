@@ -44,7 +44,9 @@ public:
 
 	virtual void selectAction()=0;
 
-	virtual Action getSelectedAction()=0;
+	virtual Action getSelectedAction() const =0;
+
+	virtual void setSelectedAction(Action, bool = false)=0; //Boolean parameter to override DIE if true.
 
 	virtual void performAction(Agent::Action)=0;
 

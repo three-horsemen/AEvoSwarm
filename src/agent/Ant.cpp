@@ -263,11 +263,16 @@ void Ant::selectAction() {
 
 	assert(mostExcitedValidAction != -1);
 //	assert(getPotential() > 0 && mostExcitedValidAction != DIE); TODO Ensure that the only time an ant picks death is if no other option is available
-	selectedAction = (Agent::Action) mostExcitedValidAction;;
+	selectedAction = (Agent::Action) mostExcitedValidAction;
 }
 
-Agent::Action Ant::getSelectedAction() {
+Agent::Action Ant::getSelectedAction() const {
 	return selectedAction;
+}
+
+void Ant::setSelectedAction(Agent::Action action, bool overrideDeath) {
+	if ((selectedAction != (Agent::Action) Ant::DIE) || overrideDeath)
+		selectedAction = action;
 }
 
 void Ant::performAction(Agent::Action agentAction) {

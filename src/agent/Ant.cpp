@@ -126,9 +126,9 @@ bool Ant::isInImpactRange(Environment &environment, Coordinate coordinate) {
 													   .getTile(potentialPredatorCoordinate)
 													   .getAgentCharacter().getOccupancy(),
 											   adjacency::BEHIND)))
-			return false;
+			return true;
 	}
-	return true;
+	return false;
 }
 
 bool Ant::isThereBirthSpace() {
@@ -252,7 +252,8 @@ void Ant::selectAction() {
 	assert(brain.getOutputLayer()->outputSize == actionCount + memoryCount);
 
 	outputs[DIE] = -1;
-	outputs[GIVE_BIRTH] += 0.2;
+//	outputs[GIVE_BIRTH] += 0.19;
+//	outputs[GROW_BABY] += 0.2;
 	int mostExcitedValidAction = -1;
 	float maxExcitation = -2;
 	for (int action = 0; action < actionCount; action++) {
@@ -322,33 +323,37 @@ void Ant::performAction(Agent::Action agentAction) {
 	}
 }
 
-void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Environment &environment) {
+void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Environment &oldEnvironment,
+							Environment &newEnvironment) {
 	assert(indexOfAnt < ants.size());
 
 	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
 
-	Energy priorEnergy = environment.getTotalEnergy();
+	Energy priorEnergy = oldEnvironment.getTotalEnergy();
 
 	//Special effect of GIVE_BIRTH
 	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
 		Ant newborn;
-		ants[indexOfAnt].pullOutNewborn(environment, newborn);
-		placeInEnvironment(newborn, environment, newborn.getGlobalCoordinate());
+		ants[indexOfAnt].pullOutNewborn(newEnvironment, newborn);
+		placeInEnvironment(newborn, newEnvironment, newborn.getGlobalCoordinate());
+		cout << "Newborn placed at (" << newborn.getGlobalCoordinate().getX() << ","
+			 << newborn.getGlobalCoordinate().getY() << ")" << endl;
 		ants.push_back(newborn);
 	}
 
-	placeCharacterInEnvironment(ants[indexOfAnt], environment, ants[indexOfAnt].getGlobalCoordinate());
+	placeCharacterInEnvironment(ants[indexOfAnt], newEnvironment, ants[indexOfAnt].getGlobalCoordinate());
 	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
 
 	//Right now this is just updating the perceived energy changes.
 	for (int x = 0; x < ants[indexOfAnt].getPerceptiveField()->width; x++) {
 		for (int y = 0; y < ants[indexOfAnt].getPerceptiveField()->height; y++) {
 			Tile perceptiveTile = ants[indexOfAnt].getPerceptiveField()->getTile(Coordinate(x, y));
-			Tile globalTile = environment.getTile(perceptiveTile.getGlobalCoordinate());
-			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - globalTile.getTotalEnergy();
+			Tile globalTile = newEnvironment.getTile(perceptiveTile.getGlobalCoordinate());
+			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - oldEnvironment.getTile(
+					perceptiveTile.getGlobalCoordinate()).getTotalEnergy();
 			if (differentialEnergyValue) {
 				globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
-				environment.setTile(globalTile, globalTile.getGlobalCoordinate());
+				newEnvironment.setTile(globalTile, globalTile.getGlobalCoordinate());
 			}
 		}
 	}
@@ -364,11 +369,12 @@ void Ant::eraseDeadAnts(vector<Ant> &ants) {
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
+	Environment environmentBackup(environment);
 	environment.clearCharacterGrid();
 	unsigned long currentAntCount = ants.size(); //This may change if ants are born, or if they die.
-	for (int i = 0; i < currentAntCount; i++) {
+	for (unsigned short i = 0; i < currentAntCount; i++) {
 //		environment.setTile((ants[i] << environment.getTile(ants[i].getGlobalCoordinate()), ants[i].getGlobalCoordinate());
-		affectEnvironment(ants, i, environment);
+		affectEnvironment(ants, i, environmentBackup, environment);
 	}
 	eraseDeadAnts(ants);
 }
@@ -419,17 +425,17 @@ void Ant::developBrain() {
 	InputLayer inputLayer(inputSize);
 	brain.addLayer((Layer &) inputLayer);
 
-	vector<vector<weight> > weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
+	vector<vector<weight>> weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
 	Neuron::randomizeWeights(weights1);
 	FullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
-	vector<vector<weight> > weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
+	vector<vector<weight>> weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
 	Neuron::randomizeWeights(weights2);
 	FullyConnectedLayer fullyConnectedLayer2(weights2);
 	brain.addLayer((Layer &) fullyConnectedLayer2);
 
-	vector<vector<weight> > weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
+	vector<vector<weight>> weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
 	Neuron::randomizeWeights(weights3);
 	FullyConnectedLayer fullyConnectedLayer3(weights3);
 	brain.addLayer((Layer &) fullyConnectedLayer3);
@@ -682,15 +688,18 @@ void Ant::pushOutNewborn() {
 		throw runtime_error("Cannot push new born until previous is pulled out");
 	}
 	pushedFetalEnergy = getFetal();
+
 	Coordinate localCoordinate = getLocalCoordinate();
 	Tile tile = perceptiveField.getTile(localCoordinate);
 	tile.setTotalEnergy(tile.getTotalEnergy() - pushedFetalEnergy);
 	perceptiveField.setTile(tile, localCoordinate);
 
-	localCoordinate = getLocalCoordinate(adjacency::BEHIND);
-	tile = perceptiveField.getTile(localCoordinate);
-	tile.setTotalEnergy(tile.getTotalEnergy() + pushedFetalEnergy);
-	perceptiveField.setTile(tile, localCoordinate);
+	//Putting energy in the tile behind is the responsibility of the environment
+//	localCoordinate = getLocalCoordinate(adjacency::BEHIND);
+//	tile = perceptiveField.getTile(localCoordinate);
+//	tile.setTotalEnergy(tile.getTotalEnergy() + pushedFetalEnergy);
+//	perceptiveField.setTile(tile, localCoordinate);
+
 	setFetal(0);
 }
 
@@ -813,4 +822,49 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	perceivedAverage = (excitation) log(perceivedAverage + exp(1.0)); //Trying to make excitation logarithmic.
 	excitation resultantExcitation = (perceivedAverage / getMaxPerceptValue(percept));
 	return resultantExcitation;
+}
+
+void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Coordinate coordinate) {
+	Tile tile = environment.getTile(coordinate);
+	if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+		&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
+		&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+			) {
+
+		Ant ant;
+
+		ant.randomize();
+		ant.setFertility(0);
+		ant.setFetal(0);
+		ant.setPushedFetalEnergy(0);
+		ant.setShield(Ant::NEWBORN_MIN_SHIELD);
+		ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
+		Ant::placeCharacterInEnvironment(ant, environment, coordinate);
+
+		ant.mutate();
+		ants.push_back(ant);
+//		cout << "Spawned ant at " << coordinate.toString() << endl;
+	} else {
+		throw invalid_argument("Cannot spark life at " + coordinate.toString());
+	}
+}
+
+void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int count) {
+	int randXOffset = rand() % environment.width;
+	int randYOffset = rand() % environment.height;
+	for (int x = 0; x < environment.width && count > 0; x++) {
+		for (int y = 0; y < environment.height && count > 0; y++) {
+			int X = (x + randXOffset) % environment.width;
+			int Y = (y + randYOffset) % environment.height;
+
+			Tile tile = environment.getTile(Coordinate(X, Y));
+			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+				&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
+				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+					) {
+				Ant::sparkLifeAt(environment, ants, Coordinate(X, Y));
+				count--;
+			}
+		}
+	}
 }

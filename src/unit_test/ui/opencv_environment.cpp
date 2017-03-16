@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 	agentCharacter.setOccupancy(OCCUPANCY_NORTH);
 	ants[0].setCharacter(agentCharacter);
 	ants[0].setPotential(60000);
-	Environment environment(8, 8);
+	Environment environment(50, 50);
 //	Environment environment(6, 6);
 	environment.randomize();
 
@@ -34,14 +34,14 @@ int main(int argc, char *argv[]) {
 	char pressedKey = 0;
 	Ant::Action selectedAction = Ant::Action::FORWARD;
 	for (unsigned long long i = 0; i < 10000000 && ants.size() > 0 && (pressedKey != escapeKey); i++) {
-		if (i % 1 == 0) {
+		if (i % 101 == 0) {
 			pressedKey = openCVEnvironment.displayEnvironment(ants, i);
-			waitKey(1000);
+			waitKey(1);
 //				cout << "ants[" << j << "] selected action: " << ants[j].getSelectedAction() << " with potential: "<< ants[j].getPotential() << endl;
 		}
 
 		AsciiEnvironment oldEnvironment(environment);
-		AsciiEnvironment::displayEnergyMatrix(environment);
+//		AsciiEnvironment::displayEnergyMatrix(environment);
 		Energy priorEnergy = environment.getTotalEnergy();
 //		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
 		unsigned long long antCount = ants.size();
@@ -51,8 +51,10 @@ int main(int argc, char *argv[]) {
 			ants[j].observeEnvironment(environment);
 			ants[j].senseObservation(environment);
 			ants[j].selectAction();
-			ants[j].performAction((Agent::Action) ((Ant::Action) ants[j].getSelectedAction()));
+//			cout << "Ant " << j << " selected action " << ants[j].getSelectedAction() << endl;
+			ants[j].performAction((Agent::Action)((Ant::Action) ants[j].getSelectedAction()));
 
+//			AsciiEnvironment::displayEnergyMatrix(*ants[j].getPerceptiveField());
 			if (i % 51 == 0) {
 //				ants[j].mutate();
 			}
@@ -61,42 +63,17 @@ int main(int argc, char *argv[]) {
 
 		Ant::realizeAntsAction(ants, environment);
 
-		if (ants.size() < 1) {
-			int randXOffset = rand() % environment.width;
-			int randYOffset = rand() % environment.height;
-			for (int x = 0; x < environment.width; x++) {
-				for (int y = 0; y < environment.height; y++) {
-					int X = (x + randXOffset) % environment.width;
-					int Y = (y + randYOffset) % environment.height;
-
-					Tile tile = environment.getTile(Coordinate(X, Y));
-					if (tile.getAgentCharacter().getOccupancy() ==
-						OCCUPANCY_DEAD && !Ant::isInImpactRange(environment, tile.getGlobalCoordinate()) &&
-						tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY) {
-
-						Ant ant;
-
-						ant.randomize();
-						ant.setFertility(0);
-						ant.setFetal(0);
-						ant.setPushedFetalEnergy(0);
-						ant.setShield(Ant::NEWBORN_MIN_SHIELD);
-						ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
-						Ant::placeCharacterInEnvironment(ant, environment, Coordinate(X, Y));
-
-						ant.mutate();
-						ants.push_back(ant);
-						cout << "Spawned ant at (" << X << "," << Y << ")" << endl;
-
-					}
-				}
-			}
+		if (ants.size() < 50) {
+			Ant::sparkNLives(environment, ants, (unsigned int) (50 - ants.size()));
 		}
 		if (environment.getTotalEnergy() != priorEnergy) {
 			AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
 			cout << "Environment energy is not conserved from " << priorEnergy << " to " << environment.getTotalEnergy()
 				 << endl;
 		}
+//		AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
+//		cout << "Environment energy transitioned from " << priorEnergy << " to " << environment.getTotalEnergy()
+//			 << endl;
 		//TODO Check for total system conservation
 	}
 	return 0;

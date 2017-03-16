@@ -71,7 +71,7 @@ void AsciiEnvironment::displayEnergyMatrix(Environment &environment) {
 	cout << endl;
 	for (int i = 0; i < environment.height; i++) {
 		for (int j = 0; j < environment.width; j++) {
-			cout << environment.getTile(Coordinate(j, i)).getTotalEnergy() << "\t";
+			printf("%6d ", environment.getTile(Coordinate(j, i)).getTotalEnergy());
 		}
 		cout << endl;
 	}
@@ -86,8 +86,8 @@ void AsciiEnvironment::displayEnergyDeltas(const Environment &oldEnvironment, co
 	cout << endl;
 	for (int i = 0; i < oldEnvironment.height; i++) {
 		for (int j = 0; j < oldEnvironment.width; j++) {
-			cout << newEnvironment.getTile(Coordinate(j, i)).getTotalEnergy() -
-					oldEnvironment.getTile(Coordinate(j, i)).getTotalEnergy() << "\t";
+			printf("%6d ", newEnvironment.getTile(Coordinate(j, i)).getTotalEnergy() -
+						   oldEnvironment.getTile(Coordinate(j, i)).getTotalEnergy());
 		}
 		cout << endl;
 	}

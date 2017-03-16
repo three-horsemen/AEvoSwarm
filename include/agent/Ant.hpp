@@ -176,7 +176,7 @@ public:
 
 	void performAction(Agent::Action);
 
-	static void affectEnvironment(vector<Ant> &, unsigned short, Environment &);
+	static void affectEnvironment(vector<Ant> &, unsigned short, Environment &, Environment &);
 
 	static void eraseDeadAnts(vector<Ant> &);
 
@@ -233,6 +233,11 @@ public:
 	excitation getMaxPerceptValue(percept::Percept);
 
 	excitation getSensation(sensor::Sensor, percept::Percept);
+
+	static void sparkLifeAt(Environment &, vector<Ant> &, Coordinate);
+
+	static void sparkNLives(Environment &, vector<Ant> &, unsigned int);
+
 };
 
 

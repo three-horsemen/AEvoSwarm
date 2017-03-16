@@ -5,6 +5,10 @@
 #ifndef AEVO_COORDINATE_HPP
 #define AEVO_COORDINATE_HPP
 
+#include <string>
+
+using namespace std;
+
 class Coordinate {
 protected:
 	int X;
@@ -25,6 +29,8 @@ public:
 	bool operator==(Coordinate);
 
 	bool operator!=(Coordinate);
+
+	string toString();
 };
 
 

@@ -13,17 +13,19 @@ class InputLayer : public Layer {
 public:
 	InputLayer(int);
 
-	InputLayer(InputLayer &);
+	InputLayer(const InputLayer &);
 
 	~InputLayer();
 
-	void set(InputLayer &);
-
-	InputLayer operator=(InputLayer &);
+	void operator=(InputLayer &);
 
 	Layer *getDeepCopy();
 
 	void compute();
+
+	void save(ofstream &);
+
+	static InputLayer getLoadedLayer(ifstream &);
 };
 
 

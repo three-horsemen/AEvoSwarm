@@ -22,8 +22,6 @@ protected:
 	Action selectedAction;
 public:
 
-	static void initialize();
-
 	Agent(short, short);
 
 	Agent(const Agent &);
@@ -51,6 +49,12 @@ public:
 	virtual void performAction(Agent::Action)=0;
 
 	//virtual void affectEnvironment(Environment &)=0;
+
+	inline Energy getActionCost(Action);
+
+	virtual void save(ofstream &)=0;
+
+	virtual void load(ifstream &, Environment &)=0;
 
 	PerceptiveField *getPerceptiveField();
 };

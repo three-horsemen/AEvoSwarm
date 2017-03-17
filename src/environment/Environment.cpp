@@ -67,13 +67,71 @@ void Environment::clearCharacterGrid() {
 }
 
 void Environment::randomize() {
-	const Energy HYPOTHETICAL_MAX_ENERGY = 500;
-	srand((unsigned int) time(NULL));
+	const Energy HYPOTHETICAL_MAX_ENERGY = 400;
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
+			float r = (rand() % 256) / 255.f;
 			tiles[i][j].setAgentCharacter(AgentCharacter());
 			tiles[i][j].setGlobalCoordinate(Coordinate(j, i));
-			tiles[i][j].setTotalEnergy((Energy) (rand() % HYPOTHETICAL_MAX_ENERGY));
+			tiles[i][j].setTotalEnergy((Energy) (r * r * HYPOTHETICAL_MAX_ENERGY));
 		}
+	}
+}
+
+void Environment::save(string filePath) {
+	cout << "Saving to file " << filePath << endl;
+	ofstream file(filePath);
+	file << height << ' ' << width << endl;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			file << tiles[i][j].getTotalEnergy() << ' '
+				 << tiles[i][j].getAgentCharacter().getAttitude() << ' '
+				 << tiles[i][j].getAgentCharacter().getOccupancy() << ' '
+				 << tiles[i][j].getAgentCharacter().getTrait() << "  ";
+		}
+		file << endl;
+	}
+	file.close();
+}
+
+bool Environment::load(string filePath) {
+	cout << "Loading from file " << filePath << endl;
+	try {
+		ifstream file(filePath);
+		if (!file.is_open())
+			return false;
+		int fileHeight, fileWidth;
+		file >> fileHeight >> fileWidth;
+		if (fileHeight != height || fileWidth != width) {
+			return false;
+		}
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				Energy totalEnergy;
+				file >> totalEnergy;
+				tiles[i][j].setTotalEnergy(totalEnergy);
+
+				AgentCharacter character;
+
+				Attitude attitude;
+				file >> attitude;
+				character.setAttitude(attitude);
+
+				int occupancy;
+				file >> occupancy;
+				character.setOccupancy((Occupancy) occupancy);
+
+				Trait trait;
+				file >> trait;
+				character.setTrait(trait);
+
+				tiles[i][j].setAgentCharacter(character);
+			}
+		}
+		file.close();
+		return true;
+	} catch (exception &e) {
+		cout << e.what() << endl;
+		return false;
 	}
 }

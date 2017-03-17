@@ -7,6 +7,10 @@
 Neuron::Neuron() {
 }
 
+Neuron::Neuron(int inputSize) : weights((unsigned long) inputSize) {
+	this->inputSize = inputSize;
+}
+
 Neuron::~Neuron() {
 }
 
@@ -31,6 +35,19 @@ excitation Neuron::getExcitation(vector<excitation> excitations) {
 
 }
 
+void Neuron::save(ofstream &file) {
+	for (unsigned int i = 0; i < weights.size(); i++) {
+		file << weights[i] << ' ';
+	}
+	file << ' ';
+}
+
+void Neuron::load(ifstream &file) {
+	for (unsigned int i = 0; i < weights.size(); i++) {
+		file >> weights[i];
+	}
+}
+
 void Neuron::randomizeExcitation(vector<excitation> &excitations) {
 	for (int i = 0; i < excitations.size(); i++) {
 		excitations[i] = ((float) rand()) / (RAND_MAX);
@@ -39,7 +56,7 @@ void Neuron::randomizeExcitation(vector<excitation> &excitations) {
 
 void Neuron::randomizeWeights(vector<weight> &weights) {
 	for (int i = 0; i < weights.size(); i++) {
-		weights[i] = 0.085f * ((float) rand()) / (RAND_MAX);
+		weights[i] = ((((float) rand()) / (RAND_MAX / 2)) - 1.f);
 	}
 }
 
@@ -50,17 +67,17 @@ void Neuron::randomizeWeights(vector<vector<weight> > &weights) {
 }
 
 void Neuron::mutateWeights(vector<weight> &weights, float variance) {
-	std::default_random_engine generator;
-	normal_distribution<float> distribution(0.9, variance);
+//	std::default_random_engine generator;
+//	normal_distribution<float> distribution(0.9, variance);
 	for (int i = 0; i < weights.size(); i++) {
 //		weights[i] *= distribution(generator);
 		//TODO Find more elegant weight mutation method
 		if (rand() % 2) {
-			weights[i] *= 1.01;
+			weights[i] += 0.01;
 			weights[i] = min(weights[i], 1.f);
 		} else {
-			weights[i] *= 0.99;
-			weights[i] = max(weights[i], 0.f);
+			weights[i] -= 0.01;
+			weights[i] = max(weights[i], -1.f);
 		}
 	}
 }

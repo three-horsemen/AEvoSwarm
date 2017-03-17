@@ -8,7 +8,7 @@
 using namespace std;
 
 int main() {
-	Ant::initialize();
+	srand((unsigned int) time(NULL));
 
 	vector<Ant> ants(1);
 

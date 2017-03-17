@@ -3,11 +3,8 @@
 //
 
 #include <brain/NeuralNetwork.hpp>
-#include <brain/InputLayer.hpp>
-#include <brain/OutputLayer.hpp>
 
 int main(int argc, char *argv[]) {
-	srand((unsigned int) time(NULL));
 
 	NeuralNetwork brain;
 

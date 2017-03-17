@@ -6,6 +6,7 @@
 #define AEVO_NEURON_HPP
 
 #include <random>
+#include <fstream>
 
 using namespace std;
 
@@ -20,6 +21,8 @@ class Neuron {
 public:
 	Neuron();
 
+	Neuron(int);
+
 	~Neuron();
 
 	void setWeights(vector<weight> &);
@@ -27,6 +30,10 @@ public:
 	vector<weight> getWeights();
 
 	excitation getExcitation(vector<excitation>);
+
+	void save(ofstream &);
+
+	void load(ifstream &);
 
 	static void randomizeExcitation(vector<excitation> &);
 

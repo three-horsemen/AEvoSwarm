@@ -9,21 +9,15 @@ InputLayer::InputLayer(int size)
 	this->inputSize = this->outputSize = size;
 }
 
-InputLayer::InputLayer(InputLayer &inputLayer)
-		: Layer(INPUT, inputLayer.inputSize, inputLayer.outputSize) {
-	set(inputLayer);
+InputLayer::InputLayer(const InputLayer &inputLayer)
+		: Layer(inputLayer) {
 }
 
 InputLayer::~InputLayer() {
 }
 
-void InputLayer::set(InputLayer &inputLayer) {
+void InputLayer::operator=(InputLayer &inputLayer) {
 	Layer::operator=(inputLayer);
-}
-
-InputLayer InputLayer::operator=(InputLayer &inputLayer) {
-	set(inputLayer);
-	return *this;
 }
 
 Layer *InputLayer::getDeepCopy() {
@@ -32,4 +26,15 @@ Layer *InputLayer::getDeepCopy() {
 
 void InputLayer::compute() {
 	setOutputs(getInputs());
+}
+
+void InputLayer::save(ofstream &file) {
+	file << type << ' ' << inputSize << ' ' << outputSize << endl;
+}
+
+InputLayer InputLayer::getLoadedLayer(ifstream &file) {
+	int inputSize, outputSize;
+	file >> inputSize >> outputSize;
+	InputLayer inputLayer(inputSize);
+	return inputLayer;
 }

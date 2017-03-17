@@ -6,7 +6,7 @@
 #include <ui/AsciiEnvironment.hpp>
 
 int main(int argc, char *argv[]) {
-	Agent::initialize();
+	srand((unsigned int) time(NULL));
 
 	Coordinate randomCoordinate(0, 0);
 
@@ -32,13 +32,8 @@ int main(int argc, char *argv[]) {
 
 	char escapeKey = char(27);
 	char pressedKey = 0;
-	Ant::Action selectedAction = Ant::Action::FORWARD;
+
 	for (unsigned long long i = 0; i < 10000000 && ants.size() > 0 && (pressedKey != escapeKey); i++) {
-		if (i % 101 == 0) {
-			pressedKey = openCVEnvironment.displayEnvironment(ants, i);
-			waitKey(1);
-//				cout << "ants[" << j << "] selected action: " << ants[j].getSelectedAction() << " with potential: "<< ants[j].getPotential() << endl;
-		}
 
 		AsciiEnvironment oldEnvironment(environment);
 //		AsciiEnvironment::displayEnergyMatrix(environment);
@@ -52,7 +47,7 @@ int main(int argc, char *argv[]) {
 			ants[j].senseObservation(environment);
 			ants[j].selectAction();
 //			cout << "Ant " << j << " selected action " << ants[j].getSelectedAction() << endl;
-			ants[j].performAction((Agent::Action)((Ant::Action) ants[j].getSelectedAction()));
+			ants[j].performAction((Agent::Action) ((Ant::Action) ants[j].getSelectedAction()));
 
 //			AsciiEnvironment::displayEnergyMatrix(*ants[j].getPerceptiveField());
 			if (i % 51 == 0) {
@@ -66,6 +61,15 @@ int main(int argc, char *argv[]) {
 		if (ants.size() < 50) {
 			Ant::sparkNLives(environment, ants, (unsigned int) (50 - ants.size()));
 		}
+		if (i % 101 == 0) {
+			openCVEnvironment.displayEnvironment(ants, i);
+			pressedKey = (char) waitKey(1);
+//				cout << "ants[" << j << "] selected action: " << ants[j].getSelectedAction() << " with potential: "<< ants[j].getPotential() << endl;
+		}
+		if (i % 100 == 0) {
+			environment.save("environment" + to_string(i) + ".txt");
+			Ant::save("ants" + to_string(i) + ".txt", ants);
+		}
 		if (environment.getTotalEnergy() != priorEnergy) {
 			AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
 			cout << "Environment energy is not conserved from " << priorEnergy << " to " << environment.getTotalEnergy()
@@ -74,7 +78,6 @@ int main(int argc, char *argv[]) {
 //		AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
 //		cout << "Environment energy transitioned from " << priorEnergy << " to " << environment.getTotalEnergy()
 //			 << endl;
-		//TODO Check for total system conservation
 	}
 	return 0;
 }

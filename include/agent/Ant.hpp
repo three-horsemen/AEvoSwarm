@@ -77,7 +77,7 @@ protected:
 
 	AgentCharacter character;
 	//TODO Use Boost enum
-	static const short actionCount, senseCount = 15, memoryCount = 15;
+	static const short actionCount, senseCount = 15, memoryCount = 5;
 
 	vector<excitation> sensoryInputs;
 	static const int GROUND_ATTITUDE = 0, GROUND_TRAIT = 0;
@@ -194,31 +194,33 @@ public:
 
 	Coordinate getGlobalCoordinate();
 
-	Energy getPotential();
+	inline Energy getActionCost(Agent::Action);
 
-	Energy getShield();
+	inline Energy getPotential();
 
-	Energy getFertility();
+	inline Energy getShield();
 
-	Energy getFetal();
+	inline Energy getFertility();
 
-	AgentCharacter getCharacter();
+	inline Energy getFetal();
 
-	void setGlobalCoordinate(Coordinate);
+	inline AgentCharacter getCharacter();
 
-	void setPotential(Energy newPotential);
+	inline void setGlobalCoordinate(Coordinate);
 
-	void setShield(Energy newShield);
+	inline void setPotential(Energy newPotential);
 
-	void setFertility(Energy newFertility);
+	inline void setShield(Energy newShield);
 
-	void setFetal(Energy newBaby);
+	inline void setFertility(Energy newFertility);
 
-	void setPushedFetalEnergy(Energy);
+	inline void setFetal(Energy newBaby);
 
-	void setCharacter(AgentCharacter newCharacter);
+	inline void setPushedFetalEnergy(Energy);
 
-	Energy getTotalEnergy();
+	inline void setCharacter(AgentCharacter newCharacter);
+
+	inline Energy getTotalEnergy();
 
 	void dissipateEnergy(Energy);
 
@@ -230,14 +232,23 @@ public:
 
 	int calculateDistance(Coordinate, Coordinate);
 
-	excitation getMaxPerceptValue(percept::Percept);
+	inline excitation getMaxPerceptValue(percept::Percept);
 
 	excitation getSensation(sensor::Sensor, percept::Percept);
+
+	inline excitation getEnergyExcitation(Energy, Energy);
 
 	static void sparkLifeAt(Environment &, vector<Ant> &, Coordinate);
 
 	static void sparkNLives(Environment &, vector<Ant> &, unsigned int);
 
+	static void save(string, vector<Ant> &);
+
+	static bool load(string, Environment &, vector<Ant> &);
+
+	void save(ofstream &);
+
+	void load(ifstream &, Environment &);
 };
 
 

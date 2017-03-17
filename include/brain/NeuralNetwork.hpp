@@ -6,9 +6,12 @@
 #define AEVO_NEURALNETWORK_HPP
 
 #include <vector>
+#include <fstream>
 
 #include <brain/Layer.hpp>
+#include <brain/InputLayer.hpp>
 #include <brain/FullyConnectedLayer.hpp>
+#include <brain/OutputLayer.hpp>
 
 using namespace std;
 
@@ -34,6 +37,11 @@ public:
 	Layer *getOutputLayer();
 
 	Layer *getLayer(int);
+
+	void save(ofstream &);
+
+	void load(ifstream &);
+
 };
 
 

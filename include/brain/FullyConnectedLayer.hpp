@@ -14,13 +14,13 @@ protected:
 public:
 	FullyConnectedLayer(vector<vector<weight> > &);
 
-	FullyConnectedLayer(FullyConnectedLayer &);
+	FullyConnectedLayer(const FullyConnectedLayer &);
+
+	FullyConnectedLayer(vector<Neuron> &);
 
 	~FullyConnectedLayer();
 
-	void operator=(FullyConnectedLayer &);
-
-	void set(FullyConnectedLayer &);
+	void operator=(const FullyConnectedLayer &);
 
 	vector<weight> getNeuronWeights(int i);
 
@@ -28,8 +28,11 @@ public:
 
 	Layer *getDeepCopy();
 
-
 	void compute();
+
+	void save(ofstream &);
+
+	static FullyConnectedLayer getLoadedLayer(ifstream &);
 };
 
 

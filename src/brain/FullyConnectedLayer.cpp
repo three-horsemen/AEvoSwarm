@@ -14,19 +14,21 @@ FullyConnectedLayer::FullyConnectedLayer(vector<vector<weight> > &weights) : Lay
 	}
 }
 
-FullyConnectedLayer::FullyConnectedLayer(FullyConnectedLayer &layer) : Layer(layer) {
-	set(layer);
+FullyConnectedLayer::FullyConnectedLayer(const FullyConnectedLayer &layer) : Layer(layer) {
+	operator=(layer);
+}
+
+FullyConnectedLayer::FullyConnectedLayer(vector<Neuron> &neurons) : Layer(FULLY_CONNECTED,
+																		  (int) neurons[0].getWeights().size(),
+																		  (int) neurons.size()),
+																	neurons(neurons) {
 }
 
 FullyConnectedLayer::~FullyConnectedLayer() {
 }
 
-void FullyConnectedLayer::operator=(FullyConnectedLayer &layer) {
+void FullyConnectedLayer::operator=(const FullyConnectedLayer &layer) {
 	//TODO Use simple assignment of vectors below
-	set(layer);
-}
-
-void FullyConnectedLayer::set(FullyConnectedLayer &layer) {
 	Layer::operator=(layer);
 	neurons.clear();
 	for (int i = 0; i < outputSize; i++) {
@@ -50,4 +52,26 @@ void FullyConnectedLayer::compute() {
 	for (int i = 0; i < outputSize; i++) {
 		outputs[i] = neurons[i].getExcitation(inputs);
 	}
+}
+
+
+void FullyConnectedLayer::save(ofstream &file) {
+	file << type << ' ' << inputSize << ' ' << outputSize << '\t';
+	for (unsigned long i = 0; i < neurons.size(); i++) {
+		neurons[i].save(file);
+	}
+	file << endl;
+}
+
+FullyConnectedLayer FullyConnectedLayer::getLoadedLayer(ifstream &file) {
+	int inputSize, outputSize;
+	file >> inputSize >> outputSize;
+	vector<Neuron> neurons((unsigned long) outputSize);
+	for (int i = 0; i < outputSize; i++) {
+		Neuron neuron(inputSize);
+		neuron.load(file);
+		neurons[i] = neuron;
+	}
+	FullyConnectedLayer layer(neurons);
+	return layer;
 }

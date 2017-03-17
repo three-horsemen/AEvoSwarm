@@ -13,6 +13,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv_modules.hpp>
+
 using namespace cv;
 
 namespace ui {
@@ -32,11 +33,13 @@ namespace ui {
 	public:
 //		vector<vector<OpenCVTile> > tiles;
 
+		OpenCV();
+
 		OpenCV(Environment &);
 
 		Environment getEnvironment() const;
 
-		char displayEnvironment(const vector<Ant> &,
+		void displayEnvironment(const vector<Ant> &,
 								unsigned long long &); //Return ASCII value of last pressed key. Else, wait for 1 millisecond.
 
 		void displayPerceptiveField(const PerceptiveField &);

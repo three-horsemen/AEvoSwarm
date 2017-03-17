@@ -6,6 +6,7 @@
 #define AEVO_LAYER_HPP
 
 #include <iostream>
+#include <fstream>
 
 #include <brain/Neuron.hpp>
 
@@ -27,9 +28,9 @@ public:
 
 	Layer(LayerType, int, int);
 
-	Layer(Layer &);
+	Layer(const Layer &);
 
-	void operator=(Layer &);
+	void operator=(const Layer &);
 
 	virtual Layer *getDeepCopy()=0;
 
@@ -46,6 +47,8 @@ public:
 	virtual ~Layer();
 
 	virtual void compute();
+
+	virtual void save(ofstream &)=0;
 };
 
 

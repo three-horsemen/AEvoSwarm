@@ -8,7 +8,7 @@
 #include <agent/Ant.hpp>
 
 int main(int argc, char *argv[]) {
-	Agent::initialize();
+	srand((unsigned int) time(NULL));
 
 	Coordinate randomCoordinate(5, 2);
 

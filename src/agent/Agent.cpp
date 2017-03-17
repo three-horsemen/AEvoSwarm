@@ -4,10 +4,6 @@
 
 #include <agent/Agent.hpp>
 
-void Agent::initialize() {
-	srand((unsigned int) time(NULL));
-}
-
 Agent::Agent(short perceptiveFieldWidth, short perceptiveFieldHeight) : perceptiveField(perceptiveFieldWidth,
 																						perceptiveFieldHeight) {
 

@@ -143,7 +143,7 @@ bool Ant::isThereBirthSpace() {
 
 
 bool Ant::isEnergyAvailable(Agent::Action action) {
-	return getPotential() >= actionCost[action];
+	return getPotential() >= getActionCost(action);
 }
 
 bool Ant::isActionValid(Agent::Action agentAction) {
@@ -230,10 +230,10 @@ void Ant::senseObservation(Environment &environment) {
 			sensoryInputs[ptr++] = getSensation((sensor::Sensor) i, (percept::Percept) j);
 		}
 	}
-	sensoryInputs[ptr++] = (excitation) (log(getPotential()) / getMaxPerceptValue(percept::ENERGY));
-	sensoryInputs[ptr++] = (excitation) (log(getShield()) / getMaxPerceptValue(percept::ENERGY));
-	sensoryInputs[ptr++] = (excitation) (log(getFertility()) / getMaxPerceptValue(percept::ENERGY));
-	sensoryInputs[ptr++] = (excitation) (log(getFetal()) / getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = getEnergyExcitation(getPotential(), (Energy) getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = getEnergyExcitation(getShield(), (Energy) getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = getEnergyExcitation(getFertility(), (Energy) getMaxPerceptValue(percept::ENERGY));
+	sensoryInputs[ptr++] = getEnergyExcitation(getFetal(), (Energy) getMaxPerceptValue(percept::ENERGY));
 	sensoryInputs[ptr++] = (excitation) (log(getCharacter().getAttitude()) / log(maxAttitude));
 	sensoryInputs[ptr] = (excitation) (log(getCharacter().getTrait()) / log(maxTrait));
 }
@@ -241,6 +241,8 @@ void Ant::senseObservation(Environment &environment) {
 void Ant::selectAction() {
 //	mutate();
 //	Neuron::randomizeExcitation(sensoryInputs);
+	assert(brain.getLayer(0)->inputSize == sensoryInputs.size());
+	sensoryInputs[sensoryInputs.size() - 1] = 1;
 	brain.getLayer(0)->setInputs(sensoryInputs);
 	brain.compute();
 	vector<excitation> outputs = brain.getOutputLayer()->getOutputs();
@@ -252,8 +254,11 @@ void Ant::selectAction() {
 	assert(brain.getOutputLayer()->outputSize == actionCount + memoryCount);
 
 	outputs[DIE] = -1;
-//	outputs[GIVE_BIRTH] += 0.19;
-//	outputs[GROW_BABY] += 0.2;
+
+//	for (int i = 0; i < outputs.size(); i++) {
+//		cout<<outputs[i]<<' ';
+//	}
+//	cout<<endl;
 	int mostExcitedValidAction = -1;
 	float maxExcitation = -2;
 	for (int action = 0; action < actionCount; action++) {
@@ -281,9 +286,9 @@ void Ant::performAction(Agent::Action agentAction) {
 	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
 	Action action = (Action) agentAction;
 
-	potential -= actionCost[agentAction];
+	potential -= getActionCost(agentAction);
 
-	dissipateEnergy(actionCost[agentAction]);
+	dissipateEnergy(getActionCost(agentAction));
 
 	switch (action) {
 		case Ant::FORWARD:
@@ -329,7 +334,7 @@ void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Enviro
 
 	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
 
-	Energy priorEnergy = oldEnvironment.getTotalEnergy();
+//	Energy priorEnergy = oldEnvironment.getTotalEnergy();
 
 	//Special effect of GIVE_BIRTH
 	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
@@ -413,9 +418,9 @@ void Ant::mutate() {
 }
 
 void Ant::developBrain() {
-	const short inputSize = senseCount + memoryCount;
-	const short fC1Size = (senseCount + memoryCount) * 9 / 10;
-	const short fC2Size = (senseCount + memoryCount) * 81 / 100;
+	const short inputSize = senseCount + memoryCount + 1;
+//	const short fC1Size = (senseCount + memoryCount) * 9 / 10;
+//	const short fC2Size = (senseCount + memoryCount) * 81 / 100;
 	const short outputSize = actionCount + memoryCount;
 
 	if (brain.getDepth() > 0) {
@@ -425,20 +430,20 @@ void Ant::developBrain() {
 	InputLayer inputLayer(inputSize);
 	brain.addLayer((Layer &) inputLayer);
 
-	vector<vector<weight>> weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
+	vector<vector<weight>> weights1((unsigned long) outputSize, vector<weight>((unsigned long) inputSize));
 	Neuron::randomizeWeights(weights1);
 	FullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
-	vector<vector<weight>> weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
-	Neuron::randomizeWeights(weights2);
-	FullyConnectedLayer fullyConnectedLayer2(weights2);
-	brain.addLayer((Layer &) fullyConnectedLayer2);
-
-	vector<vector<weight>> weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
-	Neuron::randomizeWeights(weights3);
-	FullyConnectedLayer fullyConnectedLayer3(weights3);
-	brain.addLayer((Layer &) fullyConnectedLayer3);
+//	vector<vector<weight>> weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
+//	Neuron::randomizeWeights(weights2);
+//	FullyConnectedLayer fullyConnectedLayer2(weights2);
+//	brain.addLayer((Layer &) fullyConnectedLayer2);
+//
+//	vector<vector<weight>> weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
+//	Neuron::randomizeWeights(weights3);
+//	FullyConnectedLayer fullyConnectedLayer3(weights3);
+//	brain.addLayer((Layer &) fullyConnectedLayer3);
 
 	OutputLayer outputLayer(outputSize);
 	brain.addLayer((Layer &) outputLayer);
@@ -478,6 +483,12 @@ Coordinate Ant::getGlobalCoordinate() {
 	return globalCoordinate;
 }
 
+inline Energy Ant::getActionCost(Agent::Action action) {
+//	return actionCost[action];
+	return (Energy) (actionCost[action] * 10 *
+					 (1.f + ((float) getTotalEnergy()) / (getMaxPerceptValue(percept::ENERGY))));
+}
+
 Energy Ant::getPotential() {
 	return potential;
 }
@@ -494,7 +505,7 @@ Energy Ant::getFetal() {
 	return fetal;
 }
 
-AgentCharacter Ant::getCharacter() {
+inline AgentCharacter Ant::getCharacter() {
 	return character;
 }
 
@@ -502,7 +513,7 @@ void Ant::setGlobalCoordinate(Coordinate newCoordinate) {
 	globalCoordinate = newCoordinate;
 }
 
-void Ant::setPotential(Energy newPotential) {
+inline void Ant::setPotential(Energy newPotential) {
 	potential = newPotential;
 }
 
@@ -522,7 +533,7 @@ void Ant::setPushedFetalEnergy(Energy newPushedFetalEnergy) {
 	pushedFetalEnergy = newPushedFetalEnergy;
 }
 
-void Ant::setCharacter(AgentCharacter newCharacter) {
+inline void Ant::setCharacter(AgentCharacter newCharacter) {
 	character.setAttitude(newCharacter.getAttitude());
 	character.setOccupancy(newCharacter.getOccupancy());
 	character.setTrait(newCharacter.getTrait());
@@ -716,7 +727,6 @@ void Ant::die() {
 }
 
 void Ant::randomize() {
-	srand((unsigned int) time(NULL));
 	Occupancy occupancy;
 	int val = rand() % HYPOTHETICAL_MAX_OCCUPANCY_VAL;
 	if (val == 0)
@@ -765,29 +775,33 @@ int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
 }
 
 excitation Ant::getMaxPerceptValue(percept::Percept percept) {
-	unsigned long maxPerceptVal = 0;
+//	unsigned long maxPerceptVal = 0;
 	if (percept == percept::ENERGY) {
-		Energy e = 0;
-		do {
-			e--;
-		} while (e < 0);
-		maxPerceptVal = e;
+		return (Energy) -1;
+//		Energy e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
 	} else if (percept == percept::ATTITUDE) {
-		Attitude e = 0;
-		do {
-			e--;
-		} while (e < 0);
-		maxPerceptVal = e;
+		return (Attitude) -1;
+//		Attitude e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
 	} else if (percept == percept::TRAIT) {
-		Trait e = 0;
-		do {
-			e--;
-		} while (e < 0);
-		maxPerceptVal = e;
+		return (Trait) -1;
+//		Trait e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
+	} else {
+		throw invalid_argument("Unknown percept");
 	}
-	return (excitation) log(maxPerceptVal);
+//	return (excitation) maxPerceptVal;
 }
-
 
 excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	int maxHeight = perceptiveField.height;
@@ -819,9 +833,11 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 		}
 	}
 	perceivedAverage /= totalWeightedDistance;
-	perceivedAverage = (excitation) log(perceivedAverage + exp(1.0)); //Trying to make excitation logarithmic.
-	excitation resultantExcitation = (perceivedAverage / getMaxPerceptValue(percept));
-	return resultantExcitation;
+	return (log(perceivedAverage + 1) / log(getMaxPerceptValue(percept) + 1)) - 1;
+}
+
+excitation Ant::getEnergyExcitation(Energy energy, Energy maxEnergy) {
+	return (excitation) (log(energy + 1) / log(maxEnergy + 1)) - 1;
 }
 
 void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Coordinate coordinate) {
@@ -841,7 +857,6 @@ void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Coordinate co
 		ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
 		Ant::placeCharacterInEnvironment(ant, environment, coordinate);
 
-		ant.mutate();
 		ants.push_back(ant);
 //		cout << "Spawned ant at " << coordinate.toString() << endl;
 	} else {
@@ -867,4 +882,59 @@ void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int 
 			}
 		}
 	}
+}
+
+void Ant::save(string filePath, vector<Ant> &ants) {
+	cout << "Saving to file " << filePath << endl;
+	ofstream file(filePath);
+	file << ants.size() << endl;
+	for (unsigned long i = 0; i < ants.size(); i++) {
+		ants[i].save(file);
+	}
+	file.close();
+}
+
+bool Ant::load(string filePath, Environment &environment, vector<Ant> &ants) {
+	cout << "Loading from file " << filePath << endl;
+	try {
+		ifstream file(filePath);
+		if (!file.is_open())
+			return false;
+		ants.clear();
+		int size;
+		file >> size;
+//		while(file>>size)	cout<<size<<endl;
+		for (int i = 0; i < size; i++) {
+			Ant ant;
+			ant.load(file, environment);
+			ants.push_back(ant);
+		}
+		return true;
+	} catch (exception &e) {
+		cout << e.what() << endl;
+		return false;
+	}
+}
+
+void Ant::save(ofstream &file) {
+	file << globalCoordinate.getX() << ' ' << globalCoordinate.getY() << ' ' << potential << ' ' << shield << ' '
+		 << fertility
+		 << ' '
+		 << fetal << ' ';
+	brain.save(file);
+}
+
+void Ant::load(ifstream &file, Environment &environment) {
+	int X, Y;
+	file >> X >> Y;
+	globalCoordinate.setX(X);
+	globalCoordinate.setY(Y);
+
+	AgentCharacter character = environment.getTile(globalCoordinate).getAgentCharacter();
+	setCharacter(character);
+	file >> potential;
+	file >> shield;
+	file >> fertility;
+	file >> fetal;
+	brain.load(file);
 }

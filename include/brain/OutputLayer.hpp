@@ -14,6 +14,8 @@ class OutputLayer : public Layer {
 public:
 	OutputLayer(int);
 
+	OutputLayer(const OutputLayer &);
+
 	~OutputLayer();
 
 	void compute();
@@ -21,6 +23,10 @@ public:
 	Layer *getDeepCopy();
 
 	void displayOutputs();
+
+	void save(ofstream &);
+
+	static OutputLayer getLoadedLayer(ifstream &);
 };
 
 

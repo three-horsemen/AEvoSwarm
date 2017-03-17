@@ -5,10 +5,12 @@
 #ifndef AEVO_ENVIRONMENT_HPP
 #define AEVO_ENVIRONMENT_HPP
 
-#include "environment/Tile.hpp"
+#include <environment/Tile.hpp>
+#include <agent/AgentCharacter.hpp>
 
 #include <vector>
 #include <time.h>
+#include <fstream>
 
 using namespace std;
 
@@ -34,6 +36,10 @@ public:
 	void clearCharacterGrid();
 
 	void randomize();
+
+	void save(string);
+
+	bool load(string);
 };
 
 #endif //AEVO_ENVIRONMENT_HPP

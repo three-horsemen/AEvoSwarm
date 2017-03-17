@@ -12,14 +12,14 @@ Layer::Layer(LayerType type, int inputSize, int outputSize) :
 	this->outputSize = outputSize;
 }
 
-Layer::Layer(Layer &layer) {
+Layer::Layer(const Layer &layer) {
 	operator=(layer);
 }
 
 Layer::~Layer() {
 }
 
-void Layer::operator=(Layer &layer) {
+void Layer::operator=(const Layer &layer) {
 	this->type = layer.type;
 	this->inputSize = layer.inputSize;
 	this->outputSize = layer.outputSize;

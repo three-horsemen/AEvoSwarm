@@ -28,8 +28,7 @@ Environment ui::OpenCV::getEnvironment() const {
 	return environment;
 }
 
-char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long &iterationCount) {
-	int waitKeyResult = waitKey(1);
+void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long &iterationCount) {
 
 	int i = 0, j = 0;
 	Rect2d tileRect(0, 0, TILE_SIDE_PIXEL_WIDTH, TILE_SIDE_PIXEL_HEIGHT);
@@ -176,5 +175,4 @@ char ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	);
 	cvtColor(image, image, CV_HSV2BGR_FULL);
 	imshow("AEvoSwarm-Environment", image);
-	return (char) waitKeyResult;
 }

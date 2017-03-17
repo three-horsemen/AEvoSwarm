@@ -79,3 +79,32 @@ Layer *NeuralNetwork::getLayer(int level) {
 Layer *NeuralNetwork::getOutputLayer() {
 	return layers.back();
 }
+
+void NeuralNetwork::save(ofstream &file) {
+	file << layers.size() << endl;
+	for (unsigned long i = 0; i < layers.size(); i++) {
+		layers[i]->save(file);
+	}
+}
+
+void NeuralNetwork::load(ifstream &file) {
+	resorb();
+	int size;
+	file >> size;
+	for (int i = 0; i < size; i++) {
+		int layerType;
+		file >> layerType;
+		if (layerType == INPUT) {
+			InputLayer layer(InputLayer::getLoadedLayer(file));
+			addLayer(layer);
+		} else if (layerType == OUTPUT) {
+			OutputLayer layer(OutputLayer::getLoadedLayer(file));
+			addLayer(layer);
+		} else if (layerType == FULLY_CONNECTED) {
+			FullyConnectedLayer layer(FullyConnectedLayer::getLoadedLayer(file));
+			addLayer(layer);
+		} else {
+			throw invalid_argument("Unknown layer type specified");
+		}
+	}
+}

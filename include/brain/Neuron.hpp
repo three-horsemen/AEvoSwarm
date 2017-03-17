@@ -31,9 +31,9 @@ public:
 
 	excitation getExcitation(vector<excitation>);
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	void load(ifstream &);
+	void load(istream &);
 
 	static void randomizeExcitation(vector<excitation> &);
 

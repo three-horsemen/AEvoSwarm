@@ -23,9 +23,9 @@ public:
 
 	void compute();
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	static InputLayer getLoadedLayer(ifstream &);
+	static InputLayer getLoadedLayer(istream &);
 };
 
 

@@ -884,22 +884,15 @@ void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int 
 	}
 }
 
-void Ant::save(string filePath, vector<Ant> &ants) {
-	cout << "Saving to file " << filePath << endl;
-	ofstream file(filePath);
+void Ant::save(ostream &file, vector<Ant> &ants) {
 	file << ants.size() << endl;
 	for (unsigned long i = 0; i < ants.size(); i++) {
 		ants[i].save(file);
 	}
-	file.close();
 }
 
-bool Ant::load(string filePath, Environment &environment, vector<Ant> &ants) {
-	cout << "Loading from file " << filePath << endl;
+bool Ant::load(istream &file, Environment &environment, vector<Ant> &ants) {
 	try {
-		ifstream file(filePath);
-		if (!file.is_open())
-			return false;
 		ants.clear();
 		int size;
 		file >> size;
@@ -916,7 +909,7 @@ bool Ant::load(string filePath, Environment &environment, vector<Ant> &ants) {
 	}
 }
 
-void Ant::save(ofstream &file) {
+void Ant::save(ostream &file) {
 	file << globalCoordinate.getX() << ' ' << globalCoordinate.getY() << ' ' << potential << ' ' << shield << ' '
 		 << fertility
 		 << ' '
@@ -924,7 +917,7 @@ void Ant::save(ofstream &file) {
 	brain.save(file);
 }
 
-void Ant::load(ifstream &file, Environment &environment) {
+void Ant::load(istream &file, Environment &environment) {
 	int X, Y;
 	file >> X >> Y;
 	globalCoordinate.setX(X);

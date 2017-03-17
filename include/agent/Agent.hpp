@@ -52,9 +52,9 @@ public:
 
 	inline Energy getActionCost(Action);
 
-	virtual void save(ofstream &)=0;
+	virtual void save(ostream &)=0;
 
-	virtual void load(ifstream &, Environment &)=0;
+	virtual void load(istream &, Environment &)=0;
 
 	PerceptiveField *getPerceptiveField();
 };

@@ -182,3 +182,13 @@ target_link_libraries(
 		unit_test_ant_world
 		ant_world
 )
+
+add_executable(
+		unit_test_ant_world_mpi
+		src/unit_test/ant_world/ant_world_mpi.cpp
+)
+target_link_libraries(
+		unit_test_ant_world_mpi
+		ant_world
+		${MPI_LIBRARIES}
+)

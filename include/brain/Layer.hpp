@@ -48,7 +48,7 @@ public:
 
 	virtual void compute();
 
-	virtual void save(ofstream &)=0;
+	virtual void save(ostream &)=0;
 };
 
 

@@ -37,9 +37,9 @@ public:
 
 	void randomize();
 
-	void save(string);
+	void save(ostream &);
 
-	bool load(string);
+	bool load(istream &);
 };
 
 #endif //AEVO_ENVIRONMENT_HPP

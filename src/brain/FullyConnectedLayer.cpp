@@ -55,7 +55,7 @@ void FullyConnectedLayer::compute() {
 }
 
 
-void FullyConnectedLayer::save(ofstream &file) {
+void FullyConnectedLayer::save(ostream &file) {
 	file << type << ' ' << inputSize << ' ' << outputSize << '\t';
 	for (unsigned long i = 0; i < neurons.size(); i++) {
 		neurons[i].save(file);
@@ -63,7 +63,7 @@ void FullyConnectedLayer::save(ofstream &file) {
 	file << endl;
 }
 
-FullyConnectedLayer FullyConnectedLayer::getLoadedLayer(ifstream &file) {
+FullyConnectedLayer FullyConnectedLayer::getLoadedLayer(istream &file) {
 	int inputSize, outputSize;
 	file >> inputSize >> outputSize;
 	vector<Neuron> neurons((unsigned long) outputSize);

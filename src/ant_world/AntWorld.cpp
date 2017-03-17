@@ -4,8 +4,8 @@
 
 #include "ant_world/AntWorld.hpp"
 
-AntWorld::AntWorld(int width, int height) : environment((short) width, (short) height) {
-	srand((unsigned int) time(NULL));
+AntWorld::AntWorld(int width, int height, int seed) : environment((short) width, (short) height) {
+	srand(seed);
 	environment = Environment((short) width, (short) height);
 	openCVEnvironment = new ui::OpenCV(this->environment);
 
@@ -19,7 +19,7 @@ AntWorld::AntWorld(int width, int height) : environment((short) width, (short) h
 	environment.randomize();
 
 	mutationEnabled = false;
-	minimumPopulationEnabled = displayEnabled = checkpointEnabled = _isRunning = true;
+	minimumPopulationEnabled = displayEnabled = fileCheckpointsEnabled = _isRunning = true;
 
 	waitPeriod = 250;
 	deficit = 0;
@@ -86,10 +86,23 @@ void AntWorld::displayPeriodically() {
 }
 
 void AntWorld::checkpointPeriodically() {
-	if (checkpointEnabled && iteration % checkpointPeriod == 0) {
-		environment.save(checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt");
-		Ant::save(checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt", ants);
+	if (fileCheckpointsEnabled && iteration % checkpointPeriod == 0) {
+		saveToFile();
 	}
+}
+
+void AntWorld::saveToFile() {
+	string environmentFilePath = checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt";
+	cout << "Saving to file " << environmentFilePath << endl;
+	ofstream environmentFile(environmentFilePath);
+	environment.save(environmentFile);
+	environmentFile.close();
+
+	string antFilePath = checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt";
+	cout << "Saving to file " << antFilePath << endl;
+	ofstream antFile(antFilePath);
+	Ant::save(antFile, ants);
+	antFile.close();
 }
 
 void AntWorld::waitOnePeriod() {
@@ -116,13 +129,31 @@ void AntWorld::waitRemainingPeriod() {
 	previousWaitStartTimestamp = waitStartTimestamp;
 }
 
-bool AntWorld::load(unsigned long long iteration) {
-	if (!environment.load(checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt"))
+bool AntWorld::loadFromFile(unsigned long long iteration) {
+	try {
+		string environmentFilePath = checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt";
+		string antFilePath = checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt";
+		cout << "Loading from file " << environmentFilePath << endl;
+		cout << "Loading from file " << antFilePath << endl;
+
+		ifstream antFile(antFilePath);
+		ifstream environmentFile(environmentFilePath);
+		if (!environmentFile.is_open())
+			return false;
+		if (!antFile.is_open())
+			return false;
+
+		if (!environment.load(environmentFile))
+			return false;
+		if (!Ant::load(antFile, environment, ants))
+			return false;
+		this->iteration = iteration;
+
+		return true;
+	} catch (exception &e) {
+		cout << e.what() << endl;
 		return false;
-	if (!Ant::load(checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt", environment, ants))
-		return false;
-	this->iteration = iteration;
-	return true;
+	}
 }
 
 void AntWorld::setMutationEnabled(bool enabled) {
@@ -165,12 +196,12 @@ unsigned int AntWorld::getDisplayPeriod() {
 	return displayPeriod;
 }
 
-void AntWorld::setCheckpointEnabled(bool enabled) {
-	checkpointEnabled = enabled;
+void AntWorld::setFileCheckpointsEnabled(bool enabled) {
+	fileCheckpointsEnabled = enabled;
 }
 
-bool AntWorld::getCheckpointEnabled() {
-	return checkpointEnabled;
+bool AntWorld::getFileCheckpointsEnabled() {
+	return fileCheckpointsEnabled;
 }
 
 void AntWorld::setCheckpointPeriod(unsigned int period) {

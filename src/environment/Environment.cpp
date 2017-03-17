@@ -78,9 +78,7 @@ void Environment::randomize() {
 	}
 }
 
-void Environment::save(string filePath) {
-	cout << "Saving to file " << filePath << endl;
-	ofstream file(filePath);
+void Environment::save(ostream &file) {
 	file << height << ' ' << width << endl;
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
@@ -91,15 +89,10 @@ void Environment::save(string filePath) {
 		}
 		file << endl;
 	}
-	file.close();
 }
 
-bool Environment::load(string filePath) {
-	cout << "Loading from file " << filePath << endl;
+bool Environment::load(istream &file) {
 	try {
-		ifstream file(filePath);
-		if (!file.is_open())
-			return false;
 		int fileHeight, fileWidth;
 		file >> fileHeight >> fileWidth;
 		if (fileHeight != height || fileWidth != width) {
@@ -128,7 +121,6 @@ bool Environment::load(string filePath) {
 				tiles[i][j].setAgentCharacter(character);
 			}
 		}
-		file.close();
 		return true;
 	} catch (exception &e) {
 		cout << e.what() << endl;

@@ -35,14 +35,14 @@ excitation Neuron::getExcitation(vector<excitation> excitations) {
 
 }
 
-void Neuron::save(ofstream &file) {
+void Neuron::save(ostream &file) {
 	for (unsigned int i = 0; i < weights.size(); i++) {
 		file << weights[i] << ' ';
 	}
 	file << ' ';
 }
 
-void Neuron::load(ifstream &file) {
+void Neuron::load(istream &file) {
 	for (unsigned int i = 0; i < weights.size(); i++) {
 		file >> weights[i];
 	}

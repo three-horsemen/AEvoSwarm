@@ -242,13 +242,13 @@ public:
 
 	static void sparkNLives(Environment &, vector<Ant> &, unsigned int);
 
-	static void save(string, vector<Ant> &);
+	static void save(ostream &, vector<Ant> &);
 
-	static bool load(string, Environment &, vector<Ant> &);
+	static bool load(istream &, Environment &, vector<Ant> &);
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	void load(ifstream &, Environment &);
+	void load(istream &, Environment &);
 };
 
 

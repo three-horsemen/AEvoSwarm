@@ -24,9 +24,9 @@ public:
 
 	void displayOutputs();
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	static OutputLayer getLoadedLayer(ifstream &);
+	static OutputLayer getLoadedLayer(istream &);
 };
 
 

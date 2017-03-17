@@ -30,9 +30,9 @@ public:
 
 	void compute();
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	static FullyConnectedLayer getLoadedLayer(ifstream &);
+	static FullyConnectedLayer getLoadedLayer(istream &);
 };
 
 

@@ -38,9 +38,9 @@ public:
 
 	Layer *getLayer(int);
 
-	void save(ofstream &);
+	void save(ostream &);
 
-	void load(ifstream &);
+	void load(istream &);
 
 };
 

@@ -28,11 +28,11 @@ void InputLayer::compute() {
 	setOutputs(getInputs());
 }
 
-void InputLayer::save(ofstream &file) {
+void InputLayer::save(ostream &file) {
 	file << type << ' ' << inputSize << ' ' << outputSize << endl;
 }
 
-InputLayer InputLayer::getLoadedLayer(ifstream &file) {
+InputLayer InputLayer::getLoadedLayer(istream &file) {
 	int inputSize, outputSize;
 	file >> inputSize >> outputSize;
 	InputLayer inputLayer(inputSize);

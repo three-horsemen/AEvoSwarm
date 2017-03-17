@@ -27,7 +27,7 @@ class AntWorld {
 	bool displayEnabled;
 	unsigned int displayPeriod;
 
-	bool checkpointEnabled;
+	bool fileCheckpointsEnabled;
 	unsigned int checkpointPeriod;
 
 	std::chrono::milliseconds previousWaitStartTimestamp;
@@ -36,7 +36,7 @@ class AntWorld {
 
 	bool _isRunning;
 public:
-	AntWorld(int, int);
+	AntWorld(int, int, int);
 
 	~AntWorld();
 
@@ -54,11 +54,13 @@ public:
 
 	void checkpointPeriodically();
 
+	void saveToFile();
+
 	void waitOnePeriod();
 
 	void waitRemainingPeriod();
 
-	bool load(unsigned long long);
+	bool loadFromFile(unsigned long long);
 
 	void setMutationEnabled(bool);
 
@@ -84,9 +86,9 @@ public:
 
 	unsigned int getDisplayPeriod();
 
-	void setCheckpointEnabled(bool);
+	void setFileCheckpointsEnabled(bool);
 
-	bool getCheckpointEnabled();
+	bool getFileCheckpointsEnabled();
 
 	void setCheckpointPeriod(unsigned int);
 

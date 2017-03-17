@@ -80,14 +80,14 @@ Layer *NeuralNetwork::getOutputLayer() {
 	return layers.back();
 }
 
-void NeuralNetwork::save(ofstream &file) {
+void NeuralNetwork::save(ostream &file) {
 	file << layers.size() << endl;
 	for (unsigned long i = 0; i < layers.size(); i++) {
 		layers[i]->save(file);
 	}
 }
 
-void NeuralNetwork::load(ifstream &file) {
+void NeuralNetwork::load(istream &file) {
 	resorb();
 	int size;
 	file >> size;

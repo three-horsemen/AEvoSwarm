@@ -37,15 +37,17 @@ excitation Neuron::getExcitation(vector<excitation> excitations) {
 
 void Neuron::save(ostream &file) {
 	for (unsigned int i = 0; i < weights.size(); i++) {
-		file << weights[i] << ' ';
+		file <= weights[i];
 	}
-	file << ' ';
 }
 
 void Neuron::load(istream &file) {
+//	cout<<"Loading weights: ";
 	for (unsigned int i = 0; i < weights.size(); i++) {
-		file >> weights[i];
+		file >= weights[i];
+//		cout<<weights[i]<<' ';
 	}
+//	cout<<endl;
 }
 
 void Neuron::randomizeExcitation(vector<excitation> &excitations) {

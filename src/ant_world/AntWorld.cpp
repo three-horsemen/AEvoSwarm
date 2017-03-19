@@ -4,8 +4,17 @@
 
 #include "ant_world/AntWorld.hpp"
 
-AntWorld::AntWorld(int width, int height, int seed) : environment((short) width, (short) height) {
-	srand(seed);
+AntWorld::AntWorld(int width, int height, bool geneticCrossoverEnabled) : environment((short) width, (short) height) {
+	this->geneticCrossoverEnabled = geneticCrossoverEnabled;
+	geneticCrossoverPeriod = 1000;
+	if (geneticCrossoverEnabled) {
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Comm_size(MPI_COMM_WORLD, &size);
+		assert(size != 0);
+	}
+
+	srand((unsigned int) time(NULL) + rank);
+
 	environment = Environment((short) width, (short) height);
 	openCVEnvironment = new ui::OpenCV(this->environment);
 
@@ -45,6 +54,14 @@ void AntWorld::skipIterations(unsigned long long skip) {
 }
 
 bool AntWorld::performIteration() {
+	if (geneticCrossoverEnabled && getIteration() % geneticCrossoverPeriod == 0) {
+		return performGeneMixIteration((unsigned int) (ants.size() / size), (unsigned int) size);
+	} else {
+		return performRegularIteration();
+	}
+}
+
+bool AntWorld::performRegularIteration() {
 	Energy priorEnergy = environment.getTotalEnergy();
 
 	unsigned long long antCount = ants.size();
@@ -62,6 +79,66 @@ bool AntWorld::performIteration() {
 	}
 
 	Ant::realizeAntsAction(ants, environment);
+
+	if (environment.getTotalEnergy() != priorEnergy) {
+//		AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
+		throw runtime_error(string("Environment energy is not conserved in iteration ") + to_string(iteration)
+							+ " from " + to_string(priorEnergy) + " to " + to_string(environment.getTotalEnergy()));
+	}
+
+	iteration++;
+	return true;
+}
+
+bool AntWorld::performGeneMixIteration(unsigned int sendCount, unsigned int size) {
+	assert(ants.size() >= sendCount * size);
+	Energy priorEnergy = environment.getTotalEnergy();
+
+	stringbuf sendBuffer;
+	ostream os(&sendBuffer);
+
+	unsigned long long antCount = ants.size();
+
+	for (unsigned long long j = 0; j < antCount; j++) {
+		ants[j].observeEnvironment(environment);
+		ants[j].senseObservation(environment);
+
+		if (j < sendCount * size) {
+			ants[j].saveWithCharacter(os);
+			ants[j].setSelectedAction((Agent::Action) Ant::DIE);
+		} else {
+			if (mutationEnabled && iteration % mutationPeriod == 0) {
+				ants[j].mutate();
+			}
+			ants[j].selectAction();
+		}
+		ants[j].performAction((Agent::Action) ((Ant::Action) ants[j].getSelectedAction()));
+	}
+	char *receiveBuf = new char[sendBuffer.str().size()];
+	MPI_Alltoall(sendBuffer.str().c_str(), (int) (sendBuffer.str().size() / size), MPI_CHAR,
+				 receiveBuf, (int) (sendBuffer.str().size() / size), MPI_CHAR, MPI_COMM_WORLD);
+
+//	cout << "Received " << sendBuffer.str().size() << " bytes\n";
+
+//	if (rand() % 2) {
+//		cout<<"WRITING TO FILE\n";
+//		ofstream ofs("./checkpoints/tmp.ants", ios::binary);
+//		ofs.write(receiveBuf, sendBuffer.str().size());
+//		ofs.close();
+//	}
+
+	membuf receivedBuf(receiveBuf, receiveBuf + sendBuffer.str().size());
+	istream is(&receivedBuf);
+
+//	ifstream is("./checkpoints/tmp.ants", ios::binary);
+
+	Ant::realizeAntsAction(ants, environment);
+
+	for (unsigned int i = 0; i < sendCount * size; i++) {
+		Ant ant;
+		ant.loadWithCharacter(is);
+		Ant::sparkLifeWhereAvailable(environment, ants, ant);
+	}
 
 	if (environment.getTotalEnergy() != priorEnergy) {
 //		AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
@@ -92,17 +169,44 @@ void AntWorld::checkpointPeriodically() {
 }
 
 void AntWorld::saveToFile() {
-	string environmentFilePath = checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt";
+	string environmentFilePath = checkpointLocation + "/" + to_string(iteration) + ".env";
 	cout << "Saving to file " << environmentFilePath << endl;
-	ofstream environmentFile(environmentFilePath);
+	ofstream environmentFile(environmentFilePath, ios::out | ios::binary);
 	environment.save(environmentFile);
 	environmentFile.close();
 
-	string antFilePath = checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt";
+	string antFilePath = checkpointLocation + "/" + to_string(iteration) + ".ants";
 	cout << "Saving to file " << antFilePath << endl;
-	ofstream antFile(antFilePath);
+	ofstream antFile(antFilePath, ios_base::out | ios_base::binary);
 	Ant::save(antFile, ants);
 	antFile.close();
+}
+
+bool AntWorld::loadFromFile(unsigned long long iteration) {
+	try {
+		string environmentFilePath = checkpointLocation + "/" + to_string(iteration) + ".env";
+		string antFilePath = checkpointLocation + "/" + to_string(iteration) + ".ants";
+		cout << "Loading from file " << environmentFilePath << endl;
+		cout << "Loading from file " << antFilePath << endl;
+
+		ifstream antFile(antFilePath, ios_base::in | ios_base::binary);
+		ifstream environmentFile(environmentFilePath, ios_base::in | ios_base::binary);
+		if (!environmentFile.is_open())
+			return false;
+		if (!antFile.is_open())
+			return false;
+
+		if (!environment.load(environmentFile))
+			return false;
+		if (!Ant::load(antFile, environment, ants))
+			return false;
+		this->iteration = iteration;
+
+		return true;
+	} catch (exception &e) {
+		cout << e.what() << endl;
+		return false;
+	}
 }
 
 void AntWorld::waitOnePeriod() {
@@ -122,38 +226,10 @@ void AntWorld::waitRemainingPeriod() {
 	deficit += waitPeriod - elapsed.count();
 
 	long remainingTime = std::min(waitPeriod, (unsigned long) std::max(deficit, (long) 1));
-	cout << deficit << " deficit" << " and waiting " << remainingTime << endl;
 	if (char(27) == waitKey((int) remainingTime)) {
 		_isRunning = false;
 	}
 	previousWaitStartTimestamp = waitStartTimestamp;
-}
-
-bool AntWorld::loadFromFile(unsigned long long iteration) {
-	try {
-		string environmentFilePath = checkpointLocation + "/" + "environment" + to_string(iteration) + ".txt";
-		string antFilePath = checkpointLocation + "/" + "ants" + to_string(iteration) + ".txt";
-		cout << "Loading from file " << environmentFilePath << endl;
-		cout << "Loading from file " << antFilePath << endl;
-
-		ifstream antFile(antFilePath);
-		ifstream environmentFile(environmentFilePath);
-		if (!environmentFile.is_open())
-			return false;
-		if (!antFile.is_open())
-			return false;
-
-		if (!environment.load(environmentFile))
-			return false;
-		if (!Ant::load(antFile, environment, ants))
-			return false;
-		this->iteration = iteration;
-
-		return true;
-	} catch (exception &e) {
-		cout << e.what() << endl;
-		return false;
-	}
 }
 
 void AntWorld::setMutationEnabled(bool enabled) {
@@ -226,4 +302,16 @@ void AntWorld::setCheckpointLocation(string path) {
 
 string AntWorld::getCheckpointLocation() {
 	return checkpointLocation;
+}
+
+void AntWorld::setCrossoverEnabled(bool enabled) {
+	geneticCrossoverEnabled = enabled;
+	if (geneticCrossoverEnabled) {
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Comm_size(MPI_COMM_WORLD, &size);
+	}
+}
+
+void AntWorld::setCrossoverPeriod(unsigned int period) {
+	geneticCrossoverPeriod = period;
 }

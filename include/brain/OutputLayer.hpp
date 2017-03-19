@@ -5,8 +5,10 @@
 #ifndef AEVO_OUTPUTLAYER_HPP
 #define AEVO_OUTPUTLAYER_HPP
 
-#include <iostream>
 #include <brain/Layer.hpp>
+
+#include <iostream>
+#include <shared/Utils.hpp>
 
 using namespace std;
 

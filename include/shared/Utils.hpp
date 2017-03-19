@@ -9,6 +9,8 @@
 #include <termios.h>
 #include <time.h>
 #include <sys/time.h>
+#include <iostream>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
@@ -31,5 +33,14 @@ public:
 
 };
 
+template<class T>
+inline ostream &operator<=(ostream &stream, const T &t) {
+	return stream.write((const char *) &t, sizeof(t));
+}
+
+template<class T>
+inline istream &operator>=(istream &stream, T &t) {
+	return stream.read((char *) &t, sizeof(t));
+}
 
 #endif //AEVO_UTILS_HPP

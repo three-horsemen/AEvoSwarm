@@ -4,7 +4,8 @@
 
 #include <agent/Ant.hpp>
 
-vector<Energy> Ant::actionCost = {8, 6, 6, 2, 20, 15, 25, 15, 25, 0};
+//								FORWARD LEFT RIGHT EAT ATTACK FORTIFY MATURE GROW_BABY GIVE_BIRTH DIE
+vector<Energy> Ant::actionCost = {5, 4, 4, 4, 20, 15, 25, 5, 5, 0};
 const short Ant::actionCount = (const short) Ant::actionCost.size();
 const Energy Ant::NEWBORN_MIN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 20);
 const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD;
@@ -14,6 +15,7 @@ Ant::Ant() :
 		Agent(5, 5) {
 	developBrain();
 
+	age = 0;
 	pushedFetalEnergy = 0;
 	//TODO Remove me.
 	character.setAttitude((Attitude) rand());
@@ -32,6 +34,7 @@ void Ant::operator=(const Ant &ant) {
 	fetal = ant.fetal;
 	character = ant.character;
 	pushedFetalEnergy = ant.pushedFetalEnergy;
+	age = ant.age;
 	resorbBrain();
 	developBrain();
 }
@@ -288,6 +291,8 @@ void Ant::performAction(Agent::Action agentAction) {
 
 	potential -= getActionCost(agentAction);
 
+	age++;
+
 	dissipateEnergy(getActionCost(agentAction));
 
 	switch (action) {
@@ -485,8 +490,9 @@ Coordinate Ant::getGlobalCoordinate() {
 
 inline Energy Ant::getActionCost(Agent::Action action) {
 //	return actionCost[action];
-	return (Energy) (actionCost[action] * 10 *
-					 (1.f + ((float) getTotalEnergy()) / (getMaxPerceptValue(percept::ENERGY))));
+	return (Energy) (actionCost[action] *
+					 (1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))) *
+					 (1.f + 1000000.f * (((float) age / ((unsigned int) -1)))));
 }
 
 Energy Ant::getPotential() {
@@ -537,10 +543,6 @@ inline void Ant::setCharacter(AgentCharacter newCharacter) {
 	character.setAttitude(newCharacter.getAttitude());
 	character.setOccupancy(newCharacter.getOccupancy());
 	character.setTrait(newCharacter.getTrait());
-}
-
-Energy Ant::getTotalEnergy() {
-	return potential + shield + fertility + fetal;
 }
 
 Tile Ant::operator<<(Tile tile) {
@@ -715,11 +717,11 @@ void Ant::pushOutNewborn() {
 }
 
 void Ant::die() {
+	dissipateEnergy(getTotalEnergy());
 	setPotential(0);
 	setShield(0);
 	setFertility(0);
 	setFetal(0);
-	dissipateEnergy(getTotalEnergy());
 
 	character.setOccupancy(OCCUPANCY_DEAD);
 	character.setAttitude(GROUND_ATTITUDE);
@@ -840,31 +842,47 @@ excitation Ant::getEnergyExcitation(Energy energy, Energy maxEnergy) {
 	return (excitation) (log(energy + 1) / log(maxEnergy + 1)) - 1;
 }
 
-void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Coordinate coordinate) {
-	Tile tile = environment.getTile(coordinate);
+void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Ant &ant) {
+	Tile tile = environment.getTile(ant.getGlobalCoordinate());
 	if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
-		&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
+		&& tile.getTotalEnergy() >= ant.getTotalEnergy()
 		&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
 			) {
 
-		Ant ant;
-
-		ant.randomize();
-		ant.setFertility(0);
-		ant.setFetal(0);
-		ant.setPushedFetalEnergy(0);
-		ant.setShield(Ant::NEWBORN_MIN_SHIELD);
-		ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
-		Ant::placeCharacterInEnvironment(ant, environment, coordinate);
+		Ant::placeCharacterInEnvironment(ant, environment, ant.getGlobalCoordinate());
 
 		ants.push_back(ant);
 //		cout << "Spawned ant at " << coordinate.toString() << endl;
 	} else {
-		throw invalid_argument("Cannot spark life at " + coordinate.toString());
+		throw invalid_argument("Cannot spark life at " + ant.getGlobalCoordinate().toString());
 	}
 }
 
+bool Ant::sparkLifeWhereAvailable(Environment &environment, vector<Ant> &ants, Ant &ant) {
+	int randXOffset = rand() % environment.width;
+	int randYOffset = rand() % environment.height;
+	for (int x = 0; x < environment.width; x++) {
+		for (int y = 0; y < environment.height; y++) {
+			int X = (x + randXOffset) % environment.width;
+			int Y = (y + randYOffset) % environment.height;
+
+			Tile tile = environment.getTile(Coordinate(X, Y));
+			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+				&& tile.getTotalEnergy() >= ant.getTotalEnergy()
+				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+					) {
+				ant.setGlobalCoordinate(Coordinate(X, Y));
+				Ant::sparkLifeAt(environment, ants, ant);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int count) {
+	Ant ant;
+
 	int randXOffset = rand() % environment.width;
 	int randYOffset = rand() % environment.height;
 	for (int x = 0; x < environment.width && count > 0; x++) {
@@ -877,15 +895,23 @@ void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int 
 				&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
 				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
 					) {
-				Ant::sparkLifeAt(environment, ants, Coordinate(X, Y));
+				ant.randomize();
+				ant.setFertility(0);
+				ant.setFetal(0);
+				ant.setPushedFetalEnergy(0);
+				ant.setShield(Ant::NEWBORN_MIN_SHIELD);
+				ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
+				ant.setGlobalCoordinate(Coordinate(X, Y));
+				Ant::sparkLifeAt(environment, ants, ant);
 				count--;
 			}
 		}
 	}
+	//TODO Return false
 }
 
 void Ant::save(ostream &file, vector<Ant> &ants) {
-	file << ants.size() << endl;
+	file <= ants.size();
 	for (unsigned long i = 0; i < ants.size(); i++) {
 		ants[i].save(file);
 	}
@@ -894,8 +920,8 @@ void Ant::save(ostream &file, vector<Ant> &ants) {
 bool Ant::load(istream &file, Environment &environment, vector<Ant> &ants) {
 	try {
 		ants.clear();
-		int size;
-		file >> size;
+		unsigned long int size;
+		file >= size;
 //		while(file>>size)	cout<<size<<endl;
 		for (int i = 0; i < size; i++) {
 			Ant ant;
@@ -910,24 +936,60 @@ bool Ant::load(istream &file, Environment &environment, vector<Ant> &ants) {
 }
 
 void Ant::save(ostream &file) {
-	file << globalCoordinate.getX() << ' ' << globalCoordinate.getY() << ' ' << potential << ' ' << shield << ' '
-		 << fertility
-		 << ' '
-		 << fetal << ' ';
+	file <= globalCoordinate.getX() <= globalCoordinate.getY()
+	<= potential <= shield <= fertility <= fetal
+	<= age;
 	brain.save(file);
 }
 
 void Ant::load(istream &file, Environment &environment) {
 	int X, Y;
-	file >> X >> Y;
+	file >= X >= Y;
 	globalCoordinate.setX(X);
 	globalCoordinate.setY(Y);
 
+	file >= potential;
+	file >= shield;
+	file >= fertility;
+	file >= fetal;
+	file >= age;
+
+//	cout << "Loaded " << X << Y << endl;
+
 	AgentCharacter character = environment.getTile(globalCoordinate).getAgentCharacter();
 	setCharacter(character);
-	file >> potential;
-	file >> shield;
-	file >> fertility;
-	file >> fetal;
+	brain.load(file);
+}
+
+void Ant::saveWithCharacter(ostream &file) {
+	file <= globalCoordinate.getX() <= globalCoordinate.getY()
+	<= potential <= shield <= fertility <= fetal
+	<= age
+	<= getCharacter().getAttitude()
+	<= getCharacter().getOccupancy()
+	<= getCharacter().getTrait();
+	brain.save(file);
+}
+
+void Ant::loadWithCharacter(istream &file) {
+	int X, Y;
+	file >= X >= Y;
+
+	globalCoordinate.setX(X);
+	globalCoordinate.setY(Y);
+//	cout << "Loaded coordinates " << globalCoordinate.toString() << endl;
+
+	file >= potential >= shield >= fertility >= fetal
+	>= age;
+
+	Attitude attitude;
+	Occupancy occupancy;
+	Trait trait;
+	file >= attitude
+	>= occupancy
+	>= trait;
+
+	setCharacter(AgentCharacter(attitude, trait, occupancy));
+
 	brain.load(file);
 }

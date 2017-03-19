@@ -8,34 +8,32 @@
 
 #define comm MPI_COMM_WORLD
 
+using namespace std;
+
 int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 
 	int rank, size;
-	MPI_Comm_rank(comm, &rank);
-	MPI_Comm_size(comm, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-	cout << "Initializing rank " << rank << endl;
 
-	AntWorld antWorld(50, 50, (unsigned int) time(NULL) + rank);
-	antWorld.setDisplayPeriod(101);
+	AntWorld antWorld(50, 50);
+	antWorld.setDisplayPeriod(1);
 	antWorld.setCheckpointPeriod(5000);
 	antWorld.setWaitPeriod(1);
 	antWorld.setMutationEnabled(true);
 	antWorld.setCheckpointLocation(string("./checkpoints") + to_string(rank));
 
-//	antWorld.load(700);
+	antWorld.loadFromFile(2270000);
 
 	while (antWorld.isRunning()) {
-		antWorld.performIteration();
+
 		antWorld.maintainMinimumPopulation();
+		antWorld.performIteration();
 		antWorld.displayPeriodically();
 		antWorld.checkpointPeriodically();
 		antWorld.waitOnePeriod();
-
-		if (antWorld.getIteration() % 500 == 0) {
-
-		}
 	}
 
 	MPI_Finalize();

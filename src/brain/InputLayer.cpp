@@ -29,12 +29,12 @@ void InputLayer::compute() {
 }
 
 void InputLayer::save(ostream &file) {
-	file << type << ' ' << inputSize << ' ' << outputSize << endl;
+	file <= type <= inputSize <= outputSize;
 }
 
 InputLayer InputLayer::getLoadedLayer(istream &file) {
 	int inputSize, outputSize;
-	file >> inputSize >> outputSize;
+	file >= inputSize >= outputSize;
 	InputLayer inputLayer(inputSize);
 	return inputLayer;
 }

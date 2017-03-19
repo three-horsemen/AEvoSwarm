@@ -9,6 +9,8 @@
 #include "NeuralNetwork.hpp"
 #include "Layer.hpp"
 
+#include <shared/Utils.hpp>
+
 class InputLayer : public Layer {
 public:
 	InputLayer(int);

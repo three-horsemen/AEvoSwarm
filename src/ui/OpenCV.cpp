@@ -150,12 +150,50 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	//Draw the HUD.
 	string populationLabel = "Population: ";
 	string iterationLabel = "Iteration: ";
+	string avgAgeLabel = "Avg. Age: ";
+	string avgEnergyLabel = "Avg. Energy: ";
 	rectangle(image, HUDBackdrop, Scalar(0, 0, 0), CV_FILLED, 8); //Clean the backdrop of the HUD.
 	putText(image,
 			populationLabel + to_string(ants.size()),
 			Point(
 					5,
 					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.5,
+			Scalar(0, 200, 200),
+			1
+	);
+
+	float avgAge = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int age = ants[k].getAge();
+		avgAge += age;
+	}
+	avgAge /= ants.size();
+	putText(image,
+			avgAgeLabel + to_string(avgAge),
+			Point(
+					WINDOW_WIDTH / 2 - 4 * TILE_SIDE_PIXEL_HEIGHT,
+					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.5,
+			Scalar(0, 200, 200),
+			1
+	);
+
+	float avgEnergy = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int age = ants[k].getTotalEnergy();
+		avgEnergy += age;
+	}
+	avgEnergy /= ants.size();
+	putText(image,
+			avgEnergyLabel + to_string(avgEnergy),
+			Point(
+					WINDOW_WIDTH / 2 - 4 * TILE_SIDE_PIXEL_HEIGHT,
+					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
 			),
 			FONT_HERSHEY_SIMPLEX,
 			0.5,

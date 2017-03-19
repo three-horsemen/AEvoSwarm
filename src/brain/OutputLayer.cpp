@@ -31,12 +31,12 @@ void OutputLayer::displayOutputs() {
 }
 
 void OutputLayer::save(ostream &file) {
-	file << type << ' ' << inputSize << ' ' << outputSize << endl;
+	file <= type <= inputSize <= outputSize;
 }
 
 OutputLayer OutputLayer::getLoadedLayer(istream &file) {
 	int inputSize, outputSize;
-	file >> inputSize >> outputSize;
+	file >= inputSize >= outputSize;
 	OutputLayer outputLayer(inputSize);
 	return outputLayer;
 }

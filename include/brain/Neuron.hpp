@@ -8,6 +8,8 @@
 #include <random>
 #include <fstream>
 
+#include <shared/Utils.hpp>
+
 using namespace std;
 
 typedef float weight;

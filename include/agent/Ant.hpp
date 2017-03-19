@@ -74,6 +74,7 @@ protected:
 	Energy shield;
 	Energy fertility;
 	Energy fetal;
+	unsigned int age;
 
 	AgentCharacter character;
 	//TODO Use Boost enum
@@ -204,6 +205,10 @@ public:
 
 	inline Energy getFetal();
 
+	inline unsigned int getAge() const {
+		return age;
+	}
+
 	inline AgentCharacter getCharacter();
 
 	inline void setGlobalCoordinate(Coordinate);
@@ -220,7 +225,9 @@ public:
 
 	inline void setCharacter(AgentCharacter newCharacter);
 
-	inline Energy getTotalEnergy();
+	inline Energy getTotalEnergy() const {
+		return potential + shield + fertility + fetal;
+	}
 
 	void dissipateEnergy(Energy);
 
@@ -238,7 +245,9 @@ public:
 
 	inline excitation getEnergyExcitation(Energy, Energy);
 
-	static void sparkLifeAt(Environment &, vector<Ant> &, Coordinate);
+	static void sparkLifeAt(Environment &, vector<Ant> &, Ant &);
+
+	static bool sparkLifeWhereAvailable(Environment &, vector<Ant> &, Ant &);
 
 	static void sparkNLives(Environment &, vector<Ant> &, unsigned int);
 
@@ -248,7 +257,11 @@ public:
 
 	void save(ostream &);
 
+	void saveWithCharacter(ostream &);
+
 	void load(istream &, Environment &);
+
+	void loadWithCharacter(istream &);
 };
 
 

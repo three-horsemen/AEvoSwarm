@@ -8,6 +8,8 @@
 #include <brain/Layer.hpp>
 #include <brain/Neuron.hpp>
 
+#include <shared/Utils.hpp>
+
 class FullyConnectedLayer : public Layer {
 protected:
 	vector<Neuron> neurons;//TODO Make private

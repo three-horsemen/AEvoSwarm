@@ -81,7 +81,7 @@ Layer *NeuralNetwork::getOutputLayer() {
 }
 
 void NeuralNetwork::save(ostream &file) {
-	file << layers.size() << endl;
+	file <= layers.size();
 	for (unsigned long i = 0; i < layers.size(); i++) {
 		layers[i]->save(file);
 	}
@@ -89,11 +89,13 @@ void NeuralNetwork::save(ostream &file) {
 
 void NeuralNetwork::load(istream &file) {
 	resorb();
-	int size;
-	file >> size;
+	unsigned long size;
+	file >= size;
+//	cout << "Loading " << size << " layers" << endl;
 	for (int i = 0; i < size; i++) {
-		int layerType;
-		file >> layerType;
+		LayerType layerType;
+		file >= layerType;
+//		cout << "Loading layer type " << layerType << endl;
 		if (layerType == INPUT) {
 			InputLayer layer(InputLayer::getLoadedLayer(file));
 			addLayer(layer);

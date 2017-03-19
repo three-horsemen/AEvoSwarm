@@ -8,6 +8,8 @@
 #include <environment/Tile.hpp>
 #include <agent/AgentCharacter.hpp>
 
+#include <shared/Utils.hpp>
+
 #include <vector>
 #include <time.h>
 #include <fstream>

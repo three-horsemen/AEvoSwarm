@@ -8,6 +8,10 @@
 //#include "environment/Tile.hpp"
 
 typedef unsigned short Attitude;
+namespace attitude {
+	const Attitude MAX_ATTITUDE = -1;
+};
+
 typedef unsigned short Trait;
 typedef enum {
 	OCCUPANCY_DEAD = 0,

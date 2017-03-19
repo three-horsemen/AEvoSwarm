@@ -79,43 +79,42 @@ void Environment::randomize() {
 }
 
 void Environment::save(ostream &file) {
-	file << height << ' ' << width << endl;
+	file <= height <= width;
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			file << tiles[i][j].getTotalEnergy() << ' '
-				 << tiles[i][j].getAgentCharacter().getAttitude() << ' '
-				 << tiles[i][j].getAgentCharacter().getOccupancy() << ' '
-				 << tiles[i][j].getAgentCharacter().getTrait() << "  ";
+			file <= tiles[i][j].getTotalEnergy();
+			file <= tiles[i][j].getAgentCharacter().getAttitude();
+			file <= tiles[i][j].getAgentCharacter().getOccupancy();
+			file <= tiles[i][j].getAgentCharacter().getTrait();
 		}
-		file << endl;
 	}
 }
 
 bool Environment::load(istream &file) {
 	try {
-		int fileHeight, fileWidth;
-		file >> fileHeight >> fileWidth;
+		unsigned short fileHeight, fileWidth;
+		file >= fileHeight >= fileWidth;
 		if (fileHeight != height || fileWidth != width) {
 			return false;
 		}
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				Energy totalEnergy;
-				file >> totalEnergy;
+				file >= totalEnergy;
 				tiles[i][j].setTotalEnergy(totalEnergy);
 
 				AgentCharacter character;
 
 				Attitude attitude;
-				file >> attitude;
+				file >= attitude;
 				character.setAttitude(attitude);
 
-				int occupancy;
-				file >> occupancy;
+				Occupancy occupancy;
+				file >= occupancy;
 				character.setOccupancy((Occupancy) occupancy);
 
 				Trait trait;
-				file >> trait;
+				file >= trait;
 				character.setTrait(trait);
 
 				tiles[i][j].setAgentCharacter(character);

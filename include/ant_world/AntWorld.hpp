@@ -9,10 +9,20 @@
 #include <ui/AsciiEnvironment.hpp>
 #include <chrono>
 
+#include <mpi.h>
+
+struct membuf : std::streambuf {
+	membuf(char *begin, char *end) {
+		this->setg(begin, begin, end);
+	}
+};
+
 class AntWorld {
 	vector<Ant> ants;
 	ui::OpenCV *openCVEnvironment;
 	Environment environment;
+
+	int rank, size;
 
 	string checkpointLocation;
 
@@ -30,13 +40,16 @@ class AntWorld {
 	bool fileCheckpointsEnabled;
 	unsigned int checkpointPeriod;
 
+	bool geneticCrossoverEnabled;
+	unsigned int geneticCrossoverPeriod;
+
 	std::chrono::milliseconds previousWaitStartTimestamp;
 	unsigned long waitPeriod;
 	long deficit;
 
 	bool _isRunning;
 public:
-	AntWorld(int, int, int);
+	AntWorld(int, int, bool geneticCrossoverEnabled = false);
 
 	~AntWorld();
 
@@ -48,6 +61,10 @@ public:
 
 	bool performIteration();
 
+	bool performRegularIteration();
+
+	bool performGeneMixIteration(unsigned int, unsigned int);
+
 	void maintainMinimumPopulation();
 
 	void displayPeriodically();
@@ -56,11 +73,11 @@ public:
 
 	void saveToFile();
 
+	bool loadFromFile(unsigned long long);
+
 	void waitOnePeriod();
 
 	void waitRemainingPeriod();
-
-	bool loadFromFile(unsigned long long);
 
 	void setMutationEnabled(bool);
 
@@ -101,6 +118,22 @@ public:
 	void setCheckpointLocation(string);
 
 	string getCheckpointLocation();
+
+	void setCrossoverEnabled(bool);
+
+	void setCrossoverPeriod(unsigned int);
+
+	inline vector<Ant> &getAnts() {
+		return ants;
+	}
+
+	inline Environment &getEnvironment() {
+		return environment;
+	}
+
+	inline Environment &getOldEnvironment() {
+		return environment;
+	}
 };
 
 

@@ -108,6 +108,7 @@ add_library(ant_world
 target_link_libraries(
 		ant_world
 		ui
+		${MPI_LIBRARIES}
 )
 
 
@@ -190,5 +191,4 @@ add_executable(
 target_link_libraries(
 		unit_test_ant_world_mpi
 		ant_world
-		${MPI_LIBRARIES}
 )

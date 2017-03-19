@@ -73,7 +73,7 @@ public:
 
 	void saveToFile();
 
-	bool loadFromFile(unsigned long long);
+	void loadFromFile(unsigned long long);
 
 	void waitOnePeriod();
 

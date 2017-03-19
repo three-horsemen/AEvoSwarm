@@ -15,8 +15,10 @@ int main(int argc, char *argv[]) {
 	antWorld.setCrossoverEnabled(false);
 	antWorld.setCheckpointLocation("./checkpoints");
 
-	if (!antWorld.loadFromFile(150000)) {
-		cout << "Failed to load from file\n";
+	try {
+		antWorld.loadFromFile(150000);
+	} catch (runtime_error &e) {
+		cout << e.what() << endl;
 		return 0;
 	}
 

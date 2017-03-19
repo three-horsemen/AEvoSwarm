@@ -182,7 +182,7 @@ void AntWorld::saveToFile() {
 	antFile.close();
 }
 
-bool AntWorld::loadFromFile(unsigned long long iteration) {
+void AntWorld::loadFromFile(unsigned long long iteration) {
 	try {
 		string environmentFilePath = checkpointLocation + "/" + to_string(iteration) + ".env";
 		string antFilePath = checkpointLocation + "/" + to_string(iteration) + ".ants";
@@ -201,8 +201,6 @@ bool AntWorld::loadFromFile(unsigned long long iteration) {
 		if (!Ant::load(antFile, environment, ants))
 			throw runtime_error("Error loading the ants");
 		this->iteration = iteration;
-
-		return true;
 	} catch (exception &e) {
 		cout << e.what() << endl;
 		throw e;

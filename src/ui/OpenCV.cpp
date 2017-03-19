@@ -152,6 +152,48 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	rectangle(image, HUDBackdrop, Scalar(0, 0, 0), CV_FILLED, 8); //Clean the backdrop of the HUD.
 	stringstream strStrm;
 
+	string avgFertilityLabel = "Avg. fertility: ";
+	float avgFertility = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int childrenCount = ants[k].getFertility();
+		avgFertility += childrenCount;
+	}
+	avgFertility = avgFertility / ants.size();
+	strStrm << avgFertilityLabel << setw(6) << setfill('0') << fixed << setprecision(1) << avgFertility;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.01f),
+					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
+	string avgFetalLabel = "Avg. fetal: ";
+	float avgFetal = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int x = ants[k].getFetal();
+		avgFetal += x;
+	}
+	avgFetal = avgFetal / ants.size();
+	strStrm << avgFetalLabel << setw(9) << setfill('0') << fixed << setprecision(1) << avgFetal;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.01f),
+					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
 	string avgChildrenCountLabel = "Avg. children: ";
 	float avgChildrenCount = 0;
 	for (unsigned int k = 0; k < ants.size(); k++) {
@@ -176,7 +218,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	string avgGenLabel = "Avg. gen.s: ";
 	float avgGenCount = 0;
 	for (unsigned int k = 0; k < ants.size(); k++) {
-		const unsigned short x = ants[k].getGenerationCount();
+		unsigned int x = ants[k].getGenerationCount();
 		avgGenCount += x;
 	}
 	avgGenCount = avgGenCount / ants.size();
@@ -201,7 +243,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 		avgEnergy += totalEnergy;
 	}
 	avgEnergy = avgEnergy / ants.size();
-	strStrm << avgEnergyLabel << setw(10) << setfill('0') << fixed << setprecision(2) << avgEnergy;
+	strStrm << avgEnergyLabel << setw(9) << setfill('0') << fixed << setprecision(1) << avgEnergy;
 	putText(image,
 			strStrm.str(),
 			Point(

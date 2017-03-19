@@ -198,7 +198,7 @@ public:
 
 	Coordinate getGlobalCoordinate();
 
-	inline Energy getActionCost(Agent::Action action) {
+	inline Energy getActionCost(Agent::Action action) const {
 //	return actionCost[action];
 		return (Energy) (actionCost[action] *
 						 (
@@ -211,19 +211,19 @@ public:
 						 ));
 	}
 
-	Energy getPotential() {
+	inline Energy getPotential() const {
 		return potential;
 	}
 
-	Energy getShield() {
+	inline Energy getShield() const {
 		return shield;
 	}
 
-	Energy getFertility() {
+	inline Energy getFertility() const {
 		return fertility;
 	}
 
-	Energy getFetal() {
+	inline Energy getFetal() const {
 		return fetal;
 	}
 
@@ -287,7 +287,7 @@ public:
 
 	int calculateDistance(Coordinate, Coordinate);
 
-	excitation getMaxPerceptValue(percept::Percept percept) {
+	static inline excitation getMaxPerceptValue(percept::Percept percept) {
 //	unsigned long maxPerceptVal = 0;
 		if (percept == percept::ENERGY) {
 			return (Energy) -1;

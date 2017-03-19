@@ -66,8 +66,10 @@ public:
 	static const int HYPOTHETICAL_MAX_OCCUPANCY_VAL = 4;
 
 	static const Energy MAX_DAMAGE = 10;
-	static const Energy NEWBORN_MIN_SHIELD = MAX_DAMAGE * 4;
+
 	static const Energy NEWBORN_MIN_POTENTIAL;
+	static const Energy NEWBORN_MIN_SHIELD = MAX_DAMAGE * 4;
+	static const Energy NEWBORN_MIN_FERTILITY = 1;
 	static const Energy NEWBORN_MIN_TOTAL_ENERGY;
 protected:
 	Energy potential;

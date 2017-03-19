@@ -8,7 +8,7 @@
 vector<Energy> Ant::actionCost = {5, 4, 4, 4, 20, 15, 25, 5, 5, 0};
 const short Ant::actionCount = (const short) Ant::actionCost.size();
 const Energy Ant::NEWBORN_MIN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 20);
-const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD;
+const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD + NEWBORN_MIN_FERTILITY;
 
 Ant::Ant() :
 //Perceptive field size
@@ -345,9 +345,9 @@ void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Enviro
 	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
 		Ant newborn;
 		ants[indexOfAnt].pullOutNewborn(newEnvironment, newborn);
+		cout << "Newborn pulled out at (" << newborn.getGlobalCoordinate().getX() << ","
+			 << newborn.getGlobalCoordinate().getY() << ") with " << newborn.getTotalEnergy() << " energy\n";
 		placeInEnvironment(newborn, newEnvironment, newborn.getGlobalCoordinate());
-		cout << "Newborn placed at (" << newborn.getGlobalCoordinate().getX() << ","
-			 << newborn.getGlobalCoordinate().getY() << ")" << endl;
 		ants.push_back(newborn);
 	}
 
@@ -391,18 +391,20 @@ void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
 
 void Ant::pullOutNewborn(Environment &environment, Ant &newBorn) {
 	if (pushedFetalEnergy < NEWBORN_MIN_TOTAL_ENERGY) {
-		throw runtime_error("Can only spawn one newborn after one birth");
+		throw runtime_error("Can only pull out one newborn after one birth");
 	}
 	newBorn = *this;
 
+	newBorn.setPotential(0);
 	newBorn.setShield(NEWBORN_MIN_SHIELD);
-	newBorn.setPotential(pushedFetalEnergy - NEWBORN_MIN_SHIELD);
+	newBorn.setFertility(NEWBORN_MIN_FERTILITY);
 	newBorn.setFetal(0);
-	newBorn.setFertility(0);
-	newBorn.setPushedFetalEnergy(0);
+	newBorn.setPotential(pushedFetalEnergy - newBorn.getTotalEnergy());
+//	cout << "Pulling out newborn with "<< pushedFetalEnergy << " pushed fetal energy\n";
 	newBorn.setGlobalCoordinate(getGlobalCoordinate(environment, adjacency::BEHIND));
 
-	pushedFetalEnergy = (Energy) 0;
+	newBorn.setPushedFetalEnergy(0);
+	setPushedFetalEnergy(0);
 
 	newBorn.mutate();
 }
@@ -643,7 +645,9 @@ void Ant::pushOutNewborn() {
 	if (pushedFetalEnergy != 0) {
 		throw runtime_error("Cannot push new born until previous is pulled out");
 	}
+
 	pushedFetalEnergy = getFetal();
+//	cout << "Pushed out newborn with " << pushedFetalEnergy << " energy\n";
 
 	Coordinate localCoordinate = getLocalCoordinate();
 	Tile tile = perceptiveField.getTile(localCoordinate);
@@ -685,7 +689,7 @@ void Ant::randomize() {
 	setGlobalCoordinate(Coordinate(-1, -1));
 	setPotential((Energy) (rand() % HYPOTHETICAL_MAX_POTENTIAL_ENERGY));
 	setShield((Energy) (rand() % HYPOTHETICAL_MAX_SHIELD_ENERGY));
-	setFertility((Energy) (rand() % HYPOTHETICAL_MAX_FERTILITY_ENERGY));
+	setFertility(NEWBORN_MIN_FERTILITY);
 	setFetal((Energy) (rand() % HYPOTHETICAL_MAX_BABY_ENERGY));
 	setCharacter(AgentCharacter(
 			(Attitude) ((rand() % (HYPOTHETICAL_MAX_ATTITUDE - HYPOTHETICAL_MIN_ATTITUDE)) + HYPOTHETICAL_MIN_ATTITUDE),
@@ -762,7 +766,7 @@ void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Ant &ant) {
 		Ant::placeCharacterInEnvironment(ant, environment, ant.getGlobalCoordinate());
 
 		ants.push_back(ant);
-//		cout << "Spawned ant at " << coordinate.toString() << endl;
+//		cout << "Sparked ant at " << ant.getGlobalCoordinate().toString() << " with " << ant.getTotalEnergy() << " energy\n";
 	} else {
 		throw invalid_argument("Cannot spark life at " + ant.getGlobalCoordinate().toString());
 	}
@@ -806,11 +810,12 @@ void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int 
 				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
 					) {
 				ant.randomize();
-				ant.setFertility(0);
-				ant.setFetal(0);
+				ant.setPotential(0);
 				ant.setPushedFetalEnergy(0);
+				ant.setFertility(NEWBORN_MIN_FERTILITY);
+				ant.setFetal(0);
 				ant.setShield(Ant::NEWBORN_MIN_SHIELD);
-				ant.setPotential(tile.getTotalEnergy() - Ant::NEWBORN_MIN_SHIELD);
+				ant.setPotential(tile.getTotalEnergy() - ant.getTotalEnergy());
 				ant.setGlobalCoordinate(Coordinate(X, Y));
 				Ant::sparkLifeAt(environment, ants, ant);
 				count--;

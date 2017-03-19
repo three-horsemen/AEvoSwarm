@@ -198,8 +198,14 @@ public:
 	inline Energy getActionCost(Agent::Action action) {
 //	return actionCost[action];
 		return (Energy) (actionCost[action] *
-						 (1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))) *
-						 (1.f + 1000000.f * (((float) age / ((unsigned int) -1)))));
+						 (
+								 (
+										 1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))
+								 ) *
+								 (
+										 1.f + 1000000.f * ((float) age / ((unsigned int) -1))
+								 )
+						 ));
 	}
 
 	Energy getPotential() {

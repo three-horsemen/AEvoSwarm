@@ -149,20 +149,8 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	}
 
 	//Draw the HUD.
-	stringstream strStrm;
-	string populationLabel = "Population: ";
 	rectangle(image, HUDBackdrop, Scalar(0, 0, 0), CV_FILLED, 8); //Clean the backdrop of the HUD.
-	putText(image,
-			populationLabel + to_string(ants.size()),
-			Point(
-					5,
-					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
-			),
-			FONT_HERSHEY_SIMPLEX,
-			0.4,
-			Scalar(0, 200, 200),
-			1
-	);
+	stringstream strStrm;
 
 	string avgChildrenCountLabel = "Avg. children: ";
 	float avgChildrenCount = 0;
@@ -171,7 +159,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 		avgChildrenCount += childrenCount;
 	}
 	avgChildrenCount = avgChildrenCount / ants.size();
-	strStrm << avgChildrenCountLabel << setw(6) << right << fixed << setprecision(2) << avgChildrenCount;
+	strStrm << avgChildrenCountLabel << setw(6) << setfill('0') << fixed << setprecision(2) << avgChildrenCount;
 	putText(image,
 			strStrm.str(),
 			Point(
@@ -192,7 +180,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 		avgGenCount += x;
 	}
 	avgGenCount = avgGenCount / ants.size();
-	strStrm << avgGenLabel << setw(6) << right << fixed << setprecision(2) << avgGenCount;
+	strStrm << avgGenLabel << setw(6) << setfill('0') << fixed << setprecision(2) << avgGenCount;
 	putText(image,
 			strStrm.str(),
 			Point(
@@ -213,7 +201,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 		avgEnergy += totalEnergy;
 	}
 	avgEnergy = avgEnergy / ants.size();
-	strStrm << avgEnergyLabel << setw(7) << right << fixed << setprecision(2) << avgEnergy;
+	strStrm << avgEnergyLabel << setw(10) << setfill('0') << fixed << setprecision(2) << avgEnergy;
 	putText(image,
 			strStrm.str(),
 			Point(
@@ -234,7 +222,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 		avgAge += age;
 	}
 	avgAge /= ants.size();
-	strStrm << avgAgeLabel << setw(7) << right << fixed << setprecision(2) << avgAge;
+	strStrm << avgAgeLabel << setw(7) << setfill('0') << fixed << setprecision(2) << avgAge;
 	putText(image,
 			strStrm.str(),
 			Point(
@@ -248,12 +236,27 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 	);
 	strStrm.str("");
 
-	string iterationLabel = "Iteration: ";
-	strStrm << iterationLabel << setw(10) << left << fixed << iterationCount;
+	string populationLabel = "Population: ";
+	strStrm << populationLabel << setw(5) << setfill('0') << fixed << ants.size();
 	putText(image,
 			strStrm.str(),
 			Point(
-					(int) (WINDOW_WIDTH - 9 * (iterationLabel.length() + to_string(iterationCount).length())),
+					(int) (WINDOW_WIDTH * 0.8f),
+					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
+	string iterationLabel = "Iteration: ";
+	strStrm << iterationLabel << setw(10) << setfill('0') << fixed << iterationCount;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.8f),
 					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
 			),
 			FONT_HERSHEY_SIMPLEX,

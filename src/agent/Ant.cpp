@@ -488,63 +488,6 @@ Coordinate Ant::getGlobalCoordinate() {
 	return globalCoordinate;
 }
 
-inline Energy Ant::getActionCost(Agent::Action action) {
-//	return actionCost[action];
-	return (Energy) (actionCost[action] *
-					 (1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))) *
-					 (1.f + 1000000.f * (((float) age / ((unsigned int) -1)))));
-}
-
-Energy Ant::getPotential() {
-	return potential;
-}
-
-Energy Ant::getShield() {
-	return shield;
-}
-
-Energy Ant::getFertility() {
-	return fertility;
-}
-
-Energy Ant::getFetal() {
-	return fetal;
-}
-
-inline AgentCharacter Ant::getCharacter() {
-	return character;
-}
-
-void Ant::setGlobalCoordinate(Coordinate newCoordinate) {
-	globalCoordinate = newCoordinate;
-}
-
-inline void Ant::setPotential(Energy newPotential) {
-	potential = newPotential;
-}
-
-void Ant::setShield(Energy newShield) {
-	shield = newShield;
-}
-
-void Ant::setFertility(Energy newFertility) {
-	fertility = newFertility;
-}
-
-void Ant::setFetal(Energy newFetal) {
-	fetal = newFetal;
-}
-
-void Ant::setPushedFetalEnergy(Energy newPushedFetalEnergy) {
-	pushedFetalEnergy = newPushedFetalEnergy;
-}
-
-inline void Ant::setCharacter(AgentCharacter newCharacter) {
-	character.setAttitude(newCharacter.getAttitude());
-	character.setOccupancy(newCharacter.getOccupancy());
-	character.setTrait(newCharacter.getTrait());
-}
-
 Tile Ant::operator<<(Tile tile) {
 	tile.setAgentCharacter(AgentCharacter());
 	tile.setTotalEnergy(tile.getTotalEnergy() - this->getTotalEnergy());
@@ -776,35 +719,6 @@ int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
 
 }
 
-excitation Ant::getMaxPerceptValue(percept::Percept percept) {
-//	unsigned long maxPerceptVal = 0;
-	if (percept == percept::ENERGY) {
-		return (Energy) -1;
-//		Energy e = 0;
-//		do {
-//			e--;
-//		} while (e < 0);
-//		maxPerceptVal = e;
-	} else if (percept == percept::ATTITUDE) {
-		return (Attitude) -1;
-//		Attitude e = 0;
-//		do {
-//			e--;
-//		} while (e < 0);
-//		maxPerceptVal = e;
-	} else if (percept == percept::TRAIT) {
-		return (Trait) -1;
-//		Trait e = 0;
-//		do {
-//			e--;
-//		} while (e < 0);
-//		maxPerceptVal = e;
-	} else {
-		throw invalid_argument("Unknown percept");
-	}
-//	return (excitation) maxPerceptVal;
-}
-
 excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	int maxHeight = perceptiveField.height;
 	int maxWidth = perceptiveField.width;
@@ -836,10 +750,6 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	}
 	perceivedAverage /= totalWeightedDistance;
 	return (log(perceivedAverage + 1) / log(getMaxPerceptValue(percept) + 1)) - 1;
-}
-
-excitation Ant::getEnergyExcitation(Energy energy, Energy maxEnergy) {
-	return (excitation) (log(energy + 1) / log(maxEnergy + 1)) - 1;
 }
 
 void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Ant &ant) {

@@ -195,35 +195,66 @@ public:
 
 	Coordinate getGlobalCoordinate();
 
-	inline Energy getActionCost(Agent::Action);
+	inline Energy getActionCost(Agent::Action action) {
+//	return actionCost[action];
+		return (Energy) (actionCost[action] *
+						 (1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))) *
+						 (1.f + 1000000.f * (((float) age / ((unsigned int) -1)))));
+	}
 
-	inline Energy getPotential();
+	Energy getPotential() {
+		return potential;
+	}
 
-	inline Energy getShield();
+	Energy getShield() {
+		return shield;
+	}
 
-	inline Energy getFertility();
+	Energy getFertility() {
+		return fertility;
+	}
 
-	inline Energy getFetal();
+	Energy getFetal() {
+		return fetal;
+	}
 
 	inline unsigned int getAge() const {
 		return age;
 	}
 
-	inline AgentCharacter getCharacter();
+	inline AgentCharacter getCharacter() {
+		return character;
+	}
 
-	inline void setGlobalCoordinate(Coordinate);
+	void setGlobalCoordinate(Coordinate newCoordinate) {
+		globalCoordinate = newCoordinate;
+	}
 
-	inline void setPotential(Energy newPotential);
+	inline void setPotential(Energy newPotential) {
+		potential = newPotential;
+	}
 
-	inline void setShield(Energy newShield);
+	void setShield(Energy newShield) {
+		shield = newShield;
+	}
 
-	inline void setFertility(Energy newFertility);
+	void setFertility(Energy newFertility) {
+		fertility = newFertility;
+	}
 
-	inline void setFetal(Energy newBaby);
+	void setFetal(Energy newFetal) {
+		fetal = newFetal;
+	}
 
-	inline void setPushedFetalEnergy(Energy);
+	void setPushedFetalEnergy(Energy newPushedFetalEnergy) {
+		pushedFetalEnergy = newPushedFetalEnergy;
+	}
 
-	inline void setCharacter(AgentCharacter newCharacter);
+	inline void setCharacter(AgentCharacter newCharacter) {
+		character.setAttitude(newCharacter.getAttitude());
+		character.setOccupancy(newCharacter.getOccupancy());
+		character.setTrait(newCharacter.getTrait());
+	}
 
 	inline Energy getTotalEnergy() const {
 		return potential + shield + fertility + fetal;
@@ -239,11 +270,40 @@ public:
 
 	int calculateDistance(Coordinate, Coordinate);
 
-	inline excitation getMaxPerceptValue(percept::Percept);
+	excitation getMaxPerceptValue(percept::Percept percept) {
+//	unsigned long maxPerceptVal = 0;
+		if (percept == percept::ENERGY) {
+			return (Energy) -1;
+//		Energy e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
+		} else if (percept == percept::ATTITUDE) {
+			return (Attitude) -1;
+//		Attitude e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
+		} else if (percept == percept::TRAIT) {
+			return (Trait) -1;
+//		Trait e = 0;
+//		do {
+//			e--;
+//		} while (e < 0);
+//		maxPerceptVal = e;
+		} else {
+			throw invalid_argument("Unknown percept");
+		}
+//	return (excitation) maxPerceptVal;
+	}
 
 	excitation getSensation(sensor::Sensor, percept::Percept);
 
-	inline excitation getEnergyExcitation(Energy, Energy);
+	excitation getEnergyExcitation(Energy energy, Energy maxEnergy) {
+		return (excitation) (log(energy + 1) / log(maxEnergy + 1)) - 1;
+	}
 
 	static void sparkLifeAt(Environment &, vector<Ant> &, Ant &);
 

@@ -158,15 +158,6 @@ target_link_libraries(
 )
 
 add_executable(
-		unit_test_opencv_environment
-		src/unit_test/ui/opencv_environment.cpp
-)
-target_link_libraries(
-		unit_test_opencv_environment
-		ui
-)
-
-add_executable(
 		playback_checkpoints
 		src/unit_test/ui/playback_checkpoints.cpp
 )

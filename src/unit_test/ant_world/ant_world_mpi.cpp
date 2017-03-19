@@ -19,13 +19,14 @@ int main(int argc, char *argv[]) {
 
 
 	AntWorld antWorld(50, 50);
-	antWorld.setDisplayPeriod(1);
-	antWorld.setCheckpointPeriod(5000);
+	antWorld.setDisplayPeriod(201);
+	antWorld.setCheckpointPeriod(10000);
 	antWorld.setWaitPeriod(1);
+	antWorld.setMutationPeriod(100);
 	antWorld.setMutationEnabled(true);
 	antWorld.setCheckpointLocation(string("./checkpoints") + to_string(rank));
 
-	antWorld.loadFromFile(2270000);
+	antWorld.loadFromFile(150000);
 
 	while (antWorld.isRunning()) {
 

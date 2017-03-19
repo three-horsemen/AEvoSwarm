@@ -74,12 +74,17 @@ void Neuron::mutateWeights(vector<weight> &weights, float variance) {
 	for (int i = 0; i < weights.size(); i++) {
 //		weights[i] *= distribution(generator);
 		//TODO Find more elegant weight mutation method
-		if (rand() % 2) {
-			weights[i] += 0.01;
-			weights[i] = min(weights[i], 1.f);
-		} else {
-			weights[i] -= 0.01;
-			weights[i] = max(weights[i], -1.f);
+		switch (rand() % 10) {
+			case 0:
+				weights[i] *= 1.001;
+				weights[i] = min(weights[i], 1.f);
+				break;
+			case 1:
+				weights[i] *= 0.999;
+				weights[i] = max(weights[i], -1.f);
+				break;
+			default:
+				break;
 		}
 	}
 }

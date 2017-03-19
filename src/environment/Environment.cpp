@@ -67,7 +67,7 @@ void Environment::clearCharacterGrid() {
 }
 
 void Environment::randomize() {
-	const Energy HYPOTHETICAL_MAX_ENERGY = 400;
+	const Energy HYPOTHETICAL_MAX_ENERGY = 800;
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			float r = (rand() % 256) / 255.f;

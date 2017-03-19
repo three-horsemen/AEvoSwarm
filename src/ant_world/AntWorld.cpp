@@ -192,20 +192,20 @@ bool AntWorld::loadFromFile(unsigned long long iteration) {
 		ifstream antFile(antFilePath, ios_base::in | ios_base::binary);
 		ifstream environmentFile(environmentFilePath, ios_base::in | ios_base::binary);
 		if (!environmentFile.is_open())
-			return false;
+			throw runtime_error("File could not be opened");
 		if (!antFile.is_open())
-			return false;
+			throw runtime_error("File could not be opened");
 
 		if (!environment.load(environmentFile))
-			return false;
+			throw runtime_error("Error loading the environment");
 		if (!Ant::load(antFile, environment, ants))
-			return false;
+			throw runtime_error("Error loading the ants");
 		this->iteration = iteration;
 
 		return true;
 	} catch (exception &e) {
 		cout << e.what() << endl;
-		return false;
+		throw e;
 	}
 }
 

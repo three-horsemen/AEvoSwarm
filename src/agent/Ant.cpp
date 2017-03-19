@@ -7,7 +7,7 @@
 //								FORWARD LEFT RIGHT EAT ATTACK FORTIFY MATURE GROW_BABY GIVE_BIRTH DIE
 vector<Energy> Ant::actionCost = {5, 4, 4, 4, 20, 15, 25, 5, 5, 0};
 const short Ant::actionCount = (const short) Ant::actionCost.size();
-const Energy Ant::NEWBORN_MIN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 20);
+const Energy Ant::NEWBORN_MIN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 100);
 const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD + NEWBORN_MIN_FERTILITY;
 
 Ant::Ant() :
@@ -53,44 +53,108 @@ Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjace
 	int x = coordinate.getX(), y = coordinate.getY();
 	switch (occupancy) {
 		case OCCUPANCY_NORTH:
-			if (adjacency == adjacency::AHEAD)
-				y--;
-			else if (adjacency == adjacency::BEHIND)
-				y++;
-			else if (adjacency == adjacency::LEFT)
-				x--;
-			else
-				x++;
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					y--;
+					break;
+				case adjacency::BEHIND:
+					y++;
+					break;
+				case adjacency::LEFT:
+					x--;
+					break;
+				case adjacency::RIGHT:
+					x++;
+					break;
+				case adjacency::AHEAD_LEFT:
+					y--;
+					x--;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					y--;
+					x++;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
 			break;
 		case OCCUPANCY_SOUTH:
-			if (adjacency == adjacency::AHEAD)
-				y++;
-			else if (adjacency == adjacency::BEHIND)
-				y--;
-			else if (adjacency == adjacency::LEFT)
-				x++;
-			else
-				x--;
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					y++;
+					break;
+				case adjacency::BEHIND:
+					y--;
+					break;
+				case adjacency::LEFT:
+					x++;
+					break;
+				case adjacency::RIGHT:
+					x--;
+					break;
+				case adjacency::AHEAD_LEFT:
+					y++;
+					x++;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					y++;
+					x--;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
 			break;
 		case OCCUPANCY_EAST:
-			if (adjacency == adjacency::AHEAD)
-				x++;
-			else if (adjacency == adjacency::BEHIND)
-				x--;
-			else if (adjacency == adjacency::LEFT)
-				y--;
-			else
-				y++;
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					x++;
+					break;
+				case adjacency::BEHIND:
+					x--;
+					break;
+				case adjacency::LEFT:
+					y--;
+					break;
+				case adjacency::RIGHT:
+					y++;
+					break;
+				case adjacency::AHEAD_LEFT:
+					x++;
+					y--;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					x++;
+					y++;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
 			break;
 		case OCCUPANCY_WEST:
-			if (adjacency == adjacency::AHEAD)
-				x--;
-			else if (adjacency == adjacency::BEHIND)
-				x++;
-			else if (adjacency == adjacency::LEFT)
-				y++;
-			else
-				y--;
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					x--;
+					break;
+				case adjacency::BEHIND:
+					x++;
+					break;
+				case adjacency::LEFT:
+					y++;
+					break;
+				case adjacency::RIGHT:
+					y--;
+					break;
+				case adjacency::AHEAD_LEFT:
+					x--;
+					y++;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					x--;
+					y--;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
 			break;
 		default:
 			throw invalid_argument("Unknown occupancy specified");
@@ -349,8 +413,8 @@ void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Enviro
 	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
 		Ant newborn;
 		ants[indexOfAnt].pullOutNewborn(newEnvironment, newborn);
-		cout << "Newborn pulled out at (" << newborn.getGlobalCoordinate().getX() << ","
-			 << newborn.getGlobalCoordinate().getY() << ") with " << newborn.getTotalEnergy() << " energy\n";
+//		cout << "Newborn pulled out at (" << newborn.getGlobalCoordinate().getX() << ","
+//			 << newborn.getGlobalCoordinate().getY() << ") with " << newborn.getTotalEnergy() << " energy\n";
 		placeInEnvironment(newborn, newEnvironment, newborn.getGlobalCoordinate());
 		ants.push_back(newborn);
 	}
@@ -733,15 +797,18 @@ int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
 excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	int maxHeight = perceptiveField.height;
 	int maxWidth = perceptiveField.width;
-	adjacency::Adjacency adjacency;
-	if (sensor == sensor::FRONT)
-		adjacency = adjacency::Adjacency::AHEAD;
-	else if (sensor == sensor::LEFT)
-		adjacency = adjacency::Adjacency::LEFT;
-	else
-		adjacency = adjacency::Adjacency::RIGHT;
-
-	Coordinate sensoryCoordinate = getLocalCoordinate(adjacency);
+	Coordinate sensoryCoordinate;
+	switch (sensor) {
+		case sensor::FRONT:
+			sensoryCoordinate = getLocalCoordinate();
+			break;
+		case sensor::LEFT:
+			sensoryCoordinate = getLocalCoordinate(adjacency::Adjacency::AHEAD_LEFT);
+			break;
+		case sensor::RIGHT:;
+			sensoryCoordinate = getLocalCoordinate(adjacency::Adjacency::AHEAD_RIGHT);
+			break;
+	}
 	int distance;
 	float totalWeightedDistance = 0;
 	excitation perceivedAverage = 0;

@@ -44,7 +44,9 @@ namespace ant {
 			AHEAD,
 			LEFT,
 			RIGHT,
-			BEHIND
+			BEHIND,
+			AHEAD_LEFT,
+			AHEAD_RIGHT
 		};
 		const short ADJACENCY_COUNT = 4;
 	}
@@ -203,10 +205,10 @@ public:
 		return (Energy) (actionCost[action] *
 						 (
 								 (
-										 1.f + 5.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))
+										 1.f + 2.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))
 								 ) *
 								 (
-										 1.f + 1000000.f * ((float) age / ((unsigned int) -1))
+										 1.f + 10000000.f * ((float) age / ((unsigned int) -1))
 								 )
 						 ));
 	}

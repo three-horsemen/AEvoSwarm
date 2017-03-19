@@ -143,7 +143,7 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 						  true,
 						  Scalar(0, 255, 0),
 						  1,
-						  CV_AA, 0);
+						  0, 0);
 			}
 		}
 	}

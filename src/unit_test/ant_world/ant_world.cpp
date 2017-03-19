@@ -7,17 +7,17 @@
 int main(int argc, char *argv[]) {
 	AntWorld antWorld(50, 50);
 	antWorld.setMinimumPopulation(50);
-	antWorld.setDisplayPeriod(1);
+	antWorld.setDisplayPeriod(5);
 	antWorld.setCheckpointPeriod(10000);
-	antWorld.setWaitPeriod(500);
+	antWorld.setWaitPeriod(1);
 	antWorld.setMutationEnabled(true);
 	antWorld.setCrossoverEnabled(false);
 	antWorld.setCheckpointLocation("./checkpoints");
 
-	if (!antWorld.loadFromFile(90000)) {
-		cout << "Failed to load from file\n";
-		return 0;
-	}
+//	if (!antWorld.loadFromFile(100)) {
+//		cout << "Failed to load from file\n";
+//		return 0;
+//	}
 
 	while (antWorld.isRunning()) {
 		antWorld.maintainMinimumPopulation();

@@ -147,11 +147,10 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 			}
 		}
 	}
+
 	//Draw the HUD.
+	stringstream strStrm;
 	string populationLabel = "Population: ";
-	string iterationLabel = "Iteration: ";
-	string avgAgeLabel = "Avg. Age: ";
-	string avgEnergyLabel = "Avg. Energy: ";
 	rectangle(image, HUDBackdrop, Scalar(0, 0, 0), CV_FILLED, 8); //Clean the backdrop of the HUD.
 	putText(image,
 			populationLabel + to_string(ants.size()),
@@ -160,57 +159,109 @@ void ui::OpenCV::displayEnvironment(const vector<Ant> &ants, unsigned long long 
 					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
 			),
 			FONT_HERSHEY_SIMPLEX,
-			0.5,
+			0.4,
 			Scalar(0, 200, 200),
 			1
 	);
 
+	string avgChildrenCountLabel = "Avg. children: ";
+	float avgChildrenCount = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int childrenCount = ants[k].getChildrenCount();
+		avgChildrenCount += childrenCount;
+	}
+	avgChildrenCount = avgChildrenCount / ants.size();
+	strStrm << avgChildrenCountLabel << setw(6) << right << fixed << setprecision(2) << avgChildrenCount;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.25f),
+					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
+	string avgGenLabel = "Avg. gen.s: ";
+	float avgGenCount = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned short x = ants[k].getGenerationCount();
+		avgGenCount += x;
+	}
+	avgGenCount = avgGenCount / ants.size();
+	strStrm << avgGenLabel << setw(6) << right << fixed << setprecision(2) << avgGenCount;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.25f),
+					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
+	string avgEnergyLabel = "Avg. Energy: ";
+	float avgEnergy = 0;
+	for (unsigned int k = 0; k < ants.size(); k++) {
+		const unsigned int totalEnergy = ants[k].getTotalEnergy();
+		avgEnergy += totalEnergy;
+	}
+	avgEnergy = avgEnergy / ants.size();
+	strStrm << avgEnergyLabel << setw(7) << right << fixed << setprecision(2) << avgEnergy;
+	putText(image,
+			strStrm.str(),
+			Point(
+					(int) (WINDOW_WIDTH * 0.5f),
+					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
+			),
+			FONT_HERSHEY_SIMPLEX,
+			0.4,
+			Scalar(0, 200, 200),
+			1
+	);
+	strStrm.str("");
+
+	string avgAgeLabel = "Avg. Age: ";
 	float avgAge = 0;
 	for (unsigned int k = 0; k < ants.size(); k++) {
 		const unsigned int age = ants[k].getAge();
 		avgAge += age;
 	}
 	avgAge /= ants.size();
+	strStrm << avgAgeLabel << setw(7) << right << fixed << setprecision(2) << avgAge;
 	putText(image,
-			avgAgeLabel + to_string(avgAge),
+			strStrm.str(),
 			Point(
-					WINDOW_WIDTH / 2 - 4 * TILE_SIDE_PIXEL_HEIGHT,
+					(int) (WINDOW_WIDTH * 0.5f),
 					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
 			),
 			FONT_HERSHEY_SIMPLEX,
-			0.5,
+			0.4,
 			Scalar(0, 200, 200),
 			1
 	);
+	strStrm.str("");
 
-	float avgEnergy = 0;
-	for (unsigned int k = 0; k < ants.size(); k++) {
-		const unsigned int age = ants[k].getTotalEnergy();
-		avgEnergy += age;
-	}
-	avgEnergy /= ants.size();
+	string iterationLabel = "Iteration: ";
+	strStrm << iterationLabel << setw(10) << left << fixed << iterationCount;
 	putText(image,
-			avgEnergyLabel + to_string(avgEnergy),
-			Point(
-					WINDOW_WIDTH / 2 - 4 * TILE_SIDE_PIXEL_HEIGHT,
-					WINDOW_HEIGHT + 1 * TILE_SIDE_PIXEL_HEIGHT + HUD_HEIGHT_MARGIN
-			),
-			FONT_HERSHEY_SIMPLEX,
-			0.5,
-			Scalar(0, 200, 200),
-			1
-	);
-	putText(image,
-			iterationLabel + to_string(iterationCount),
+			strStrm.str(),
 			Point(
 					(int) (WINDOW_WIDTH - 9 * (iterationLabel.length() + to_string(iterationCount).length())),
 					WINDOW_HEIGHT + 2 * TILE_SIDE_PIXEL_HEIGHT + (HUD_HEIGHT_MARGIN + HUD_HEIGHT_PADDING)
 			),
 			FONT_HERSHEY_SIMPLEX,
-			0.5,
+			0.4,
 			Scalar(0, 200, 200),
 			1
 	);
+	strStrm.str("");
 	cvtColor(image, image, CV_HSV2BGR_FULL);
 	imshow("AEvoSwarm-Environment", image);
 }

@@ -16,6 +16,8 @@ Ant::Ant() :
 	developBrain();
 
 	age = 0;
+	children = 0;
+	nGeneration = 0;
 	pushedFetalEnergy = 0;
 	//TODO Remove me.
 	character.setAttitude((Attitude) rand());
@@ -35,6 +37,8 @@ void Ant::operator=(const Ant &ant) {
 	character = ant.character;
 	pushedFetalEnergy = ant.pushedFetalEnergy;
 	age = ant.age;
+	children = ant.children;
+	nGeneration = ant.nGeneration;
 	resorbBrain();
 	developBrain();
 }
@@ -395,6 +399,8 @@ void Ant::pullOutNewborn(Environment &environment, Ant &newBorn) {
 	}
 	newBorn = *this;
 
+	newBorn.nGeneration = nGeneration + (unsigned short) 1;
+
 	newBorn.setPotential(0);
 	newBorn.setShield(NEWBORN_MIN_SHIELD);
 	newBorn.setFertility(NEWBORN_MIN_FERTILITY);
@@ -661,6 +667,7 @@ void Ant::pushOutNewborn() {
 //	perceptiveField.setTile(tile, localCoordinate);
 
 	setFetal(0);
+	children++;
 }
 
 void Ant::die() {
@@ -853,7 +860,9 @@ bool Ant::load(istream &file, Environment &environment, vector<Ant> &ants) {
 void Ant::save(ostream &file) {
 	file <= globalCoordinate.getX() <= globalCoordinate.getY()
 	<= potential <= shield <= fertility <= fetal
-	<= age;
+	<= age
+	<= children
+	<= nGeneration;
 	brain.save(file);
 }
 
@@ -868,6 +877,8 @@ void Ant::load(istream &file, Environment &environment) {
 	file >= fertility;
 	file >= fetal;
 	file >= age;
+	file >= children;
+	file >= nGeneration;
 
 //	cout << "Loaded " << X << Y << endl;
 
@@ -880,6 +891,8 @@ void Ant::saveWithCharacter(ostream &file) {
 	file <= globalCoordinate.getX() <= globalCoordinate.getY()
 	<= potential <= shield <= fertility <= fetal
 	<= age
+	<= children
+	<= nGeneration
 	<= getCharacter().getAttitude()
 	<= getCharacter().getOccupancy()
 	<= getCharacter().getTrait();
@@ -895,7 +908,9 @@ void Ant::loadWithCharacter(istream &file) {
 //	cout << "Loaded coordinates " << globalCoordinate.toString() << endl;
 
 	file >= potential >= shield >= fertility >= fetal
-	>= age;
+	>= age
+	>= children
+	>= nGeneration;
 
 	Attitude attitude;
 	Occupancy occupancy;

@@ -77,6 +77,7 @@ protected:
 	Energy fertility;
 	Energy fetal;
 	unsigned int age;
+	unsigned short children, nGeneration;
 
 	AgentCharacter character;
 	//TODO Use Boost enum
@@ -228,6 +229,14 @@ public:
 
 	inline unsigned int getAge() const {
 		return age;
+	}
+
+	inline unsigned int getChildrenCount() const {
+		return children;
+	}
+
+	inline unsigned int getGenerationCount() const {
+		return nGeneration;
 	}
 
 	inline AgentCharacter getCharacter() {

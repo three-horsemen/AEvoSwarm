@@ -55,7 +55,7 @@ void AntWorld::skipIterations(unsigned long long skip) {
 
 bool AntWorld::performIteration() {
 	if (geneticCrossoverEnabled && getIteration() % geneticCrossoverPeriod == 0) {
-		return performGeneMixIteration((unsigned int) (ants.size() / size), (unsigned int) size);
+		return performGeneMixIteration((unsigned int) (5), (unsigned int) size);
 	} else {
 		return performRegularIteration();
 	}
@@ -228,88 +228,4 @@ void AntWorld::waitRemainingPeriod() {
 		_isRunning = false;
 	}
 	previousWaitStartTimestamp = waitStartTimestamp;
-}
-
-void AntWorld::setMutationEnabled(bool enabled) {
-	mutationEnabled = enabled;
-}
-
-void AntWorld::setMutationPeriod(unsigned int period) {
-	mutationPeriod = period;
-}
-
-void AntWorld::setMinimumPopulationEnabled(bool enabled) {
-	minimumPopulationEnabled = enabled;
-}
-
-bool AntWorld::getMinimumPopulationEnabled() {
-	return minimumPopulationEnabled;
-}
-
-void AntWorld::setMinimumPopulation(unsigned int minPopulation) {
-	minimumPopulation = minPopulation;
-}
-
-unsigned int AntWorld::getMinimumPopulation() {
-	return minimumPopulation;
-}
-
-void AntWorld::setDisplayEnabled(bool enabled) {
-	displayEnabled = enabled;
-}
-
-bool AntWorld::getDisplayEnabled() {
-	return displayEnabled;
-}
-
-void AntWorld::setDisplayPeriod(unsigned int period) {
-	displayPeriod = period;
-}
-
-unsigned int AntWorld::getDisplayPeriod() {
-	return displayPeriod;
-}
-
-void AntWorld::setFileCheckpointsEnabled(bool enabled) {
-	fileCheckpointsEnabled = enabled;
-}
-
-bool AntWorld::getFileCheckpointsEnabled() {
-	return fileCheckpointsEnabled;
-}
-
-void AntWorld::setCheckpointPeriod(unsigned int period) {
-	checkpointPeriod = period;
-}
-
-unsigned int AntWorld::getCheckpointPeriod() {
-	return checkpointPeriod;
-}
-
-void AntWorld::setWaitPeriod(unsigned long period) {
-	waitPeriod = period;
-}
-
-unsigned long AntWorld::getWaitPeriod() {
-	return waitPeriod;
-}
-
-void AntWorld::setCheckpointLocation(string path) {
-	checkpointLocation = path;
-}
-
-string AntWorld::getCheckpointLocation() {
-	return checkpointLocation;
-}
-
-void AntWorld::setCrossoverEnabled(bool enabled) {
-	geneticCrossoverEnabled = enabled;
-	if (geneticCrossoverEnabled) {
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		MPI_Comm_size(MPI_COMM_WORLD, &size);
-	}
-}
-
-void AntWorld::setCrossoverPeriod(unsigned int period) {
-	geneticCrossoverPeriod = period;
 }

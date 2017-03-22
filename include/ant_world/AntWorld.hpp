@@ -79,49 +79,89 @@ public:
 
 	void waitRemainingPeriod();
 
-	void setMutationEnabled(bool);
+	inline void setMutationEnabled(bool enabled) {
+		mutationEnabled = enabled;
+	}
 
-	bool getMutationEnabled();
+	inline void setMutationPeriod(unsigned int period) {
+		mutationPeriod = period;
+	}
 
-	void setMutationPeriod(unsigned int);
+	inline void setMinimumPopulationEnabled(bool enabled) {
+		minimumPopulationEnabled = enabled;
+	}
 
-	unsigned int getMutationPeriod();
+	inline bool getMinimumPopulationEnabled() {
+		return minimumPopulationEnabled;
+	}
 
-	void setMinimumPopulationEnabled(bool);
+	inline void setMinimumPopulation(unsigned int minPopulation) {
+		minimumPopulation = minPopulation;
+	}
 
-	bool getMinimumPopulationEnabled();
+	inline unsigned int getMinimumPopulation() {
+		return minimumPopulation;
+	}
 
-	void setMinimumPopulation(unsigned int);
+	inline void setDisplayEnabled(bool enabled) {
+		displayEnabled = enabled;
+	}
 
-	unsigned int getMinimumPopulation();
+	inline bool getDisplayEnabled() {
+		return displayEnabled;
+	}
 
-	void setDisplayEnabled(bool);
+	inline void setDisplayPeriod(unsigned int period) {
+		displayPeriod = period;
+	}
 
-	bool getDisplayEnabled();
+	inline unsigned int getDisplayPeriod() {
+		return displayPeriod;
+	}
 
-	void setDisplayPeriod(unsigned int);
+	inline void setFileCheckpointsEnabled(bool enabled) {
+		fileCheckpointsEnabled = enabled;
+	}
 
-	unsigned int getDisplayPeriod();
+	inline bool getFileCheckpointsEnabled() {
+		return fileCheckpointsEnabled;
+	}
 
-	void setFileCheckpointsEnabled(bool);
+	inline void setCheckpointPeriod(unsigned int period) {
+		checkpointPeriod = period;
+	}
 
-	bool getFileCheckpointsEnabled();
+	inline unsigned int getCheckpointPeriod() {
+		return checkpointPeriod;
+	}
 
-	void setCheckpointPeriod(unsigned int);
+	inline void setWaitPeriod(unsigned long period) {
+		waitPeriod = period;
+	}
 
-	unsigned int getCheckpointPeriod();
+	inline unsigned long getWaitPeriod() {
+		return waitPeriod;
+	}
 
-	void setWaitPeriod(unsigned long);
+	inline void setCheckpointLocation(string path) {
+		checkpointLocation = path;
+	}
 
-	unsigned long getWaitPeriod();
+	inline string getCheckpointLocation() {
+		return checkpointLocation;
+	}
 
-	void setCheckpointLocation(string);
+	inline void setCrossoverEnabled(bool enabled) {
+		geneticCrossoverEnabled = enabled;
+		if (geneticCrossoverEnabled) {
+			MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+			MPI_Comm_size(MPI_COMM_WORLD, &size);
+		}
+	}
 
-	string getCheckpointLocation();
-
-	void setCrossoverEnabled(bool);
-
-	void setCrossoverPeriod(unsigned int);
+	inline void setCrossoverPeriod(unsigned int period) {
+		geneticCrossoverPeriod = period;
+	}
 
 	inline vector<Ant> &getAnts() {
 		return ants;

@@ -18,15 +18,17 @@ int main(int argc, char *argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 
 
-	AntWorld antWorld(50, 50);
-	antWorld.setDisplayPeriod(201);
+	AntWorld antWorld(50, 50, true);
+	antWorld.setDisplayPeriod(101);
 	antWorld.setCheckpointPeriod(10000);
 	antWorld.setWaitPeriod(1);
 	antWorld.setMutationPeriod(100);
 	antWorld.setMutationEnabled(true);
+	antWorld.setCrossoverEnabled(true);
+	antWorld.setCrossoverPeriod(1000);
 	antWorld.setCheckpointLocation(string("./checkpoints") + to_string(rank));
 
-	antWorld.loadFromFile(150000);
+	antWorld.loadFromFile(1210000);
 
 	while (antWorld.isRunning()) {
 

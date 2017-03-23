@@ -188,6 +188,10 @@ public:
 
 	static void realizeAntsAction(vector<Ant> &, Environment &);
 
+	static void realizeAntAttacks(vector<Ant> &, Environment &);
+
+	static void haveAntsDieOfInjury(vector<Ant> &, Environment &);
+
 	void pullOutNewborn(Environment &, Ant &);
 
 	void mutate();
@@ -201,14 +205,24 @@ public:
 	Coordinate getGlobalCoordinate();
 
 	inline Energy getActionCost(Agent::Action action) const {
+		float energyScaleFactor;
+		switch (action) {
+			case FORWARD:
+				energyScaleFactor = 10.f;
+				break;
+			default:
+				energyScaleFactor = 2.f;
+				break;
+		}
 //	return actionCost[action];
 		return (Energy) (actionCost[action] *
 						 (
 								 (
-										 1.f + 2.f * ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))
+										 1.f + energyScaleFactor *
+											   ((float) getTotalEnergy() / getMaxPerceptValue(percept::ENERGY))
 								 ) *
 								 (
-										 1.f + 10000000.f * ((float) age / ((unsigned int) -1))
+										 1.f + 1000000.f * ((float) age / ((unsigned int) -1))
 								 )
 						 ));
 	}

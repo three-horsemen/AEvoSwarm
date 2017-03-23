@@ -5,9 +5,9 @@
 #include <agent/Ant.hpp>
 
 //								FORWARD LEFT RIGHT EAT ATTACK FORTIFY MATURE GROW_BABY GIVE_BIRTH DIE
-vector<Energy> Ant::actionCost = {5, 4, 4, 4, 20, 15, 25, 5, 5, 0};
+vector<Energy> Ant::actionCost = {10, 2, 2, 1, 6, 5, 12, 1, 5, 0};
 const short Ant::actionCount = (const short) Ant::actionCost.size();
-const Energy Ant::NEWBORN_MIN_POTENTIAL = (const Energy) (actionCost[FORWARD] * 100);
+const Energy Ant::NEWBORN_MIN_POTENTIAL = 400;
 const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD + NEWBORN_MIN_FERTILITY;
 
 Ant::Ant() :
@@ -349,18 +349,17 @@ Agent::Action Ant::getSelectedAction() const {
 }
 
 void Ant::setSelectedAction(Agent::Action action, bool overrideDeath) {
+	//TODO Remove unnecessary conditional check
 	if ((selectedAction != (Agent::Action) Ant::DIE) || overrideDeath)
 		selectedAction = action;
 }
 
 void Ant::performAction(Agent::Action agentAction) {
 	if (!isActionValid(agentAction)) throw invalid_argument("The provided action is invalid");
+
 	Action action = (Action) agentAction;
-
 	potential -= getActionCost(agentAction);
-
 	age++;
-
 	dissipateEnergy(getActionCost(agentAction));
 
 	switch (action) {
@@ -395,18 +394,13 @@ void Ant::performAction(Agent::Action agentAction) {
 			die();
 			break;
 		default:
-			//TODO Complete remaining actions
-//			throw invalid_argument("Undefined action selected to be performed");
-			break;
+			throw invalid_argument("Undefined action selected to be performed");
 	}
 }
 
 void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Environment &oldEnvironment,
 							Environment &newEnvironment) {
 	assert(indexOfAnt < ants.size());
-
-	//TODO Handle inter-ant social interactions, like ATTACK and BIRTH.
-
 //	Energy priorEnergy = oldEnvironment.getTotalEnergy();
 
 	//Special effect of GIVE_BIRTH
@@ -443,18 +437,42 @@ void Ant::eraseDeadAnts(vector<Ant> &ants) {
 			ants.erase(ants.begin() + i);
 			i--;
 		}
-
 }
 
 void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
+	realizeAntAttacks(ants, environment);
+	unsigned long initialAntCount = ants.size(); //This may change if ants are born, or if they die.
 	Environment environmentBackup(environment);
 	environment.clearCharacterGrid();
-	unsigned long currentAntCount = ants.size(); //This may change if ants are born, or if they die.
-	for (unsigned short i = 0; i < currentAntCount; i++) {
-//		environment.setTile((ants[i] << environment.getTile(ants[i].getGlobalCoordinate()), ants[i].getGlobalCoordinate());
+	for (unsigned short i = 0; i < initialAntCount; i++) {
 		affectEnvironment(ants, i, environmentBackup, environment);
 	}
+	haveAntsDieOfInjury(ants, environment);
 	eraseDeadAnts(ants);
+}
+
+void Ant::realizeAntAttacks(vector<Ant> &ants, Environment &environment) {
+	vector<Coordinate> attackTargets;
+	for (unsigned short i = 0; i < ants.size(); i++) {
+		if ((Ant::Action) ants[i].getSelectedAction() == Ant::ATTACK) {
+			attackTargets.push_back(ants[i].getGlobalCoordinate(environment, adjacency::AHEAD));
+		}
+	}
+	for (unsigned short i = 0; i < attackTargets.size(); i++) {
+		for (unsigned short j = 0; j < ants.size(); j++) {
+			if (ants[j].getGlobalCoordinate() == attackTargets[i]
+				&& ants[j].getShield() > 0)    //Simple optimization
+				ants[j].beAttacked(ants[j].MAX_DAMAGE);
+		}
+	}
+}
+
+void Ant::haveAntsDieOfInjury(vector<Ant> &ants, Environment &environment) {
+	for (unsigned short j = 0; j < ants.size(); j++) {
+		if (!ants[j].getCharacter().getOccupancy() == OCCUPANCY_DEAD && ants[j].getShield() == 0) {
+			ants[j].die();
+		}
+	}
 }
 
 void Ant::pullOutNewborn(Environment &environment, Ant &newBorn) {
@@ -496,7 +514,7 @@ void Ant::mutate() {
 
 void Ant::developBrain() {
 	const short inputSize = senseCount + memoryCount + 1;
-//	const short fC1Size = (senseCount + memoryCount) * 9 / 10;
+	const short fC1Size = (senseCount + memoryCount) + 1;
 //	const short fC2Size = (senseCount + memoryCount) * 81 / 100;
 	const short outputSize = actionCount + memoryCount;
 
@@ -507,15 +525,15 @@ void Ant::developBrain() {
 	InputLayer inputLayer(inputSize);
 	brain.addLayer((Layer &) inputLayer);
 
-	vector<vector<weight>> weights1((unsigned long) outputSize, vector<weight>((unsigned long) inputSize));
+	vector<vector<weight>> weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
 	Neuron::randomizeWeights(weights1);
 	FullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
-//	vector<vector<weight>> weights2((unsigned long) fC2Size, vector<weight>((unsigned long) fC1Size));
-//	Neuron::randomizeWeights(weights2);
-//	FullyConnectedLayer fullyConnectedLayer2(weights2);
-//	brain.addLayer((Layer &) fullyConnectedLayer2);
+	vector<vector<weight>> weights2((unsigned long) outputSize, vector<weight>((unsigned long) fC1Size));
+	Neuron::randomizeWeights(weights2);
+	FullyConnectedLayer fullyConnectedLayer2(weights2);
+	brain.addLayer((Layer &) fullyConnectedLayer2);
 //
 //	vector<vector<weight>> weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));
 //	Neuron::randomizeWeights(weights3);
@@ -667,13 +685,6 @@ void Ant::beAttacked(Energy damage) {
 	setShield(getShield() - damage);
 
 	dissipateEnergy(damage);
-
-	assert(getShield() >= 0);
-
-	if (getShield() == 0) {
-		die();
-	}
-
 }
 
 void Ant::fortify() {

@@ -24,6 +24,9 @@ class AntWorld {
 
 	int rank, size;
 
+	int key;
+	unsigned long selectedAnt;
+
 	string checkpointLocation;
 
 	unsigned long long iteration;

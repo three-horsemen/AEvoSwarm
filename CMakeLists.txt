@@ -138,7 +138,7 @@ add_executable(
 )
 target_link_libraries(
 		unit_test_ant_action
-		ui
+		ant_world
 )
 
 add_executable(

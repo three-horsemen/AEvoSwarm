@@ -5,7 +5,7 @@
 #include <agent/Ant.hpp>
 
 //								FORWARD LEFT RIGHT EAT ATTACK FORTIFY MATURE GROW_BABY GIVE_BIRTH DIE
-vector<Energy> Ant::actionCost = {10, 2, 2, 1, 6, 5, 12, 1, 5, 0};
+vector<Energy> Ant::actionCost = {10, 2, 2, 1, 6, 5, 12, 1, 1, 0};
 const short Ant::actionCount = (const short) Ant::actionCost.size();
 const Energy Ant::NEWBORN_MIN_POTENTIAL = 400;
 const Energy Ant::NEWBORN_MIN_TOTAL_ENERGY = NEWBORN_MIN_POTENTIAL + NEWBORN_MIN_SHIELD + NEWBORN_MIN_FERTILITY;

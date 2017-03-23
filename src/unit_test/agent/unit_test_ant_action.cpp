@@ -2,45 +2,33 @@
 // Created by reuben on 5/3/17.
 //
 
-#include <vector>
-
-#include <ui/AsciiEnvironment.hpp>
-#include <agent/Ant.hpp>
+#include <ant_world/AntWorld.hpp>
 
 int main(int argc, char *argv[]) {
-	srand((unsigned int) time(NULL));
+	AntWorld antWorld(15, 15);
+	antWorld.setMinimumPopulation(15);
+	antWorld.setDisplayPeriod(1);
+	antWorld.setCheckpointPeriod(10000);
+	antWorld.setWaitPeriod(5000);
+	antWorld.setMutationEnabled(true);
+	antWorld.setMutationPeriod(100);
+	antWorld.setCrossoverEnabled(false);
+	antWorld.setCheckpointLocation("./checkpoints");
 
-	Coordinate randomCoordinate(5, 2);
-
-	vector<Ant> ants(1);
-
-	ants[0].randomize();
-	Environment environment(10, 10);
-	environment.randomize();
-
-	for (int i = 0; i < environment.width; i++) {
-		for (int j = 0; j < environment.height; j++) {
-			if (randomCoordinate == Coordinate(i, j)) {
-				Ant::placeInEnvironment(ants[0], environment, Coordinate(i, j));
-			}
-		}
+	try {
+//		antWorld.loadFromFile(20000);
+	} catch (runtime_error &e) {
+		cout << e.what() << endl;
+		return 0;
 	}
 
-	Ant::Action selectedAction;
-	do {
-		cout << "Total energy present on the random environment: " << environment.getTotalEnergy() << endl;
-		AsciiEnvironment::displayAsciiEnvironment(environment);
-
-		ants[0].observeEnvironment(environment);
-		ants[0].senseObservation(environment);
-		ants[0].selectAction();
-		selectedAction = (Ant::Action) ants[0].getSelectedAction();
-		ants[0].performAction((Agent::Action) selectedAction);
-
-
-		Ant::realizeAntsAction(ants, environment);
-
-	} while (selectedAction != Ant::Action::DIE);//TODO Change this condition when there are multiple ants
+	while (antWorld.isRunning()) {
+		antWorld.maintainMinimumPopulation();
+		antWorld.performIteration();
+		antWorld.displayPeriodically();
+		antWorld.checkpointPeriodically();
+		antWorld.waitOnePeriod();
+	}
 	return 0;
 }
 

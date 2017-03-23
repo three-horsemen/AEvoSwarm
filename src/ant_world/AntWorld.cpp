@@ -30,7 +30,9 @@ AntWorld::AntWorld(int width, int height, bool geneticCrossoverEnabled) : enviro
 	mutationEnabled = false;
 	minimumPopulationEnabled = displayEnabled = fileCheckpointsEnabled = _isRunning = true;
 
+	key = -1;
 	waitPeriod = 250;
+	selectedAnt = 0;
 	deficit = 0;
 	previousWaitStartTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::system_clock::now().time_since_epoch()
@@ -64,13 +66,79 @@ bool AntWorld::performIteration() {
 bool AntWorld::performRegularIteration() {
 	Energy priorEnergy = environment.getTotalEnergy();
 
+	switch (key) {
+		case '[':
+			if (selectedAnt > 0)
+				selectedAnt--;
+			cout << "Selected ant: " << selectedAnt << endl;
+			break;
+		case ']':
+			if (selectedAnt < ants.size() - 1)
+				selectedAnt++;
+			cout << "Selected ant: " << selectedAnt << endl;
+			break;
+		default:
+			cout << "Ignoring keypress '" << key << "'\n";
+			break;
+	}
+
 	unsigned long long antCount = ants.size();
 	for (unsigned long long j = 0; j < antCount; j++) {
 
 		ants[j].observeEnvironment(environment);
 		ants[j].senseObservation(environment);
-		ants[j].selectAction();
-		ants[j].performAction((Agent::Action) ((Ant::Action) ants[j].getSelectedAction()));
+
+		int key = this->key;
+		if (selectedAnt == j) {
+			Ant::Action selectedAction = (Ant::Action) -1;
+			do {
+				switch (key) {
+					case 'w':
+						selectedAction = Ant::FORWARD;
+						break;
+					case 97:
+						selectedAction = Ant::LEFT;
+						break;
+					case 'd':
+						selectedAction = Ant::RIGHT;
+						break;
+					case 'e':
+						selectedAction = Ant::EAT;
+						break;
+					case 'q':
+						selectedAction = Ant::ATTACK;
+						break;
+					case 'f':
+						selectedAction = Ant::FORTIFY;
+						break;
+					case 'm':
+						selectedAction = Ant::MATURE;
+						break;
+					case 'b':
+						selectedAction = Ant::GROW_BABY;
+						break;
+					case 'n':
+						selectedAction = Ant::GIVE_BIRTH;
+						break;
+					default:
+						cout << "Ignoring keypress '" << key << "'\n";
+						ants[j].selectAction();
+						selectedAction = (Ant::Action) ants[j].getSelectedAction();
+						break;
+				}
+				if (selectedAction != -1 && !ants[j].isActionValid((Agent::Action) selectedAction)) {
+					selectedAction = (Ant::Action) -1;
+				}
+				if (selectedAction == -1) {
+					key = waitKey(1);
+				}
+			} while (selectedAction == -1);
+			assert(ants[j].isActionValid((Agent::Action) selectedAction));
+			ants[j].setSelectedAction((Agent::Action) selectedAction);
+		} else {
+			ants[j].selectAction();
+		}
+		ants[j].performAction(ants[j].getSelectedAction());
 
 		if (mutationEnabled && iteration % mutationPeriod == 0) {
 			ants[j].mutate();
@@ -79,6 +147,9 @@ bool AntWorld::performRegularIteration() {
 	}
 
 	Ant::realizeAntsAction(ants, environment);
+
+	if (selectedAnt > ants.size() - 1)
+		selectedAnt = ants.size() - 1;
 
 	if (environment.getTotalEnergy() != priorEnergy) {
 //		AsciiEnvironment::displayEnergyDeltas(oldEnvironment.getEnvironment(), environment);
@@ -208,7 +279,8 @@ void AntWorld::loadFromFile(unsigned long long iteration) {
 }
 
 void AntWorld::waitOnePeriod() {
-	if (char(27) == waitKey((int) waitPeriod)) {
+	key = waitKey((int) waitPeriod);
+	if (char(27) == key) {
 		_isRunning = false;
 	}
 	previousWaitStartTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -224,7 +296,8 @@ void AntWorld::waitRemainingPeriod() {
 	deficit += waitPeriod - elapsed.count();
 
 	long remainingTime = std::min(waitPeriod, (unsigned long) std::max(deficit, (long) 1));
-	if (char(27) == waitKey((int) remainingTime)) {
+	key = waitKey((int) waitPeriod);
+	if (char(27) == key) {
 		_isRunning = false;
 	}
 	previousWaitStartTimestamp = waitStartTimestamp;

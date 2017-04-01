@@ -31,8 +31,11 @@ int main(int argc, char *argv[]) {
 	antWorld.loadFromFile(1210000);
 
 	while (antWorld.isRunning()) {
-
-		antWorld.maintainMinimumPopulation();
+		try {
+			antWorld.maintainMinimumPopulation();
+		} catch (Exception &e) {
+			cerr << e.what() << endl;
+		}
 		antWorld.performIteration();
 		antWorld.displayPeriodically();
 		antWorld.checkpointPeriodically();

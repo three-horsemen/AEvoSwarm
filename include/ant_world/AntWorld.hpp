@@ -68,6 +68,16 @@ public:
 
 	bool performGeneMixIteration(unsigned int, unsigned int);
 
+	void realizeAntsAction();
+
+	void realizeAntAttacks();
+
+	void affectEnvironment(unsigned short, Environment &);
+
+	void eraseDeadAnts();
+
+	void haveAntsDieOfInjury();
+
 	void maintainMinimumPopulation();
 
 	void displayPeriodically();
@@ -177,6 +187,21 @@ public:
 	inline Environment &getOldEnvironment() {
 		return environment;
 	}
+
+	void placeInEnvironment(Ant &, Coordinate);
+
+	void placeCharacterInEnvironment(Ant &, Coordinate);
+
+	void sparkLifeAt(Ant &);
+
+	bool sparkLifeWhereAvailable(Ant &);
+
+	void sparkNLives(unsigned int);
+
+	void save(ostream &);
+
+	bool load(istream &);
+
 };
 
 

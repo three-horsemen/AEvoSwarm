@@ -146,7 +146,7 @@ bool AntWorld::performRegularIteration() {
 
 	}
 
-	Ant::realizeAntsAction(ants, environment);
+	realizeAntsAction();
 
 	if (selectedAnt > ants.size() - 1)
 		selectedAnt = ants.size() - 1;
@@ -203,12 +203,12 @@ bool AntWorld::performGeneMixIteration(unsigned int sendCount, unsigned int size
 
 //	ifstream is("./checkpoints/tmp.ants", ios::binary);
 
-	Ant::realizeAntsAction(ants, environment);
+	realizeAntsAction();
 
 	for (unsigned int i = 0; i < sendCount * size; i++) {
 		Ant ant;
 		ant.loadWithCharacter(is);
-		Ant::sparkLifeWhereAvailable(environment, ants, ant);
+		sparkLifeWhereAvailable(ant);
 	}
 
 	if (environment.getTotalEnergy() != priorEnergy) {
@@ -221,9 +221,85 @@ bool AntWorld::performGeneMixIteration(unsigned int sendCount, unsigned int size
 	return true;
 }
 
+void AntWorld::realizeAntsAction() {
+	realizeAntAttacks();
+	unsigned long initialAntCount = ants.size(); //This may change if ants are born, or if they die.
+	Environment environmentBackup(environment);
+	environment.clearCharacterGrid();
+	for (unsigned short i = 0; i < initialAntCount; i++) {
+		affectEnvironment(i, environmentBackup);
+	}
+	haveAntsDieOfInjury();
+	eraseDeadAnts();
+}
+
+void AntWorld::realizeAntAttacks() {
+	vector<Coordinate> attackTargets;
+	for (unsigned short i = 0; i < ants.size(); i++) {
+		if ((Ant::Action) ants[i].getSelectedAction() == Ant::ATTACK) {
+			attackTargets.push_back(ants[i].getGlobalCoordinate(environment, adjacency::AHEAD));
+		}
+	}
+	for (unsigned short i = 0; i < attackTargets.size(); i++) {
+		for (unsigned short j = 0; j < ants.size(); j++) {
+			if (ants[j].getGlobalCoordinate() == attackTargets[i]
+				&& ants[j].getShield() > 0)    //Simple optimization
+				ants[j].beAttacked(ants[j].MAX_DAMAGE);
+		}
+	}
+}
+
+void AntWorld::affectEnvironment(unsigned short indexOfAnt, Environment &oldEnvironment) {
+	assert(indexOfAnt < ants.size());
+//	Energy priorEnergy = oldEnvironment.getTotalEnergy();
+
+	//Special effect of GIVE_BIRTH
+	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
+		Ant newborn;
+		ants[indexOfAnt].pullOutNewborn(environment, newborn);
+//		cout << "Newborn pulled out at (" << newborn.getGlobalCoordinate().getX() << ","
+//			 << newborn.getGlobalCoordinate().getY() << ") with " << newborn.getTotalEnergy() << " energy\n";
+		placeInEnvironment(newborn, newborn.getGlobalCoordinate());
+		ants.push_back(newborn);
+	}
+
+	placeCharacterInEnvironment(ants[indexOfAnt], ants[indexOfAnt].getGlobalCoordinate());
+	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
+
+	//Right now this is just updating the perceived energy changes.
+	for (int x = 0; x < ants[indexOfAnt].getPerceptiveField()->width; x++) {
+		for (int y = 0; y < ants[indexOfAnt].getPerceptiveField()->height; y++) {
+			Tile perceptiveTile = ants[indexOfAnt].getPerceptiveField()->getTile(Coordinate(x, y));
+			Tile globalTile = environment.getTile(perceptiveTile.getGlobalCoordinate());
+			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - oldEnvironment.getTile(
+					perceptiveTile.getGlobalCoordinate()).getTotalEnergy();
+			if (differentialEnergyValue) {
+				globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
+				environment.setTile(globalTile, globalTile.getGlobalCoordinate());
+			}
+		}
+	}
+}
+
+void AntWorld::eraseDeadAnts() {
+	for (int i = 0; i < ants.size(); i++)
+		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0)) {
+			ants.erase(ants.begin() + i);
+			i--;
+		}
+}
+
+void AntWorld::haveAntsDieOfInjury() {
+	for (unsigned short j = 0; j < ants.size(); j++) {
+		if (!ants[j].getCharacter().getOccupancy() == OCCUPANCY_DEAD && ants[j].getShield() == 0) {
+			ants[j].die();
+		}
+	}
+}
+
 void AntWorld::maintainMinimumPopulation() {
 	if (minimumPopulationEnabled && ants.size() < minimumPopulation) {
-		Ant::sparkNLives(environment, ants, (unsigned int) (minimumPopulation - ants.size()));
+		sparkNLives((unsigned int) (minimumPopulation - ants.size()));
 	}
 }
 
@@ -249,7 +325,7 @@ void AntWorld::saveToFile() {
 	string antFilePath = checkpointLocation + "/" + to_string(iteration) + ".ants";
 	cout << "Saving to file " << antFilePath << endl;
 	ofstream antFile(antFilePath, ios_base::out | ios_base::binary);
-	Ant::save(antFile, ants);
+	save(antFile);
 	antFile.close();
 }
 
@@ -269,11 +345,11 @@ void AntWorld::loadFromFile(unsigned long long iteration) {
 
 		if (!environment.load(environmentFile))
 			throw runtime_error("Error loading the environment");
-		if (!Ant::load(antFile, environment, ants))
+		if (!load(antFile))
 			throw runtime_error("Error loading the ants");
 		this->iteration = iteration;
 	} catch (exception &e) {
-		cout << e.what() << endl;
+		cerr << e.what() << endl;
 		throw e;
 	}
 }
@@ -301,4 +377,114 @@ void AntWorld::waitRemainingPeriod() {
 		_isRunning = false;
 	}
 	previousWaitStartTimestamp = waitStartTimestamp;
+}
+
+void AntWorld::placeInEnvironment(Ant &ant, Coordinate coordinate) {
+	environment.setTile(
+			(ant >> environment.getTile(coordinate)),
+			coordinate
+	);
+}
+
+void AntWorld::placeCharacterInEnvironment(Ant &ant, Coordinate coordinate) {
+	environment.setTile(
+			(ant >= environment.getTile(coordinate)),
+			coordinate
+	);
+}
+
+void AntWorld::sparkLifeAt(Ant &ant) {
+	Tile tile = environment.getTile(ant.getGlobalCoordinate());
+	if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+		&& tile.getTotalEnergy() >= ant.getTotalEnergy()
+		&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+			) {
+
+		placeCharacterInEnvironment(ant, ant.getGlobalCoordinate());
+
+		ants.push_back(ant);
+//		cout << "Sparked ant at " << ant.getGlobalCoordinate().toString() << " with " << ant.getTotalEnergy() << " energy\n";
+	} else {
+		throw invalid_argument("Cannot spark life at " + ant.getGlobalCoordinate().toString());
+	}
+}
+
+bool AntWorld::sparkLifeWhereAvailable(Ant &ant) {
+	int randXOffset = rand() % environment.width;
+	int randYOffset = rand() % environment.height;
+	for (int x = 0; x < environment.width; x++) {
+		for (int y = 0; y < environment.height; y++) {
+			int X = (x + randXOffset) % environment.width;
+			int Y = (y + randYOffset) % environment.height;
+
+			Tile tile = environment.getTile(Coordinate(X, Y));
+			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+				&& tile.getTotalEnergy() >= ant.getTotalEnergy()
+				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+					) {
+				ant.setGlobalCoordinate(Coordinate(X, Y));
+				AntWorld::sparkLifeAt(ant);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void AntWorld::sparkNLives(unsigned int count) {
+	Ant ant;
+
+	int randXOffset = rand() % environment.width;
+	int randYOffset = rand() % environment.height;
+	for (int x = 0; x < environment.width && count > 0; x++) {
+		for (int y = 0; y < environment.height && count > 0; y++) {
+			int X = (x + randXOffset) % environment.width;
+			int Y = (y + randYOffset) % environment.height;
+
+			Tile tile = environment.getTile(Coordinate(X, Y));
+			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
+				&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
+				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
+					) {
+				ant.randomize();
+				ant.setPotential(0);
+				ant.setPushedFetalEnergy(0);
+				ant.setFertility(Ant::NEWBORN_MIN_FERTILITY);
+				ant.setFetal(0);
+				ant.setShield(Ant::NEWBORN_MIN_SHIELD);
+				ant.setPotential(tile.getTotalEnergy() - ant.getTotalEnergy());
+				ant.setGlobalCoordinate(Coordinate(X, Y));
+				AntWorld::sparkLifeAt(ant);
+				count--;
+			}
+		}
+	}
+	if (count > 0) {
+		throw runtime_error(std::string("Not enough energy to spark remaining ") + to_string(count) + " ants");
+	}
+}
+
+void AntWorld::save(ostream &file) {
+	file <= ants.size();
+	for (unsigned long i = 0; i < ants.size(); i++) {
+		ants[i].save(file);
+	}
+}
+
+bool AntWorld::load(istream &file) {
+	try {
+		ants.clear();
+		unsigned long int size;
+		file >= size;
+//		while(file>>size)	cout<<size<<endl;
+		for (int i = 0; i < size; i++) {
+			Ant ant;
+			ant.load(file, environment);
+			ants.push_back(ant);
+		}
+		return true;
+	} catch (exception &e) {
+		cerr << e.what();
+		return false;
+	}
 }

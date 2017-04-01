@@ -16,6 +16,19 @@
 
 using namespace std;
 
+namespace adjacency {
+	enum Adjacency {
+		UNDER,
+		AHEAD,
+		LEFT,
+		RIGHT,
+		BEHIND,
+		AHEAD_LEFT,
+		AHEAD_RIGHT
+	};
+	const short ADJACENCY_COUNT = 4;
+}
+
 class Environment {
 protected:
 	short _width, _height;
@@ -32,6 +45,10 @@ public:
 	Tile getTile(Coordinate) const;
 
 	void setTile(Tile, Coordinate);
+
+	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
+
+	Coordinate getGlobalCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
 
 	Energy getTotalEnergy();
 

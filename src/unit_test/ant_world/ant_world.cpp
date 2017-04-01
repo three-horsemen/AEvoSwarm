@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 	antWorld.setMinimumPopulation(40);
 	antWorld.setDisplayPeriod(1);
 	antWorld.setCheckpointPeriod(10000);
-	antWorld.setWaitPeriod(1000);
+	antWorld.setWaitPeriod(1);
 	antWorld.setMutationEnabled(true);
 	antWorld.setMutationPeriod(100);
 	antWorld.setCrossoverEnabled(false);
@@ -18,12 +18,16 @@ int main(int argc, char *argv[]) {
 	try {
 //		antWorld.loadFromFile(70000);
 	} catch (runtime_error &e) {
-		cout << e.what() << endl;
+		cerr << e.what() << endl;
 		return 0;
 	}
 
 	while (antWorld.isRunning()) {
-		antWorld.maintainMinimumPopulation();
+		try {
+			antWorld.maintainMinimumPopulation();
+		} catch (Exception &e) {
+			cerr << e.what() << endl;
+		}
 		antWorld.performIteration();
 		antWorld.displayPeriodically();
 		antWorld.checkpointPeriodically();

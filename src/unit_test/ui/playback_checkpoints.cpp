@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 			antWorld.waitRemainingPeriod();
 		}
 	} catch (exception &e) {
-		cout << e.what() << endl;
+		cerr << e.what() << endl;
 	}
 	return 0;
 }

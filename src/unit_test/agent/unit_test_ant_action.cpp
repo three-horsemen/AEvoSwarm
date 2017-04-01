@@ -18,12 +18,16 @@ int main(int argc, char *argv[]) {
 	try {
 //		antWorld.loadFromFile(20000);
 	} catch (runtime_error &e) {
-		cout << e.what() << endl;
+		cerr << e.what() << endl;
 		return 0;
 	}
 
 	while (antWorld.isRunning()) {
-		antWorld.maintainMinimumPopulation();
+		try {
+			antWorld.maintainMinimumPopulation();
+		} catch (Exception &e) {
+			cerr << e.what() << endl;
+		}
 		antWorld.performIteration();
 		antWorld.displayPeriodically();
 		antWorld.checkpointPeriodically();

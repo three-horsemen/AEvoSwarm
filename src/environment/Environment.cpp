@@ -46,6 +46,131 @@ void Environment::setTile(Tile newTile, Coordinate newCoordinate) {
 	tiles[newCoordinate.getY()][newCoordinate.getX()] = newTile;
 }
 
+Coordinate Environment::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjacency::Adjacency adjacency) {
+	if (adjacency == adjacency::UNDER)
+		return coordinate;
+	int x = coordinate.getX(), y = coordinate.getY();
+	switch (occupancy) {
+		case OCCUPANCY_NORTH:
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					y--;
+					break;
+				case adjacency::BEHIND:
+					y++;
+					break;
+				case adjacency::LEFT:
+					x--;
+					break;
+				case adjacency::RIGHT:
+					x++;
+					break;
+				case adjacency::AHEAD_LEFT:
+					y--;
+					x--;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					y--;
+					x++;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
+			break;
+		case OCCUPANCY_SOUTH:
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					y++;
+					break;
+				case adjacency::BEHIND:
+					y--;
+					break;
+				case adjacency::LEFT:
+					x++;
+					break;
+				case adjacency::RIGHT:
+					x--;
+					break;
+				case adjacency::AHEAD_LEFT:
+					y++;
+					x++;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					y++;
+					x--;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
+			break;
+		case OCCUPANCY_EAST:
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					x++;
+					break;
+				case adjacency::BEHIND:
+					x--;
+					break;
+				case adjacency::LEFT:
+					y--;
+					break;
+				case adjacency::RIGHT:
+					y++;
+					break;
+				case adjacency::AHEAD_LEFT:
+					x++;
+					y--;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					x++;
+					y++;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
+			break;
+		case OCCUPANCY_WEST:
+			switch (adjacency) {
+				case adjacency::AHEAD:
+					x--;
+					break;
+				case adjacency::BEHIND:
+					x++;
+					break;
+				case adjacency::LEFT:
+					y++;
+					break;
+				case adjacency::RIGHT:
+					y--;
+					break;
+				case adjacency::AHEAD_LEFT:
+					x--;
+					y++;
+					break;
+				case adjacency::AHEAD_RIGHT:
+					x--;
+					y--;
+					break;
+				default:
+					throw invalid_argument("Unknown adjacency");
+			}
+			break;
+		default:
+			throw invalid_argument("Unknown occupancy specified");
+	}
+	return Coordinate(x, y);
+}
+
+Coordinate Environment::getGlobalCoordinate(Coordinate coordinate, Occupancy occupancy,
+											adjacency::Adjacency adjacency) {
+	Coordinate potentialOutOfBoundsCoordinate = Environment::getCoordinate(coordinate, occupancy, adjacency);
+	int x = potentialOutOfBoundsCoordinate.getX();
+	int y = potentialOutOfBoundsCoordinate.getY();
+	potentialOutOfBoundsCoordinate.setX(Utils::modulo(x, width));
+	potentialOutOfBoundsCoordinate.setY(Utils::modulo(y, height));
+	return potentialOutOfBoundsCoordinate;
+}
+
 Energy Environment::getTotalEnergy() {
 	Energy totalEnergy = 0;
 	for (int i = 0; i < width; i++) {
@@ -122,7 +247,7 @@ bool Environment::load(istream &file) {
 		}
 		return true;
 	} catch (exception &e) {
-		cout << e.what() << endl;
+		cerr << e.what() << endl;
 		return false;
 	}
 }

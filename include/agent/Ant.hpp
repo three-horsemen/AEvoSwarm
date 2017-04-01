@@ -38,18 +38,6 @@ namespace ant {
 		};
 		const short PERCEPT_COUNT = 3;
 	}
-	namespace adjacency {
-		enum Adjacency {
-			UNDER,
-			AHEAD,
-			LEFT,
-			RIGHT,
-			BEHIND,
-			AHEAD_LEFT,
-			AHEAD_RIGHT
-		};
-		const short ADJACENCY_COUNT = 4;
-	}
 }
 using namespace ant;
 
@@ -91,8 +79,6 @@ protected:
 
 	Energy pushedFetalEnergy;
 
-	static Coordinate getCoordinate(Coordinate, Occupancy, adjacency::Adjacency);
-
 	Coordinate getLocalCoordinate(Occupancy, adjacency::Adjacency);
 
 	Coordinate getLocalCoordinate(adjacency::Adjacency);
@@ -111,8 +97,6 @@ protected:
 
 	void attack();
 
-	void beAttacked(Energy);
-
 	void fortify();
 
 	void mature();
@@ -120,20 +104,6 @@ protected:
 	void growBaby();
 
 	void pushOutNewborn();
-
-	void die();
-
-	Tile operator<<(Tile);
-
-	Tile operator>>(Tile);
-
-	Tile operator>=(Tile);
-
-	Tile operator<=(Tile);
-
-	Tile operator>(Tile);
-
-	Tile operator<(Tile);
 
 public:
 	static vector<Energy> actionCost;
@@ -182,21 +152,13 @@ public:
 
 	void performAction(Agent::Action);
 
-	static void affectEnvironment(vector<Ant> &, unsigned short, Environment &, Environment &);
-
-	static void eraseDeadAnts(vector<Ant> &);
-
-	static void realizeAntsAction(vector<Ant> &, Environment &);
-
-	static void realizeAntAttacks(vector<Ant> &, Environment &);
-
-	static void haveAntsDieOfInjury(vector<Ant> &, Environment &);
-
 	void pullOutNewborn(Environment &, Ant &);
 
-	void mutate();
+	void beAttacked(Energy);
 
-	static Coordinate getGlobalCoordinate(Environment &, Coordinate, Occupancy, adjacency::Adjacency);
+	void die();
+
+	void mutate();
 
 	Coordinate getGlobalCoordinate(Environment &, Occupancy, adjacency::Adjacency);
 
@@ -295,11 +257,19 @@ public:
 
 	void dissipateEnergy(Energy);
 
+	Tile operator<<(Tile);
+
+	Tile operator>>(Tile);
+
+	Tile operator>=(Tile);
+
+	Tile operator<=(Tile);
+
+	Tile operator>(Tile);
+
+	Tile operator<(Tile);
+
 	void randomize();
-
-	static void placeInEnvironment(Ant &, Environment &, Coordinate);
-
-	static void placeCharacterInEnvironment(Ant &, Environment &, Coordinate);
 
 	int calculateDistance(Coordinate, Coordinate);
 
@@ -337,16 +307,6 @@ public:
 	excitation getEnergyExcitation(Energy energy, Energy maxEnergy) {
 		return (excitation) (log(energy + 1) / log(maxEnergy + 1)) - 1;
 	}
-
-	static void sparkLifeAt(Environment &, vector<Ant> &, Ant &);
-
-	static bool sparkLifeWhereAvailable(Environment &, vector<Ant> &, Ant &);
-
-	static void sparkNLives(Environment &, vector<Ant> &, unsigned int);
-
-	static void save(ostream &, vector<Ant> &);
-
-	static bool load(istream &, Environment &, vector<Ant> &);
 
 	void save(ostream &);
 

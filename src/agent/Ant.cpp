@@ -47,156 +47,44 @@ Ant::~Ant() {
 	resorbBrain();
 }
 
-Coordinate Ant::getCoordinate(Coordinate coordinate, Occupancy occupancy, adjacency::Adjacency adjacency) {
-	if (adjacency == adjacency::UNDER)
-		return coordinate;
-	int x = coordinate.getX(), y = coordinate.getY();
-	switch (occupancy) {
-		case OCCUPANCY_NORTH:
-			switch (adjacency) {
-				case adjacency::AHEAD:
-					y--;
-					break;
-				case adjacency::BEHIND:
-					y++;
-					break;
-				case adjacency::LEFT:
-					x--;
-					break;
-				case adjacency::RIGHT:
-					x++;
-					break;
-				case adjacency::AHEAD_LEFT:
-					y--;
-					x--;
-					break;
-				case adjacency::AHEAD_RIGHT:
-					y--;
-					x++;
-					break;
-				default:
-					throw invalid_argument("Unknown adjacency");
-			}
-			break;
-		case OCCUPANCY_SOUTH:
-			switch (adjacency) {
-				case adjacency::AHEAD:
-					y++;
-					break;
-				case adjacency::BEHIND:
-					y--;
-					break;
-				case adjacency::LEFT:
-					x++;
-					break;
-				case adjacency::RIGHT:
-					x--;
-					break;
-				case adjacency::AHEAD_LEFT:
-					y++;
-					x++;
-					break;
-				case adjacency::AHEAD_RIGHT:
-					y++;
-					x--;
-					break;
-				default:
-					throw invalid_argument("Unknown adjacency");
-			}
-			break;
-		case OCCUPANCY_EAST:
-			switch (adjacency) {
-				case adjacency::AHEAD:
-					x++;
-					break;
-				case adjacency::BEHIND:
-					x--;
-					break;
-				case adjacency::LEFT:
-					y--;
-					break;
-				case adjacency::RIGHT:
-					y++;
-					break;
-				case adjacency::AHEAD_LEFT:
-					x++;
-					y--;
-					break;
-				case adjacency::AHEAD_RIGHT:
-					x++;
-					y++;
-					break;
-				default:
-					throw invalid_argument("Unknown adjacency");
-			}
-			break;
-		case OCCUPANCY_WEST:
-			switch (adjacency) {
-				case adjacency::AHEAD:
-					x--;
-					break;
-				case adjacency::BEHIND:
-					x++;
-					break;
-				case adjacency::LEFT:
-					y++;
-					break;
-				case adjacency::RIGHT:
-					y--;
-					break;
-				case adjacency::AHEAD_LEFT:
-					x--;
-					y++;
-					break;
-				case adjacency::AHEAD_RIGHT:
-					x--;
-					y--;
-					break;
-				default:
-					throw invalid_argument("Unknown adjacency");
-			}
-			break;
-		default:
-			throw invalid_argument("Unknown occupancy specified");
-	}
-	return Coordinate(x, y);
-}
-
 Coordinate Ant::getLocalCoordinate(Occupancy occupancy, adjacency::Adjacency adjacency) {
-	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), occupancy, adjacency);
+	return Environment::getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), occupancy,
+									  adjacency);
 }
 
 Coordinate Ant::getLocalCoordinate(adjacency::Adjacency adjacency) {
-	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), character.getOccupancy(),
-						 adjacency);
+	return Environment::getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2),
+									  character.getOccupancy(),
+									  adjacency);
 }
 
 Coordinate Ant::getLocalCoordinate() {
-	return getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2), character.getOccupancy(),
-						 adjacency::UNDER);
+	return Environment::getCoordinate(Coordinate(perceptiveField.width / 2, perceptiveField.height / 2),
+									  character.getOccupancy(),
+									  adjacency::UNDER);
 }
 
 bool Ant::isInImpactRange(Environment &environment, Coordinate coordinate) {
 //TODO Look here for bug bounty.
 	for (int adjacent = adjacency::AHEAD;
 		 adjacent <= adjacency::RIGHT; adjacent++) {
-		Coordinate potentialPredatorCoordinate = getGlobalCoordinate(environment, coordinate,
-																	 (Occupancy) OCCUPANCY_NORTH,
-																	 (adjacency::Adjacency) adjacent);//TODO Optimization: Directly access north, south, east, west tiles
+		Coordinate potentialPredatorCoordinate = environment.getGlobalCoordinate(coordinate,
+																				 (Occupancy) OCCUPANCY_NORTH,
+																				 (adjacency::Adjacency) adjacent);//TODO Optimization: Directly access north, south, east, west tiles
 		if (environment
 					.getTile(potentialPredatorCoordinate)
 					.getAgentCharacter()
 					.getOccupancy() != OCCUPANCY_DEAD
-			&& (coordinate == getCoordinate(potentialPredatorCoordinate,
-											environment
+			&& (coordinate == Environment::getCoordinate(potentialPredatorCoordinate,
+														 environment
 													.getTile(potentialPredatorCoordinate)
 													.getAgentCharacter().getOccupancy(),
-											adjacency::AHEAD)
-				|| coordinate == getCoordinate(potentialPredatorCoordinate,
-											   environment
+														 adjacency::AHEAD)
+				|| coordinate == Environment::getCoordinate(potentialPredatorCoordinate,
+															environment
 													   .getTile(potentialPredatorCoordinate)
 													   .getAgentCharacter().getOccupancy(),
-											   adjacency::BEHIND)))
+															adjacency::BEHIND)))
 			return true;
 	}
 	return false;
@@ -230,19 +118,19 @@ bool Ant::isActionValid(Agent::Action agentAction) {
 				return false;
 			for (int adjacent = adjacency::AHEAD;
 				 adjacent <= adjacency::RIGHT; adjacent++) {
-				Coordinate potentialPredatorCoordinate = getCoordinate(coordinateAhead,
-																	   (Occupancy) getCharacter().getOccupancy(),
-																	   (adjacency::Adjacency) adjacent);
+				Coordinate potentialPredatorCoordinate = Environment::getCoordinate(coordinateAhead,
+																					(Occupancy) getCharacter().getOccupancy(),
+																					(adjacency::Adjacency) adjacent);
 				Tile potentialPredatorTile = perceptiveField.getTile(potentialPredatorCoordinate);
 
 				if (potentialPredatorCoordinate != getLocalCoordinate() //TODO This condition can be removed
 					&& potentialPredatorTile.getAgentCharacter().getOccupancy() != OCCUPANCY_DEAD
 					&& potentialPredatorTile.getTotalEnergy() >= this->getTotalEnergy()) {
 
-					if (coordinateAhead == getCoordinate(potentialPredatorCoordinate,
-														 potentialPredatorTile
+					if (coordinateAhead == Environment::getCoordinate(potentialPredatorCoordinate,
+																	  potentialPredatorTile
 																 .getAgentCharacter().getOccupancy(),
-														 adjacency::AHEAD))
+																	  adjacency::AHEAD))
 						return false;
 				}
 			}
@@ -398,83 +286,6 @@ void Ant::performAction(Agent::Action agentAction) {
 	}
 }
 
-void Ant::affectEnvironment(vector<Ant> &ants, unsigned short indexOfAnt, Environment &oldEnvironment,
-							Environment &newEnvironment) {
-	assert(indexOfAnt < ants.size());
-//	Energy priorEnergy = oldEnvironment.getTotalEnergy();
-
-	//Special effect of GIVE_BIRTH
-	if ((Ant::Action) ants[indexOfAnt].getSelectedAction() == Ant::GIVE_BIRTH) {
-		Ant newborn;
-		ants[indexOfAnt].pullOutNewborn(newEnvironment, newborn);
-//		cout << "Newborn pulled out at (" << newborn.getGlobalCoordinate().getX() << ","
-//			 << newborn.getGlobalCoordinate().getY() << ") with " << newborn.getTotalEnergy() << " energy\n";
-		placeInEnvironment(newborn, newEnvironment, newborn.getGlobalCoordinate());
-		ants.push_back(newborn);
-	}
-
-	placeCharacterInEnvironment(ants[indexOfAnt], newEnvironment, ants[indexOfAnt].getGlobalCoordinate());
-	//Dead ants aren't placed in the environment, but may still have energy distribution effects in the environment.
-
-	//Right now this is just updating the perceived energy changes.
-	for (int x = 0; x < ants[indexOfAnt].getPerceptiveField()->width; x++) {
-		for (int y = 0; y < ants[indexOfAnt].getPerceptiveField()->height; y++) {
-			Tile perceptiveTile = ants[indexOfAnt].getPerceptiveField()->getTile(Coordinate(x, y));
-			Tile globalTile = newEnvironment.getTile(perceptiveTile.getGlobalCoordinate());
-			signed int differentialEnergyValue = perceptiveTile.getTotalEnergy() - oldEnvironment.getTile(
-					perceptiveTile.getGlobalCoordinate()).getTotalEnergy();
-			if (differentialEnergyValue) {
-				globalTile.setTotalEnergy((Energy) (globalTile.getTotalEnergy() + differentialEnergyValue));
-				newEnvironment.setTile(globalTile, globalTile.getGlobalCoordinate());
-			}
-		}
-	}
-}
-
-void Ant::eraseDeadAnts(vector<Ant> &ants) {
-	for (int i = 0; i < ants.size(); i++)
-		if ((ants[i].getCharacter().getOccupancy() == OCCUPANCY_DEAD) || (ants[i].getShield() <= 0)) {
-			ants.erase(ants.begin() + i);
-			i--;
-		}
-}
-
-void Ant::realizeAntsAction(vector<Ant> &ants, Environment &environment) {
-	realizeAntAttacks(ants, environment);
-	unsigned long initialAntCount = ants.size(); //This may change if ants are born, or if they die.
-	Environment environmentBackup(environment);
-	environment.clearCharacterGrid();
-	for (unsigned short i = 0; i < initialAntCount; i++) {
-		affectEnvironment(ants, i, environmentBackup, environment);
-	}
-	haveAntsDieOfInjury(ants, environment);
-	eraseDeadAnts(ants);
-}
-
-void Ant::realizeAntAttacks(vector<Ant> &ants, Environment &environment) {
-	vector<Coordinate> attackTargets;
-	for (unsigned short i = 0; i < ants.size(); i++) {
-		if ((Ant::Action) ants[i].getSelectedAction() == Ant::ATTACK) {
-			attackTargets.push_back(ants[i].getGlobalCoordinate(environment, adjacency::AHEAD));
-		}
-	}
-	for (unsigned short i = 0; i < attackTargets.size(); i++) {
-		for (unsigned short j = 0; j < ants.size(); j++) {
-			if (ants[j].getGlobalCoordinate() == attackTargets[i]
-				&& ants[j].getShield() > 0)    //Simple optimization
-				ants[j].beAttacked(ants[j].MAX_DAMAGE);
-		}
-	}
-}
-
-void Ant::haveAntsDieOfInjury(vector<Ant> &ants, Environment &environment) {
-	for (unsigned short j = 0; j < ants.size(); j++) {
-		if (!ants[j].getCharacter().getOccupancy() == OCCUPANCY_DEAD && ants[j].getShield() == 0) {
-			ants[j].die();
-		}
-	}
-}
-
 void Ant::pullOutNewborn(Environment &environment, Ant &newBorn) {
 	if (pushedFetalEnergy < NEWBORN_MIN_TOTAL_ENERGY) {
 		throw runtime_error("Can only pull out one newborn after one birth");
@@ -495,6 +306,25 @@ void Ant::pullOutNewborn(Environment &environment, Ant &newBorn) {
 	setPushedFetalEnergy(0);
 
 	newBorn.mutate();
+}
+
+void Ant::beAttacked(Energy damage) {
+	damage = min(getShield(), damage);
+	setShield(getShield() - damage);
+
+	dissipateEnergy(damage);
+}
+
+void Ant::die() {
+	dissipateEnergy(getTotalEnergy());
+	setPotential(0);
+	setShield(0);
+	setFertility(0);
+	setFetal(0);
+
+	character.setOccupancy(OCCUPANCY_DEAD);
+	character.setAttitude(GROUND_ATTITUDE);
+	character.setTrait(GROUND_TRAIT);
 }
 
 void Ant::mutate() {
@@ -551,18 +381,8 @@ void Ant::resorbBrain() {
 	brain.resorb();
 }
 
-Coordinate Ant::getGlobalCoordinate(Environment &environment, Coordinate coordinate, Occupancy occupancy,
-									adjacency::Adjacency adjacency) {
-	Coordinate potentialOutOfBoundsCoordinate = getCoordinate(coordinate, occupancy, adjacency);
-	int x = potentialOutOfBoundsCoordinate.getX();
-	int y = potentialOutOfBoundsCoordinate.getY();
-	potentialOutOfBoundsCoordinate.setX(Utils::modulo(x, environment.width));
-	potentialOutOfBoundsCoordinate.setY(Utils::modulo(y, environment.height));
-	return potentialOutOfBoundsCoordinate;
-}
-
 Coordinate Ant::getGlobalCoordinate(Environment &environment, Occupancy occupancy, adjacency::Adjacency adjacency) {
-	Coordinate potentialOutOfBoundsCoordinate = getCoordinate(globalCoordinate, occupancy, adjacency);
+	Coordinate potentialOutOfBoundsCoordinate = Environment::getCoordinate(globalCoordinate, occupancy, adjacency);
 	int x = potentialOutOfBoundsCoordinate.getX();
 	int y = potentialOutOfBoundsCoordinate.getY();
 	potentialOutOfBoundsCoordinate.setX(Utils::modulo(x, environment.width));
@@ -576,64 +396,6 @@ Coordinate Ant::getGlobalCoordinate(Environment &environment, adjacency::Adjacen
 
 Coordinate Ant::getGlobalCoordinate() {
 	return globalCoordinate;
-}
-
-Tile Ant::operator<<(Tile tile) {
-	tile.setAgentCharacter(AgentCharacter());
-	tile.setTotalEnergy(tile.getTotalEnergy() - this->getTotalEnergy());
-	return tile;
-}
-
-Tile Ant::operator>>(Tile tile) {
-	tile.setAgentCharacter(character);
-	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
-	globalCoordinate = tile.getGlobalCoordinate();
-	return tile;
-}
-
-Tile Ant::operator<=(Tile tile) {
-	tile.setAgentCharacter(AgentCharacter());
-	return tile;
-}
-
-Tile Ant::operator>=(Tile tile) {
-	tile.setAgentCharacter(character);
-	globalCoordinate = tile.getGlobalCoordinate();
-	return tile;
-}
-
-Tile Ant::operator>(Tile tile) {
-	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy = OCCUPANCY_DEAD;
-	if (currentOccupancy == OCCUPANCY_NORTH)
-		newOccupancy = OCCUPANCY_EAST;
-	else if (currentOccupancy == OCCUPANCY_EAST)
-		newOccupancy = OCCUPANCY_SOUTH;
-	else if (currentOccupancy == OCCUPANCY_SOUTH)
-		newOccupancy = OCCUPANCY_WEST;
-	else if (currentOccupancy == OCCUPANCY_WEST)
-		newOccupancy = OCCUPANCY_NORTH;
-	character.setOccupancy(newOccupancy);
-
-	tile.setAgentCharacter(character);
-	return tile;
-}
-
-Tile Ant::operator<(Tile tile) {
-	Occupancy currentOccupancy = character.getOccupancy();
-	Occupancy newOccupancy = OCCUPANCY_DEAD;
-	if (currentOccupancy == OCCUPANCY_NORTH)
-		newOccupancy = OCCUPANCY_WEST;
-	else if (currentOccupancy == OCCUPANCY_EAST)
-		newOccupancy = OCCUPANCY_NORTH;
-	else if (currentOccupancy == OCCUPANCY_SOUTH)
-		newOccupancy = OCCUPANCY_EAST;
-	else if (currentOccupancy == OCCUPANCY_WEST)
-		newOccupancy = OCCUPANCY_SOUTH;
-	character.setOccupancy(newOccupancy);
-
-	tile.setAgentCharacter(character);
-	return tile;
 }
 
 void Ant::dissipateEnergy(Energy energy) {
@@ -678,13 +440,6 @@ void Ant::eat() {
 
 void Ant::attack() {
 	//Environment handles this :p
-}
-
-void Ant::beAttacked(Energy damage) {
-	damage = min(getShield(), damage);
-	setShield(getShield() - damage);
-
-	dissipateEnergy(damage);
 }
 
 void Ant::fortify() {
@@ -745,16 +500,62 @@ void Ant::pushOutNewborn() {
 	children++;
 }
 
-void Ant::die() {
-	dissipateEnergy(getTotalEnergy());
-	setPotential(0);
-	setShield(0);
-	setFertility(0);
-	setFetal(0);
+Tile Ant::operator<<(Tile tile) {
+	tile.setAgentCharacter(AgentCharacter());
+	tile.setTotalEnergy(tile.getTotalEnergy() - this->getTotalEnergy());
+	return tile;
+}
 
-	character.setOccupancy(OCCUPANCY_DEAD);
-	character.setAttitude(GROUND_ATTITUDE);
-	character.setTrait(GROUND_TRAIT);
+Tile Ant::operator>>(Tile tile) {
+	tile.setAgentCharacter(character);
+	tile.setTotalEnergy(tile.getTotalEnergy() + this->getTotalEnergy());
+	globalCoordinate = tile.getGlobalCoordinate();
+	return tile;
+}
+
+Tile Ant::operator<=(Tile tile) {
+	tile.setAgentCharacter(AgentCharacter());
+	return tile;
+}
+
+Tile Ant::operator>=(Tile tile) {
+	tile.setAgentCharacter(character);
+	globalCoordinate = tile.getGlobalCoordinate();
+	return tile;
+}
+
+Tile Ant::operator>(Tile tile) {
+	Occupancy currentOccupancy = character.getOccupancy();
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
+	if (currentOccupancy == OCCUPANCY_NORTH)
+		newOccupancy = OCCUPANCY_EAST;
+	else if (currentOccupancy == OCCUPANCY_EAST)
+		newOccupancy = OCCUPANCY_SOUTH;
+	else if (currentOccupancy == OCCUPANCY_SOUTH)
+		newOccupancy = OCCUPANCY_WEST;
+	else if (currentOccupancy == OCCUPANCY_WEST)
+		newOccupancy = OCCUPANCY_NORTH;
+	character.setOccupancy(newOccupancy);
+
+	tile.setAgentCharacter(character);
+	return tile;
+}
+
+Tile Ant::operator<(Tile tile) {
+	Occupancy currentOccupancy = character.getOccupancy();
+	Occupancy newOccupancy = OCCUPANCY_DEAD;
+	if (currentOccupancy == OCCUPANCY_NORTH)
+		newOccupancy = OCCUPANCY_WEST;
+	else if (currentOccupancy == OCCUPANCY_EAST)
+		newOccupancy = OCCUPANCY_NORTH;
+	else if (currentOccupancy == OCCUPANCY_SOUTH)
+		newOccupancy = OCCUPANCY_EAST;
+	else if (currentOccupancy == OCCUPANCY_WEST)
+		newOccupancy = OCCUPANCY_SOUTH;
+	character.setOccupancy(newOccupancy);
+
+	tile.setAgentCharacter(character);
+	return tile;
 }
 
 void Ant::randomize() {
@@ -778,20 +579,6 @@ void Ant::randomize() {
 			(Trait) (rand() % HYPOTHETICAL_MAX_TRAIT),
 			occupancy
 	));
-}
-
-void Ant::placeInEnvironment(Ant &ant, Environment &environment, Coordinate coordinate) {
-	environment.setTile(
-			(ant >> environment.getTile(coordinate)),
-			coordinate
-	);
-}
-
-void Ant::placeCharacterInEnvironment(Ant &ant, Environment &environment, Coordinate coordinate) {
-	environment.setTile(
-			(ant >= environment.getTile(coordinate)),
-			coordinate
-	);
 }
 
 int Ant::calculateDistance(Coordinate c1, Coordinate c2) {
@@ -839,100 +626,6 @@ excitation Ant::getSensation(sensor::Sensor sensor, percept::Percept percept) {
 	}
 	perceivedAverage /= totalWeightedDistance;
 	return (log(perceivedAverage + 1) / log(getMaxPerceptValue(percept) + 1)) - 1;
-}
-
-void Ant::sparkLifeAt(Environment &environment, vector<Ant> &ants, Ant &ant) {
-	Tile tile = environment.getTile(ant.getGlobalCoordinate());
-	if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
-		&& tile.getTotalEnergy() >= ant.getTotalEnergy()
-		&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
-			) {
-
-		Ant::placeCharacterInEnvironment(ant, environment, ant.getGlobalCoordinate());
-
-		ants.push_back(ant);
-//		cout << "Sparked ant at " << ant.getGlobalCoordinate().toString() << " with " << ant.getTotalEnergy() << " energy\n";
-	} else {
-		throw invalid_argument("Cannot spark life at " + ant.getGlobalCoordinate().toString());
-	}
-}
-
-bool Ant::sparkLifeWhereAvailable(Environment &environment, vector<Ant> &ants, Ant &ant) {
-	int randXOffset = rand() % environment.width;
-	int randYOffset = rand() % environment.height;
-	for (int x = 0; x < environment.width; x++) {
-		for (int y = 0; y < environment.height; y++) {
-			int X = (x + randXOffset) % environment.width;
-			int Y = (y + randYOffset) % environment.height;
-
-			Tile tile = environment.getTile(Coordinate(X, Y));
-			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
-				&& tile.getTotalEnergy() >= ant.getTotalEnergy()
-				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
-					) {
-				ant.setGlobalCoordinate(Coordinate(X, Y));
-				Ant::sparkLifeAt(environment, ants, ant);
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-void Ant::sparkNLives(Environment &environment, vector<Ant> &ants, unsigned int count) {
-	Ant ant;
-
-	int randXOffset = rand() % environment.width;
-	int randYOffset = rand() % environment.height;
-	for (int x = 0; x < environment.width && count > 0; x++) {
-		for (int y = 0; y < environment.height && count > 0; y++) {
-			int X = (x + randXOffset) % environment.width;
-			int Y = (y + randYOffset) % environment.height;
-
-			Tile tile = environment.getTile(Coordinate(X, Y));
-			if (tile.getAgentCharacter().getOccupancy() == OCCUPANCY_DEAD
-				&& tile.getTotalEnergy() >= Ant::NEWBORN_MIN_TOTAL_ENERGY
-				&& !Ant::isInImpactRange(environment, tile.getGlobalCoordinate())
-					) {
-				ant.randomize();
-				ant.setPotential(0);
-				ant.setPushedFetalEnergy(0);
-				ant.setFertility(NEWBORN_MIN_FERTILITY);
-				ant.setFetal(0);
-				ant.setShield(Ant::NEWBORN_MIN_SHIELD);
-				ant.setPotential(tile.getTotalEnergy() - ant.getTotalEnergy());
-				ant.setGlobalCoordinate(Coordinate(X, Y));
-				Ant::sparkLifeAt(environment, ants, ant);
-				count--;
-			}
-		}
-	}
-	//TODO Return false
-}
-
-void Ant::save(ostream &file, vector<Ant> &ants) {
-	file <= ants.size();
-	for (unsigned long i = 0; i < ants.size(); i++) {
-		ants[i].save(file);
-	}
-}
-
-bool Ant::load(istream &file, Environment &environment, vector<Ant> &ants) {
-	try {
-		ants.clear();
-		unsigned long int size;
-		file >= size;
-//		while(file>>size)	cout<<size<<endl;
-		for (int i = 0; i < size; i++) {
-			Ant ant;
-			ant.load(file, environment);
-			ants.push_back(ant);
-		}
-		return true;
-	} catch (exception &e) {
-		cout << e.what() << endl;
-		return false;
-	}
 }
 
 void Ant::save(ostream &file) {

@@ -149,14 +149,6 @@ target_link_libraries(
 		unit_test_asciienvironment
 		ui
 )
-add_executable(unit_test_controlant
-		src/unit_test/ui/controlant.cpp
-		)
-target_link_libraries(
-		unit_test_controlant
-		ui
-)
-
 add_executable(
 		playback_checkpoints
 		src/unit_test/ui/playback_checkpoints.cpp

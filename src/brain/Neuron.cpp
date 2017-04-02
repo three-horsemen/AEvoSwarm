@@ -18,7 +18,12 @@ vector<weight> Neuron::getWeights() {
 	return weights;
 }
 
+void Neuron::setInputSize(unsigned int inputSize) {
+	this->inputSize = inputSize;
+}
+
 void Neuron::setWeights(vector<weight> &weights) {
+	assert(inputSize == weights.size());
 	this->inputSize = (int) weights.size();
 
 	this->weights.clear();
@@ -68,7 +73,7 @@ void Neuron::randomizeWeights(vector<vector<weight> > &weights) {
 	}
 }
 
-void Neuron::mutateWeights(vector<weight> &weights, float variance) {
+void Neuron::mutateWeights(vector<weight> &weights, float relativeMutation) {
 //	std::default_random_engine generator;
 //	normal_distribution<float> distribution(0.9, variance);
 	for (int i = 0; i < weights.size(); i++) {
@@ -76,11 +81,11 @@ void Neuron::mutateWeights(vector<weight> &weights, float variance) {
 		//TODO Find more elegant weight mutation method
 		switch (rand() % 10) {
 			case 0:
-				weights[i] *= 1.001;
+				weights[i] *= 1 + relativeMutation;
 				weights[i] = min(weights[i], 1.f);
 				break;
 			case 1:
-				weights[i] *= 0.999;
+				weights[i] *= 1 - relativeMutation;
 				weights[i] = max(weights[i], -1.f);
 				break;
 			default:

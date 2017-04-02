@@ -47,11 +47,13 @@ target_link_libraries(
 add_library(brain
 		src/brain/NeuralNetwork.cpp
 		src/brain/FullyConnectedLayer.cpp
+		src/brain/OpenCLFullyConnectedLayer.cpp
 		src/brain/Neuron.cpp
 		src/brain/InputLayer.cpp
 		src/brain/OutputLayer.cpp
 		src/brain/Layer.cpp
-		)
+		include/brain/BrainLoss.hpp
+		include/brain/BrainLosses.hpp)
 target_link_libraries(
 		brain
 		shared
@@ -73,7 +75,8 @@ target_link_libraries(
 add_library(agent
 		src/agent/Agent.cpp
 		src/agent/AgentCharacter.cpp
-		src/agent/PerceptiveField.cpp include/agent/PerceptiveField.hpp)
+		src/agent/PerceptiveField.cpp
+		include/agent/PerceptiveField.hpp)
 target_link_libraries(
 		agent
 		brain
@@ -115,7 +118,7 @@ target_link_libraries(
 ###Unit tests
 add_executable(
 		unit_test_mpi_map_comm
-		src/unit_test/environment/unit_test_mpi_map_comm.cpp
+		src/unit_test/environment/mpi_map_comm.cpp
 )
 target_link_libraries(
 		unit_test_mpi_map_comm
@@ -125,7 +128,7 @@ target_link_libraries(
 
 add_executable(
 		unit_test_neural_network
-		src/unit_test/brain/unit_test_neural_network.cpp
+		src/unit_test/brain/neural_network.cpp
 )
 target_link_libraries(
 		unit_test_neural_network
@@ -133,8 +136,17 @@ target_link_libraries(
 )
 
 add_executable(
+		unit_test_convergence
+		src/unit_test/brain/convergence.cpp
+)
+target_link_libraries(
+		unit_test_convergence
+		brain
+)
+
+add_executable(
 		unit_test_ant_action
-		src/unit_test/agent/unit_test_ant_action.cpp
+		src/unit_test/agent/ant_action.cpp
 )
 target_link_libraries(
 		unit_test_ant_action
@@ -173,5 +185,14 @@ add_executable(
 )
 target_link_libraries(
 		unit_test_ant_world_mpi
+		ant_world
+)
+
+add_executable(
+		unit_test_ant_brain
+		src/unit_test/brain/opencl.cpp
+)
+target_link_libraries(
+		unit_test_ant_brain
 		ant_world
 )

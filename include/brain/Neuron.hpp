@@ -27,6 +27,8 @@ public:
 
 	~Neuron();
 
+	void setInputSize(unsigned int inputSize);
+
 	void setWeights(vector<weight> &);
 
 	vector<weight> getWeights();

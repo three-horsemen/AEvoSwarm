@@ -9,6 +9,7 @@ FullyConnectedLayer::FullyConnectedLayer(vector<vector<weight> > &weights) : Lay
 																				   (int) weights.size()) {
 	for (int i = 0; i < weights.size(); i++) {
 		Neuron neuron;
+		neuron.setInputSize((unsigned int) weights[i].size());
 		neuron.setWeights(weights[i]);
 		neurons.push_back(neuron);
 	}

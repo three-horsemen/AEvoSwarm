@@ -334,7 +334,7 @@ void Ant::mutate() {
 			FullyConnectedLayer *layer = (FullyConnectedLayer *) brain.getLayer(i);
 			for (int j = 0; j < layer->outputSize; j++) {
 				vector<weight> weights = layer->getNeuronWeights(j);
-				Neuron::mutateWeights(weights, 0.06f);
+				Neuron::mutateWeights(weights, 0.006f);
 				layer->setNeuronWeights(j, weights);
 			}
 		}

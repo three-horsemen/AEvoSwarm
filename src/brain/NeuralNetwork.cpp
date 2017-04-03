@@ -105,6 +105,9 @@ void NeuralNetwork::load(istream &file) {
 		} else if (layerType == FULLY_CONNECTED) {
 			FullyConnectedLayer layer(FullyConnectedLayer::getLoadedLayer(file));
 			addLayer(layer);
+		} else if (layerType == OPENCL_FULLY_CONNECTED) {
+			OpenCLFullyConnectedLayer layer(OpenCLFullyConnectedLayer::getLoadedLayer(file));
+			addLayer(layer);
 		} else {
 			throw invalid_argument("Unknown layer type specified");
 		}

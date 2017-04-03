@@ -61,6 +61,9 @@ public:
 					for (int k = 0; k < layer->outputSize; k++) {
 						brainWeights[x][j][k] = layer->getNeuronWeights(k);
 					}
+				} else if (brain.getLayer(j)->type == OPENCL_FULLY_CONNECTED) {
+					OpenCLFullyConnectedLayer *layer = (OpenCLFullyConnectedLayer *) brain.getLayer(j);
+					brainWeights[x][j] = layer->getNeuronWeights();
 				}
 			}
 		}
@@ -75,6 +78,9 @@ public:
 					for (int k = 0; k < layer->outputSize; k++) {
 						layer->setNeuronWeights(k, brainWeights[parent][j][k]);
 					}
+				} else if (brain.getLayer(j)->type == OPENCL_FULLY_CONNECTED) {
+					OpenCLFullyConnectedLayer *layer = (OpenCLFullyConnectedLayer *) brain.getLayer(j);
+					layer->setNeuronWeights(brainWeights[parent][j]);
 				}
 			}
 		}

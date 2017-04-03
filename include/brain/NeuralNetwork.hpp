@@ -11,6 +11,7 @@
 #include <brain/Layer.hpp>
 #include <brain/InputLayer.hpp>
 #include <brain/FullyConnectedLayer.hpp>
+#include <brain/OpenCLFullyConnectedLayer.hpp>
 #include <brain/OutputLayer.hpp>
 
 using namespace std;

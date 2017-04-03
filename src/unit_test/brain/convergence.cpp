@@ -8,7 +8,7 @@
 void mutate(BrainLoss &brainScore, vector<NeuralNetwork> &brains) {
 	NeuralNetwork &brain = brains[brainScore.index];
 	float r = ((rand() % 201 - 100) / 500.f);
-	brainScore.mutationRate *= 1 + r * r;
+	brainScore.mutationRate *= 1 + r * r * r;
 	for (int i = 0; i < brain.getDepth(); i++) {
 		if (brain.getLayer(i)->type == FULLY_CONNECTED) {
 			FullyConnectedLayer *layer = (FullyConnectedLayer *) brain.getLayer(i);
@@ -52,6 +52,12 @@ int main(int argc, char *argv[]) {
 		brains[i].addLayer((Layer &) outputLayer);
 	}
 
+	{
+		ifstream convergedBrainFile("convergedBrain.brain");
+		brains[0].load(convergedBrainFile);
+		convergedBrainFile.close();
+	}
+
 	BrainLosses topBrains(brains);
 	NeuralNetwork trueBrain;
 	trueBrain.addLayer((Layer &) inputLayer);
@@ -93,9 +99,11 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	ofstream convergedBrainFile("convergedBrain.brain");
-	brains[topBrains.topScores[0].index].save(convergedBrainFile);
-	convergedBrainFile.close();
+	{
+		ofstream convergedBrainFile("convergedBrain.brain");
+		brains[topBrains.topScores[0].index].save(convergedBrainFile);
+		convergedBrainFile.close();
+	}
 
 	//Layer* layer = &outputLayer;
 	//layer->displayOutputs();

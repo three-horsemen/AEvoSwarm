@@ -4,7 +4,7 @@
 
 #include "brain/Layer.hpp"
 
-Layer::Layer(LayerType type, int inputSize, int outputSize) :
+Layer::Layer(LayerType type, unsigned int inputSize, int outputSize) :
 		inputs((unsigned long) inputSize),
 		outputs((unsigned long) outputSize) {
 	this->type = type;
@@ -33,7 +33,7 @@ void Layer::operator=(const Layer &layer) {
 	}
 }
 
-void Layer::setInputs(vector<excitation> &excitations) {
+void Layer::setInputs(const vector<excitation> &excitations) {
 	for (int i = 0; i < inputSize; i++) {
 		inputs[i] = excitations[i];
 	}

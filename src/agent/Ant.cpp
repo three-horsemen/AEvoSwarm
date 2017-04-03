@@ -357,12 +357,12 @@ void Ant::developBrain() {
 
 	vector<vector<weight>> weights1((unsigned long) fC1Size, vector<weight>((unsigned long) inputSize));
 	Neuron::randomizeWeights(weights1);
-	FullyConnectedLayer fullyConnectedLayer1(weights1);
+	OpenCLFullyConnectedLayer fullyConnectedLayer1(weights1);
 	brain.addLayer((Layer &) fullyConnectedLayer1);
 
 	vector<vector<weight>> weights2((unsigned long) outputSize, vector<weight>((unsigned long) fC1Size));
 	Neuron::randomizeWeights(weights2);
-	FullyConnectedLayer fullyConnectedLayer2(weights2);
+	OpenCLFullyConnectedLayer fullyConnectedLayer2(weights2);
 	brain.addLayer((Layer &) fullyConnectedLayer2);
 //
 //	vector<vector<weight>> weights3((unsigned long) outputSize, vector<weight>((unsigned long) fC2Size));

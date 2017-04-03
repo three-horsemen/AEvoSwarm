@@ -12,6 +12,7 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.54 COMPONENTS log log_setup thread system date_time REQUIRED)
 find_package(MPI REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(OpenCL REQUIRED)
 
 include_directories(
 		include
@@ -43,6 +44,16 @@ target_link_libraries(
 		shared
 )
 
+###OpenCL module
+add_library(openclShared
+		src/opencl/Utils.cpp
+		)
+target_link_libraries(
+		openclShared
+		shared
+		OpenCL
+)
+
 ###Brain module
 add_library(brain
 		src/brain/NeuralNetwork.cpp
@@ -56,7 +67,8 @@ add_library(brain
 		include/brain/BrainLosses.hpp)
 target_link_libraries(
 		brain
-		shared
+		OpenCL
+		openclShared
 )
 
 ###Environment Module
@@ -189,10 +201,11 @@ target_link_libraries(
 )
 
 add_executable(
-		unit_test_ant_brain
+		unit_test_opencl_convergence
 		src/unit_test/brain/opencl.cpp
 )
 target_link_libraries(
-		unit_test_ant_brain
+		unit_test_opencl_convergence
 		ant_world
+		openclShared
 )

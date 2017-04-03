@@ -37,10 +37,13 @@ AntWorld::AntWorld(int width, int height, bool geneticCrossoverEnabled) : enviro
 	previousWaitStartTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::system_clock::now().time_since_epoch()
 	);
+
+	OpenCLFullyConnectedLayer::staticInit();    //TODO Make this conditional on enabling OpenCL
 }
 
 AntWorld::~AntWorld() {
 	delete openCVEnvironment;
+	OpenCLFullyConnectedLayer::staticDeinit();    //TODO Make this conditional on enabling OpenCL
 }
 
 bool AntWorld::isRunning() {

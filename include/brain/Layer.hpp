@@ -15,7 +15,8 @@ using namespace std;
 enum LayerType {
 	INPUT,
 	OUTPUT,
-	FULLY_CONNECTED
+	FULLY_CONNECTED,
+	OPENCL_FULLY_CONNECTED
 };
 
 class Layer {
@@ -23,24 +24,24 @@ protected:
 	vector<excitation> inputs;
 	vector<excitation> outputs;
 public:
-	int inputSize, outputSize;
+	unsigned int inputSize, outputSize;
 	LayerType type;
 
-	Layer(LayerType, int, int);
+	Layer(LayerType, unsigned int, int);
 
 	Layer(const Layer &);
 
-	void operator=(const Layer &);
+	virtual void operator=(const Layer &);
 
 	virtual Layer *getDeepCopy()=0;
 
-	void setInputs(vector<excitation> &);
+	virtual void setInputs(const vector<excitation> &);
 
-	void setOutputs(const vector<excitation> &);
+	virtual void setOutputs(const vector<excitation> &);
 
-	vector<excitation> getInputs();
+	virtual vector<excitation> getInputs();
 
-	vector<excitation> getOutputs();
+	virtual vector<excitation> getOutputs();
 
 	virtual void displayOutputs();
 

@@ -1,3 +1,3 @@
 set -e
 
-sudo apt install libboost-all-dev mpi ocl-icd-opencl-dev
+sudo apt-get install -y libboost-all-dev mpi ocl-icd-opencl-dev

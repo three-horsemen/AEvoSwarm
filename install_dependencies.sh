@@ -8,7 +8,7 @@ sudo apt-get install -y python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev l
 curl -sL https://github.com/Itseez/opencv/archive/3.4.11.zip > opencv.zip
 unzip opencv.zip
 
-cd opencv-3.4.11-beta
+cd opencv-3.4.11
 
   # Create a new 'build' folder.
 mkdir build_opencv

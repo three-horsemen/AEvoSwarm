@@ -26,8 +26,63 @@ We hope to observe new and exciting behaviors that emerge from the swarms over t
 Applications of parallelism
 ---
 
-The usage of parallel processing has major implications with respect to the success of this project as a result of the SIMD-based framework described above. Thus the processed of each ant can be simulated on a separate GPU thread. Moreover, since the receptive field of an ant will be restricted to only a few tiles around it, we can make the assumption that a given ant can function independently of the ants outside its receptive field. This will prevent the need for excessive synchronization among the threads. 
+The usage of parallel processing has major implications with respect to the success of this project as a result of the
+SIMD-based framework described above. Thus the processed of each ant can be simulated on a separate GPU thread.
+Moreover, since the receptive field of an ant will be restricted to only a few tiles around it, we can make the
+assumption that a given ant can function independently of the ants outside its receptive field. This will prevent the
+need for excessive synchronization among the threads.
 
 ![](https://media.githubusercontent.com/media/three-horsemen/AEvoSwarm/master/screenshots/mpi%20-n%204%20with%20task%20manager.png)
 
-From generation of food on the map to handling the interactions of ants on the map, can also be parallelized to a great extent. Further, dividing the map into logical sectors, each of which can individually host multiple tiles upon which the ants can coexist provides scope for increasing the parallelization further.
+From generation of food on the map to handling the interactions of ants on the map, can also be parallelized to a great
+extent. Further, dividing the map into logical sectors, each of which can individually host multiple tiles upon which
+the ants can coexist provides scope for increasing the parallelization further.
+
+Setup
+---
+
+This project utilizes a variety of computational methods including multiprocessing in MPI and GPU programming in OpenCL,
+and performs a variety of functionalities such as GTK window management, graphics in OpenCV and also utilizes the boost
+libraries to perform various miscellaneous functions such as multithreading, OS interaction and logging. As a result,
+there are a variety of dependencies that need to be installed. Installation of the required dependencies on Ubuntu have
+been documented below:
+
+Install dependencies:
+
+    sudo apt install libboost-all-dev mpi ocl-icd-opencl-dev
+
+You will also need to install opencv, but ensure you have these dependencies before you do:
+
+    sudo apt install libgtk2.0-dev pkg-config
+
+There are a variety of online guides on how to do this. For example, step 3
+of [this](https://www.pyimagesearch.com/2015/07/20/install-opencv-3-0-and-python-3-4-on-ubuntu/) guide should suffice
+for our purposes.
+
+Once you have these installed you can proceed to compilation.
+
+This project is structured like you typical CMake project. Most modern IDEs should thus be able to natively support
+compiling and generation of build artifacts that you can execute.
+
+Alternatively, running it from command line:
+
+    mkdir build
+    cd build
+    cmake ..
+    make
+
+Usage
+---
+
+Now that you have your executables generated, we recommend starting with one of the main executable files:
+
+    cd ..
+    ./build/unit_test_ant_world
+    # Press escape to exit gracefully
+
+    # The below executable will parallelize the evolution in two processes
+    ./build/unit_test_ant_world_mpi -n 2 unit_test_ant_world_mpi
+
+There are also a variety of other unit tests that would be generated that help you troubleshoot the various
+functionality such as OpenCL if the main simulation is not executing. You are likely missing a dependency installation
+or have incompatible system specifications.

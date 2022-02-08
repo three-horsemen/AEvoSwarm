@@ -81,7 +81,7 @@ bool AntWorld::performRegularIteration() {
 			cout << "Selected ant: " << selectedAnt << endl;
 			break;
 		default:
-			cout << "Ignoring keypress '" << key << "'\n";
+//			cout << "Ignoring keypress '" << key << "'\n";
 			break;
 	}
 
@@ -124,7 +124,7 @@ bool AntWorld::performRegularIteration() {
 						selectedAction = Ant::GIVE_BIRTH;
 						break;
 					default:
-						cout << "Ignoring keypress '" << key << "'\n";
+//						cout << "Ignoring keypress '" << key << "'\n";
 						ants[j].selectAction();
 						selectedAction = (Ant::Action) ants[j].getSelectedAction();
 						break;

@@ -3,6 +3,8 @@ project(aevo)
 
 add_compile_options(-std=c++11)
 
+include(CTest)
+
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED OFF)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -35,7 +37,7 @@ target_link_libraries(
 		pthread
 )
 
-add_executable(
+add_test(
 		unit_test_logger
 		src/unit_test/shared/logger.cpp
 )
